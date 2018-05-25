@@ -31,12 +31,22 @@ const store = new Vuex.Store({
 });
 
 // Vue Router Routes
-import UserManagement from './UserManagement.vue'
 import Dashboard from './Dashboard.vue'
+import ItemManagement from './ItemManagement.vue'
+import RequestManagement from './RequestManagement.vue'
+import AgreementManagement from './AgreementManagement.vue'
+import UserManagement from './UserManagement.vue'
+import Settings from './Settings.vue'
+import About from './About.vue'
 
 const routes = [
-    {path: '/users', component: UserManagement},
-    {path: '/dashboard', component: Dashboard}
+    {path: '/', component: Dashboard},
+    {path: '/item', component: ItemManagement},
+    {path: '/request', component: RequestManagement},
+    {path: '/agreement', component: AgreementManagement},
+    {path: '/user', component: UserManagement},
+    {path: '/setting', component: Settings},
+    {path: '/about', component: About}
 ];
 const router = new VueRouter({routes});
 

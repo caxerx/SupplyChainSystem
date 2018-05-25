@@ -44,7 +44,7 @@
                 </v-toolbar>
                 <v-divider></v-divider>
                 <v-list dense class="pt-0">
-                    <v-list-tile v-for="item in items" :key="item.title">
+                    <v-list-tile v-for="item in navItems" :key="item.title">
                         <v-list-tile-action>
                             <v-icon>{{ item.icon }}</v-icon>
                         </v-list-tile-action>
@@ -116,7 +116,7 @@
 
                     <!-- Table start -->
                     <v-data-table :headers="headers" :items="users" hide-actions class="elevation-1">
-                        <template slot="items" slot-scope="props">
+                        <template slot="navItems" slot-scope="props">
                             <td>{{ props.item.userId }}</td>
                             <td>{{ props.item.userName }}</td>
                             <td>{{ props.item.userType }}</td>

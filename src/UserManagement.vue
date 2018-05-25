@@ -37,7 +37,7 @@
 
         <!-- Table start -->
         <v-data-table :headers="headers" :items="users" hide-actions class="elevation-1">
-            <template slot="items" slot-scope="props">
+            <template slot="navItems" slot-scope="props">
                 <td>{{ props.item.userId }}</td>
                 <td>{{ props.item.userName }}</td>
                 <td>{{ props.item.userType }}</td>

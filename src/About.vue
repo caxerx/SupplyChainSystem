@@ -1,7 +1,7 @@
 <template>
     <v-container>
         <!-- Page title start -->
-        <h1 class="display-1 primary--text">Dashboard</h1>
+        <h1 class="display-1 primary--text">About</h1>
         <!-- Page title end -->
 
         <!-- Breadcrumbs start -->
@@ -18,7 +18,7 @@
 
 <script>
     export default {
-        name: "AgreementManagement"
+        name: "About"
     }
 </script>
 

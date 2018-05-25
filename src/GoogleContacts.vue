@@ -205,7 +205,7 @@ export default {
   data: () => ({
     dialog: false,
     drawer: null,
-    items: [
+    navItems: [
       { icon: "contacts", text: "Contacts" },
       { icon: "history", text: "Frequently contacted" },
       { icon: "content_copy", text: "Duplicates" },

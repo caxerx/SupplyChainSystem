@@ -13,10 +13,10 @@
             >
                 <v-list>
                     <v-list-tile value="true"
-                                 v-for="(item, i) in items"
+                                 v-for="(item, i) in navItems"
                                  :key="i" :to="item.link">
                         <v-list-tile-action>
-                            <v-icon v-html="item.icon">{{ item.icon }}</v-icon>
+                            <v-icon>{{ item.icon }}</v-icon>
                         </v-list-tile-action>
                         <v-list-tile-content>
                             <v-list-tile-title>{{ item.title }}</v-list-tile-title>
@@ -80,16 +80,19 @@
     export default {
         data() {
             return {
-                // Vue components
-
-                // Vuetify UI settings
+                // Vuetify UI Component settings
                 drawer: true,
                 fixed: false,
                 miniVariant: false,
                 // Navigation drawer items
-                items: [
-                    {link: '/dashboard', icon: 'dashboard', title: 'Dashboard'},
-                    {link: '/users', icon: 'account_circle', title: 'User Management'}
+                navItems: [
+                    {link: '/', icon: 'dashboard', title: 'Dashboard'},
+                    {link: '/item', icon: 'category', title: 'Item Management'},
+                    {link: '/request', icon: 'assignment', title: 'Request Management'},
+                    {link: '/agreement', icon: 'description', title: 'Agreement Management'},
+                    {link: '/user', icon: 'account_circle', title: 'User Management'},
+                    {link: '/setting', icon: 'settings', title: 'Settings'},
+                    {link: '/about', icon: 'information', title: 'About'},
                 ],
                 title: 'Supply Chain System',
                 // Login data
