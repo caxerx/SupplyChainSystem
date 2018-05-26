@@ -1,8 +1,8 @@
 <template>
     <v-app>
         <!-- IF THE USER IS LOGGED IN -->
-        <template v-if="isLoggedIn">
-            <!-- NAVIGATION DRAWER -->
+        <template v-if="this.$store.state.isLoggedIn">
+            <!-- Navigation drawer start -->
             <v-navigation-drawer
                     fixed
                     :mini-variant="miniVariant"
@@ -23,8 +23,9 @@
                     </v-list-tile>
                 </v-list>
             </v-navigation-drawer>
+            <!-- Navigation drawer end -->
 
-            <!-- MAIN ACTION BAR -->
+            <!-- Title toolbar start -->
 
             <v-toolbar fixed app :clipped-left="$vuetify.breakpoint.lgAndDown" color="primary" dark class="pr-4">
                 <v-toolbar-title>
@@ -40,13 +41,15 @@
                 </v-avatar>
             </v-toolbar>
 
-            <!-- MAIN CONTENT -->
+            <!-- Title toolbar end -->
+
+            <!-- Main content start -->
             <v-content>
-                <!-- BREADCRUMBS -->
+                <!-- Breadcrumbs start -->
                 <v-toolbar dense flat color="grey lighten-3">
                     <v-breadcrumbs class="ml-3">
                         <v-icon slot="divider">chevron_right</v-icon>
-                        <v-breadcrumbs-item v-for="item in $store.state.breadcrumbs" :key="item.text"
+                        <v-breadcrumbs-item v-for="item in $store.getters.breadcrumbs" :key="item.text" :to="item.link"
                                             :disabled="item.disabled">
                             {{ item.text }}
                         </v-breadcrumbs-item>
@@ -54,46 +57,24 @@
                     <span class="ml-3"><v-icon>arrow_left</v-icon>Well... fix this later</span>
                 </v-toolbar>
                 <router-view></router-view>
+                <!-- Breadcrumbs end -->
             </v-content>
+            <!-- Main content end -->
         </template>
 
-        <!-- IF THE USER IS NOT LOGGED IN -->
+        <!-- If the user is NOT logged in -->
 
-        <!-- LOGIN SCREEN -->
-        <v-content v-else>
-            <v-container fluid fill-height>
-                <v-layout align-center justify-center>
-                    <v-flex xs12 sm8 md6 lg4>
-                        <v-card class="elevation-12">
-                            <v-toolbar dark color="primary">
-                                <v-toolbar-title>Login</v-toolbar-title>
-                            </v-toolbar>
-                            <v-form @submit="login" @submit.prevent class="pa-3">
-                                <v-card-text>
-                                    <v-text-field prepend-icon="person" name="login" label="Login" type="text"
-                                                  v-model="loginInfo.userName"></v-text-field>
-                                    <v-text-field id="password" prepend-icon="lock" name="password" label="Password"
-                                                  type="password" v-model="loginInfo.password"
-                                                  autocomplete="current-password"></v-text-field>
-                                </v-card-text>
-                                <v-card-actions>
-                                    <span v-if="isLoginFailed" class="red--text ml-4">Incorrect username or
-                                        password
-                                    </span>
-                                    <v-spacer></v-spacer>
-                                    <v-btn color="primary" type="submit">Login</v-btn>
-                                </v-card-actions>
-                            </v-form>
-                        </v-card>
-                    </v-flex>
-                </v-layout>
-            </v-container>
-        </v-content>
+        <login v-else></login>
+
+
     </v-app>
 </template>
 
 <script>
+    import Login from "./App/Login";
+
     export default {
+        components: {Login},
         created() {
             this.$store.state.token = window.localStorage.getItem('token');
             this.checkLoginStatus();
@@ -115,36 +96,9 @@
                     {link: '/about', icon: 'info', title: 'About'},
                 ],
                 title: 'Supply Chain System',
-                // Login data
-                loginInfo: {
-                    userName: '',
-                    password: ''
-                },
-                isLoginFailed: false,
-                isLoggedIn: false
             }
         },
         methods: {
-            login() {
-                this.$http({
-                    method: "post",
-                    url: "http://219.77.158.36:37370/api/token",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    data: this.loginInfo
-                }).then(res => {
-                    if (res.data.success) {
-                        this.$store.state.token = res.data.responseContent.token;
-                        window.localStorage.setItem("token", this.$store.state.token);
-                        this.isLoggedIn = true;
-                        // console.log(res.data.responseContent);
-                    } else {
-                        this.isLoginFailed = true;
-                    }
-                })
-            },
-            // TODO fix api get token status
             checkLoginStatus() {
                 if (this.$store.state.token !== '') {
                     this.$http({
@@ -155,14 +109,11 @@
                             authorization: `Bearer ${this.$store.state.token}`
                         }
                     }).then(res => {
-                        if (res.data.success) {
-                            this.isLoggedIn = true;
-                        } else {
-                            this.isLoggedIn = false;
-                        }
+                        this.$store.state.isLoggedIn = !!res.data.success;
                     }).catch(err => {
                         // Error Handling
                         console.log(err.message);
+                        this.$store.state.isLoggedIn = false;
                     })
                 }
             }

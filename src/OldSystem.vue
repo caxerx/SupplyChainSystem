@@ -230,8 +230,8 @@
             return {
                 token: "", //Token of api auth
                 isLoadingData: false, //Loading state
-                dialog: false, //Edit dialog
-                dialog2: false, //Confirm dialog
+                isEditDialogShown: false, //Edit dialog
+                isConfirmDialogShown: false, //Confirm dialog
                 bc: [
                     //Breadcrumb data
                     {
@@ -293,7 +293,7 @@
             },
 
             watch: {
-                dialog(val) {
+                isEditDialogShown(val) {
                     val || this.close();
                 }
             },

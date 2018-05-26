@@ -130,7 +130,7 @@
       color="pink"
       dark
       fixed
-      @click.stop="dialog = !dialog"
+      @click.stop="isEditDialogShown = !dialog"
     >
       <v-icon>add</v-icon>
     </v-btn>
@@ -192,8 +192,8 @@
         <v-card-actions>
           <v-btn flat color="primary">More</v-btn>
           <v-spacer></v-spacer>
-          <v-btn flat color="primary" @click="dialog = false">Cancel</v-btn>
-          <v-btn flat @click="dialog = false">Save</v-btn>
+          <v-btn flat color="primary" @click="isEditDialogShown = false">Cancel</v-btn>
+          <v-btn flat @click="isEditDialogShown = false">Save</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -203,7 +203,7 @@
 <script>
 export default {
   data: () => ({
-    dialog: false,
+    isEditDialogShown: false,
     drawer: null,
     navItems: [
       { icon: "contacts", text: "Contacts" },

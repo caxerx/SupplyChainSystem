@@ -6,7 +6,6 @@ import VueRouter from 'vue-router'
 import Vuex from 'vuex'
 import VueSimpleSpinner from 'vue-simple-spinner'
 import axios from 'axios'
-
 import colors from 'vuetify/es5/util/colors'
 
 // Set axios to handle HTTP requests
@@ -21,33 +20,6 @@ Vue.use(Vuetify, {
 });
 Vue.use(VueRouter);
 Vue.use(Vuex);
-
-// Register global components
-Vue.component('vue-simple-spinner', VueSimpleSpinner);
-
-// Vuex State Management
-const store = new Vuex.Store({
-    state: {
-        token: '', // Token of api auth
-        breadcrumbs: [
-            {
-                text: "Dashboard",
-                disabled: false
-            }, {
-                text: "Request Management",
-                disabled: false
-            }, {
-                text: "Create Request",
-                disabled: false
-            }],
-    },
-    mutations: {},
-    getters: {
-        breadcrumbs() {
-            return [{text: 'hi', disabled: false}]
-        }
-    }
-});
 
 // Vue Router Routes
 import Dashboard from './Dashboard.vue'
@@ -96,6 +68,37 @@ const routes = [
     }
 ];
 const router = new VueRouter({routes});
+
+// Register global components
+Vue.component('vue-simple-spinner', VueSimpleSpinner);
+
+// Vuex State Management
+const store = new Vuex.Store({
+    state: {
+        isLoggedIn: false,
+        token: '', // Token of api auth
+        breadcrumbs: [
+            {
+                text: "Dashboard",
+                link: "/",
+                disabled: false
+            }, {
+                text: "Request Management",
+                link: "/request",
+                disabled: false
+            }, {
+                text: "Create Request",
+                link: "#",
+                disabled: false
+            }],
+    },
+    mutations: {},
+    getters: {
+        breadcrumbs() {
+            return [{text: 'hi', disabled: false}];
+        }
+    }
+});
 
 new Vue({
     el: '#app',
