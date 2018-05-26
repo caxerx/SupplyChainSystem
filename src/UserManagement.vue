@@ -1,23 +1,20 @@
 <template>
     <v-container>
         <!-- Page title start -->
-        <h1 class="display-1 primary--text">User Management</h1>
+        <h1 class="display-1 primary--text mb-3">User Management</h1>
         <!-- Page title end -->
-
-        <!-- Breadcrumbs start -->
-        <div>
-            <v-breadcrumbs divider="/">
-                <v-breadcrumbs-item v-for="item in $store.state.breadcrumbs" :key="item.text" :disabled="item.disabled">
-                    {{ item.text }}
-                </v-breadcrumbs-item>
-            </v-breadcrumbs>
-        </div>
-        <!-- Breadcrumbs end -->
 
         <!-- Table toolbar start -->
         <div>
             <v-toolbar dark color="primary" class="elevation-0" :clipped-left="$vuetify.breakpoint.lgAndUp">
                 <v-toolbar-title class="white--text">User List</v-toolbar-title>
+                <v-text-field
+                        flat
+                        solo-inverted
+                        prepend-icon="search"
+                        label="Search"
+                        class="ml-5"
+                ></v-text-field>
                 <v-spacer></v-spacer>
 
                 <v-btn icon @click="addItem()">
@@ -29,15 +26,13 @@
                     <vue-simple-spinner style="transform: scale(0.65)"
                                         v-if="isLoadingData"></vue-simple-spinner>
                 </v-btn>
-
-
             </v-toolbar>
         </div>
         <!-- Table toolbar end -->
 
         <!-- Table start -->
         <v-data-table :headers="headers" :items="users" hide-actions class="elevation-1">
-            <template slot="navItems" slot-scope="props">
+            <template slot="items" slot-scope="props">
                 <td>{{ props.item.userId }}</td>
                 <td>{{ props.item.userName }}</td>
                 <td>{{ props.item.userType }}</td>
@@ -125,6 +120,10 @@
 
 <script>
     export default {
+        created() {
+            this.loadData();
+            console.log(this.$route.matched)
+        },
         data() {
             return {
                 isLoadingData: false, //Loading state

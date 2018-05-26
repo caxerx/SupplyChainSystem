@@ -1,7 +1,7 @@
 <template>
     <v-app>
         <!-- IF THE USER IS LOGGED IN -->
-        <template v-if="this.$store.state.token!==''">
+        <template v-if="isLoggedIn">
             <!-- NAVIGATION DRAWER -->
             <v-navigation-drawer
                     fixed
@@ -9,7 +9,6 @@
                     :clipped="$vuetify.breakpoint.lgAndDown"
                     v-model="drawer"
                     app
-                    permanent
             >
                 <v-list>
                     <v-list-tile value="true"
@@ -27,25 +26,44 @@
 
             <!-- MAIN ACTION BAR -->
 
-            <v-toolbar fixed app :clipped-left="$vuetify.breakpoint.lgAndDown" color="primary" dark>
-                <v-toolbar-title v-text="title"></v-toolbar-title>
+            <v-toolbar fixed app :clipped-left="$vuetify.breakpoint.lgAndDown" color="primary" dark class="pr-4">
+                <v-toolbar-title>
+                    <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
+                    {{ title }}
+                </v-toolbar-title>
                 <v-spacer></v-spacer>
                 <v-btn icon @click.stop="fixed = !fixed">
                     <v-icon>notifications</v-icon>
                 </v-btn>
+                <v-avatar color="accent">
+                    <v-icon>account_circle</v-icon>
+                </v-avatar>
             </v-toolbar>
 
             <!-- MAIN CONTENT -->
             <v-content>
+                <!-- BREADCRUMBS -->
+                <v-toolbar dense flat color="grey lighten-3">
+                    <v-breadcrumbs class="ml-3">
+                        <v-icon slot="divider">chevron_right</v-icon>
+                        <v-breadcrumbs-item v-for="item in $store.state.breadcrumbs" :key="item.text"
+                                            :disabled="item.disabled">
+                            {{ item.text }}
+                        </v-breadcrumbs-item>
+                    </v-breadcrumbs>
+                    <span class="ml-3"><v-icon>arrow_left</v-icon>Well... fix this later</span>
+                </v-toolbar>
                 <router-view></router-view>
             </v-content>
         </template>
 
         <!-- IF THE USER IS NOT LOGGED IN -->
+
+        <!-- LOGIN SCREEN -->
         <v-content v-else>
             <v-container fluid fill-height>
                 <v-layout align-center justify-center>
-                    <v-flex xs12 sm8 md4>
+                    <v-flex xs12 sm8 md6 lg4>
                         <v-card class="elevation-12">
                             <v-toolbar dark color="primary">
                                 <v-toolbar-title>Login</v-toolbar-title>
@@ -63,7 +81,7 @@
                                         password
                                     </span>
                                     <v-spacer></v-spacer>
-                                    <v-btn color="primary" @click.native="login" type="submit">Login</v-btn>
+                                    <v-btn color="primary" type="submit">Login</v-btn>
                                 </v-card-actions>
                             </v-form>
                         </v-card>
@@ -75,9 +93,11 @@
 </template>
 
 <script>
-    import axios from 'axios'
-
     export default {
+        created() {
+            this.$store.state.token = window.localStorage.getItem('token');
+            this.checkLoginStatus();
+        },
         data() {
             return {
                 // Vuetify UI Component settings
@@ -92,7 +112,7 @@
                     {link: '/agreement', icon: 'description', title: 'Agreement Management'},
                     {link: '/user', icon: 'account_circle', title: 'User Management'},
                     {link: '/setting', icon: 'settings', title: 'Settings'},
-                    {link: '/about', icon: 'information', title: 'About'},
+                    {link: '/about', icon: 'info', title: 'About'},
                 ],
                 title: 'Supply Chain System',
                 // Login data
@@ -100,7 +120,8 @@
                     userName: '',
                     password: ''
                 },
-                isLoginFailed: false
+                isLoginFailed: false,
+                isLoggedIn: false
             }
         },
         methods: {
@@ -116,11 +137,34 @@
                     if (res.data.success) {
                         this.$store.state.token = res.data.responseContent.token;
                         window.localStorage.setItem("token", this.$store.state.token);
-                        console.log(res.data.responseContent);
+                        this.isLoggedIn = true;
+                        // console.log(res.data.responseContent);
                     } else {
-                        this.isLoginFailed = true
+                        this.isLoginFailed = true;
                     }
                 })
+            },
+            // TODO fix api get token status
+            checkLoginStatus() {
+                if (this.$store.state.token !== '') {
+                    this.$http({
+                        method: 'get',
+                        url: 'http://219.77.158.36:37370/api/token',
+                        headers: {
+                            "Content-Type": "application/json",
+                            authorization: `Bearer ${this.$store.state.token}`
+                        }
+                    }).then(res => {
+                        if (res.data.success) {
+                            this.isLoggedIn = true;
+                        } else {
+                            this.isLoggedIn = false;
+                        }
+                    }).catch(err => {
+                        // Error Handling
+                        console.log(err.message);
+                    })
+                }
             }
         }
     }
