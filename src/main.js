@@ -91,6 +91,8 @@ const store = new Vuex.Store({
                 link: "#",
                 disabled: false
             }],
+        // Server settings
+        serverUrl: 'http://219.77.158.36:37370',
     },
     mutations: {},
     getters: {

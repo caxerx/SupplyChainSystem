@@ -17,8 +17,8 @@
                                               autocomplete="current-password"></v-text-field>
                             </v-card-text>
                             <v-card-actions>
-                                    <span v-if="isLoginFailed" class="red--text ml-4">Incorrect username or
-                                        password
+                                    <span v-if="isLoginFailed" class="red--text ml-4">
+                                        {{ loginFailMessage }}
                                     </span>
                                 <v-spacer></v-spacer>
                                 <v-btn color="primary" type="submit">Login</v-btn>
@@ -43,13 +43,14 @@
                     password: ''
                 },
                 isLoginFailed: false,
+                loginFailMessage: ""
             }
         },
         methods: {
             login() {
                 this.$http({
                     method: "post",
-                    url: "http://219.77.158.36:37370/api/token",
+                    url: `${this.$store.state.serverUrl}/api/token`,
                     headers: {
                         "Content-Type": "application/json"
                     },
@@ -62,8 +63,12 @@
                         // console.log(res.data.responseContent);
                     } else {
                         this.isLoginFailed = true;
+                        this.loginFailMessage = "Incorrect username or password";
                     }
-                })
+                }).catch(err => {
+                    this.isLoginFailed = true;
+                    this.loginFailMessage = "Network Error";
+                });
             },
         }
     }

@@ -18,7 +18,7 @@
 
             <v-btn icon @click="loadData()">
                 <v-icon v-if="!isLoadingData">refresh</v-icon>
-                <vue-simple-spinner style="transform: scale(0.65)" v-else></vue-simple-spinner>
+                <v-progress-circular v-else size="25" indeterminate color="blue"></v-progress-circular>
             </v-btn>
         </v-toolbar>
         <!-- Table toolbar end -->
@@ -181,7 +181,7 @@
                 this.$http({
                     //method: 'post',
                     method: "get",
-                    url: "http://219.77.158.36:37370/api/user",
+                    url: `${this.$store.state.serverUrl}/api/user`,
                     headers: {
                         Authorization: `Bearer ${this.$store.state.token}`
                     }
@@ -216,9 +216,7 @@
             confirm() {
                 this.$http({
                     method: "delete",
-                    url: `http://219.77.158.36:37370/api/user/${
-                        this.users[this.removedIndex].userId
-                        }`,
+                    url: `${this.$store.state.serverUrl}/api/user/${this.users[this.removedIndex].userId}`,
                     headers: {
                         Authorization: `Bearer ${this.$store.state.token}`
                     }
@@ -249,7 +247,7 @@
                 if (this.editedIndex > -1) {
                     this.$http({
                         method: "put",
-                        url: `http://219.77.158.36:37370/api/user/${this.editedItem.userId}`,
+                        url: `${this.$store.state.serverUrl}/api/user/${this.editedItem.userId}`,
                         headers: {
                             Authorization: `Bearer ${this.$store.state.token}`,
                             "Content-Type": "application/json"
@@ -265,7 +263,7 @@
                     console.log(this.editedItem);
                     this.$http({
                         method: "post",
-                        url: `http://219.77.158.36:37370/api/user`,
+                        url: `${this.$store.state.serverUrl}/api/user`,
                         headers: {
                             Authorization: `Bearer ${this.$store.state.token}`,
                             "Content-Type": "application/json"

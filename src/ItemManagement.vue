@@ -15,7 +15,3 @@
         components: {ItemList}
     }
 </script>
-
-<style scoped>
-
-</style>

@@ -9,6 +9,7 @@
                     prepend-icon="search"
                     label="Search"
                     class="ml-5"
+                    v-model="search"
             ></v-text-field>
             <v-spacer></v-spacer>
 
@@ -18,19 +19,19 @@
 
             <v-btn icon @click="loadData()">
                 <v-icon v-if="!isLoadingData">refresh</v-icon>
-                <vue-simple-spinner style="transform: scale(0.65)"
-                                    v-if="isLoadingData"></vue-simple-spinner>
+                <v-progress-circular v-else size="25" indeterminate="" color="blue"></v-progress-circular>
             </v-btn>
         </v-toolbar>
         <!-- Table toolbar end -->
 
         <!-- Table start -->
-        <v-data-table :headers="headers" :items="items" hide-actions class="elevation-1">
+        <v-data-table :headers="headers" :items="items" class="elevation-1" :search="search">
             <template slot="items" slot-scope="props">
+                <td>{{ props.item.id }}</td>
                 <td>{{ props.item.supplierItemId }}</td>
                 <td>{{ props.item.itemName }}</td>
-                <td>{{ props.item.supplier }}</td>
-                <td>{{ props.item.description }}</td>
+                <td>{{ props.item.supplierId }}</td>
+                <td>{{ props.item.itemDescription }}</td>
                 <td class="layout px-0">
                     <v-btn icon class="mx-0" @click="editItem(props.item)">
                         <v-icon color="teal">edit</v-icon>
@@ -57,24 +58,24 @@
                     <v-container fluid>
                         <v-layout row>
                             <v-flex xs4>
-                                <v-subheader>Username</v-subheader>
+                                <v-subheader>Item Name</v-subheader>
                             </v-flex>
                             <v-flex xs8>
-                                <v-text-field v-model="editedItem.userName" label="Username"></v-text-field>
+                                <v-text-field v-model="editedItem.itemName" label="Username"></v-text-field>
                             </v-flex>
                         </v-layout>
                         <v-layout row>
                             <v-flex xs4>
-                                <v-subheader>User Type</v-subheader>
+                                <v-subheader>Supplier</v-subheader>
                             </v-flex>
                             <v-flex xs8>
-                                <v-text-field v-model="editedItem.userType"
+                                <v-text-field v-model="editedItem.supplierId"
                                               label="User Type"></v-text-field>
                             </v-flex>
                         </v-layout>
                         <v-layout row>
                             <v-flex xs4>
-                                <v-subheader>Password</v-subheader>
+                                <v-subheader>Description</v-subheader>
                             </v-flex>
                             <v-flex xs8>
 
@@ -118,15 +119,20 @@
         name: "ItemList",
         created() {
             this.loadData();
-            console.log(this.$route.matched)
         },
         data() {
             return {
+                search: '',
                 isLoadingData: false, //Loading state
                 isEditDialogShown: false, //Edit dialog
                 isConfirmDialogShown: false, //Confirm dialog
                 headers: [
                     //Table header data
+                    {
+                        text: "Id",
+                        align: "left",
+                        value: "id"
+                    },
                     {
                         text: "Supplier Item Id",
                         align: "left",
@@ -151,25 +157,22 @@
                     }
                 ],
                 items: [], //User data, ajax fetch reserve
+                suppliers: [],
                 editedIndex: -1,
                 removedIndex: -1,
                 editedItem: {
-                    userId: "1",
-                    userName: "",
-                    password: "",
-                    userType: ""
+                    id: '',
+                    supplierItemId: '',
+                    itemName: '',
+                    supplierId: '',
+                    itemDescription: ''
                 },
                 defaultItem: {
-                    userName: "",
-                    password: "",
-                    userType: ""
-                },
-                loginInfo: {
-                    //Object reserve to submit login request
-                    userName: "",
-                    password: ""
-                },
-                drawer: true
+                    supplierItemId: '',
+                    itemName: '',
+                    supplierId: '',
+                    itemDescription: ''
+                }
             };
         },
 
@@ -193,7 +196,7 @@
                 this.$http({
                     //method: 'post',
                     method: "get",
-                    url: "http://219.77.158.36:37370/api/item",
+                    url: `${this.$store.state.serverUrl}/api/item`,
                     headers: {
                         Authorization: `Bearer ${this.$store.state.token}`
                     }
@@ -215,21 +218,21 @@
             editItem(item) {
                 this.editedIndex = this.items.indexOf(item);
                 this.editedItem = Object.assign({}, item);
-                this.dialog = true;
+                this.isEditDialogShown = true;
             },
 
             deleteItem(item) {
-                this.dialog2 = true;
+                this.isConfirmDialogShown = true;
                 this.removedIndex = this.items.indexOf(item);
             },
 
             cancel() {
-                this.dialog2 = false;
+                this.isConfirmDialogShown = false;
             },
             confirm() {
                 this.$http({
                     method: "delete",
-                    url: `http://219.77.158.36:37370/api/user/${this.items[this.removedIndex].userId}`,
+                    url: `${this.$store.state.serverUrl}/api/item/${this.items[this.removedIndex].userId}`,
                     headers: {
                         Authorization: `Bearer ${this.$store.state.token}`
                     }
@@ -244,11 +247,11 @@
             },
 
             addItem() {
-                this.dialog = true;
+                this.isEditDialogShown = true;
             },
 
             close() {
-                this.dialog = false;
+                this.isEditDialogShown = false;
                 setTimeout(() => {
                         this.editedItem = Object.assign({}, this.defaultItem);
                         this.editedIndex = -1;
@@ -262,7 +265,7 @@
                 if (this.editedIndex > -1) {
                     this.$http({
                         method: "put",
-                        url: `http://219.77.158.36:37370/api/user/${this.editedItem.userId}`,
+                        url: `${this.$store.state.serverUrl}/api/user/${this.editedItem.userId}`,
                         headers: {
                             Authorization: `Bearer ${this.$store.state.token}`,
                             "Content-Type": "application/json"
@@ -279,7 +282,7 @@
                     console.log(this.editedItem);
                     this.$http({
                         method: "post",
-                        url: `http://219.77.158.36:37370/api/user`,
+                        url: `${this.$store.state.serverUrl}/api/user`,
                         headers: {
                             Authorization: `Bearer ${this.$store.state.token}`,
                             "Content-Type": "application/json"
@@ -298,3 +301,11 @@
         }
     }
 </script>
+<style scoped>
+    td {
+        max-width: 20vw;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+</style>

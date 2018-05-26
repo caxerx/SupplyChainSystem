@@ -27,7 +27,7 @@
 
             <!-- Title toolbar start -->
 
-            <v-toolbar fixed app :clipped-left="$vuetify.breakpoint.lgAndDown" color="primary" dark class="pr-4">
+            <v-toolbar fixed app :clipped-left="$vuetify.breakpoint.lgAndDown" color="primary" dark class="pr-4" style="z-index: 100">
                 <v-toolbar-title>
                     <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
                     {{ title }}
@@ -36,9 +36,24 @@
                 <v-btn icon @click.stop="fixed = !fixed">
                     <v-icon>notifications</v-icon>
                 </v-btn>
-                <v-avatar color="accent">
-                    <v-icon>account_circle</v-icon>
-                </v-avatar>
+                <v-menu offset-y>
+                    <v-btn fab slot="activator">
+                        <v-avatar color="accent">
+                            <v-icon>account_circle</v-icon>
+                        </v-avatar>
+                    </v-btn>
+                    <v-list>
+                        <v-list-tile @click.stop="logout">
+                            <v-list-tile-action>
+                                <v-icon>exit_to_app</v-icon>
+                            </v-list-tile-action>
+                            <v-list-tile-content>
+                                <v-list-tile-title>Logout</v-list-tile-title>
+                            </v-list-tile-content>
+                        </v-list-tile>
+                    </v-list>
+                </v-menu>
+
             </v-toolbar>
 
             <!-- Title toolbar end -->
@@ -103,7 +118,7 @@
                 if (this.$store.state.token !== '') {
                     this.$http({
                         method: 'get',
-                        url: 'http://219.77.158.36:37370/api/token',
+                        url: `${this.$store.state.serverUrl}/api/token`,
                         headers: {
                             "Content-Type": "application/json",
                             authorization: `Bearer ${this.$store.state.token}`
@@ -116,6 +131,11 @@
                         this.$store.state.isLoggedIn = false;
                     })
                 }
+            },
+            logout() {
+                window.localStorage.setItem('token', '');
+                this.$store.state.token = '';
+                this.$store.state.isLoggedIn = false;
             }
         }
     }
