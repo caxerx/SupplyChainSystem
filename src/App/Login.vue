@@ -50,8 +50,8 @@
             login() {
                 this.$http.getToken(this.loginInfo).then(res => {
                     if (res.data.success) {
+                        this.$store.commit('setToken', res.data.responseContent.token);
                         window.localStorage.setItem("token", this.$store.state.token);
-                        this.$store.state.token = res.data.responseContent.token;
                         this.$store.commit('setLoginState', true);
                         this.$store.commit('setTokenValidState', true);
                         console.log(res.data.responseContent);

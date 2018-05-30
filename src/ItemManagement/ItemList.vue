@@ -25,7 +25,8 @@
         <!-- Table toolbar end -->
 
         <!-- Table start -->
-        <v-data-table :headers="headers" :items="items" class="elevation-1" :search="search">
+        <v-data-table :headers="headers" :items="items" class="elevation-1" :search="search"
+                      :rows-per-page-items="this.$store.state.rowPerPage">
             <template slot="items" slot-scope="props">
                 <td>{{ props.item.id }}</td>
                 <td>{{ props.item.supplierItemId }}</td>
@@ -158,7 +159,8 @@
                     },
                     {
                         text: "Description",
-                        value: "itemDescription"
+                        value: "itemDescription",
+                        width: "300"
                     },
                     {
                         text: "Actions",
@@ -242,7 +244,7 @@
                 this.isConfirmDialogShown = false;
             },
             confirm() {
-                this.$http.delete('item', this.items[this.removedIndex].id).then(res => {
+                this.$http.delete('item', this.items[this.removedIndex].supplierItemId).then(res => {
                     console.log(res);
                     if (res.data.success) {
                         this.items.splice(this.removedIndex, 1);
@@ -269,6 +271,9 @@
                     this.$http.put('item', this.editedSupplierItemId, this.editedItem).then(res => {
                         console.log(res);
                         if (res.data.success) {
+                            this.editedItem['supplierName'] =
+                                this.suppliers.find(s => s.supplierId === this.editedItem.supplierId).supplierName;
+                            console.log(this.editedItem);
                             Object.assign(this.items[this.editedIndex], this.editedItem);
                         }
                     });
@@ -284,11 +289,3 @@
         }
     }
 </script>
-<style scoped>
-    td {
-        max-width: 20vw;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-</style>

@@ -73,22 +73,10 @@ const store = new Vuex.Store({
         token: '', // Token of api auth
         // Server settings
         serverUrl: 'https://sapi.caxerx.com/api',
-        /*
-        breadcrumbs: [
-            {
-                text: "Dashboard",
-                link: "/",
-                disabled: false
-            }, {
-                text: "Request Management",
-                link: "/request",
-                disabled: false
-            }, {
-                text: "Create Request",
-                link: "#",
-                disabled: false
-            }],
-            */
+        rowPerPage: [15, 30, 60, {text: 'All', value: -1}],
+        // Error Dialog
+        isErrorDialogShown: false,
+        errorMessage: '',
     },
     mutations: {
         setLoginState(state, payload) {
@@ -99,6 +87,16 @@ const store = new Vuex.Store({
         },
         setTokenValidState(state, payload) {
             state.isTokenValid = payload;
+        },
+        setErrorDialogState(state, payload) {
+            state.isErrorDialogShown = payload;
+        },
+        setErrorMessage(state, payload) {
+            state.errorMessage = payload;
+        },
+        closeErrorDialog(state) {
+            state.isErrorDialogShown = false;
+            setTimeout(() => state.errorMessage = '', 1000);
         }
     },
     getters: {
@@ -129,6 +127,10 @@ axios.interceptors.request.use(config => {
 });
 
 axios.interceptors.response.use(response => {
+    if (!response.data.success) {
+        store.commit('setErrorMessage', response.data.responseContent);
+        store.commit('setErrorDialogState', true);
+    }
     return response;
 }, error => {
     // Errors from server response

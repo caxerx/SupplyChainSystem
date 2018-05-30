@@ -115,6 +115,31 @@
 
         <!-- Session expiry dialog end -->
 
+        <!-- Error dialog start -->
+
+        <v-dialog v-model="this.$store.state.isErrorDialogShown" persistent max-width="500px">
+            <v-card>
+                <v-card-title>
+                    <span class="headline">Error - {{ this.$store.state.errorMessage.failType }}</span>
+                </v-card-title>
+                <v-card-text>
+                    <v-container fluid>
+                        {{ this.$store.state.errorMessage.message }}
+                    </v-container>
+                </v-card-text>
+                <v-card-actions>
+                    <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn color="blue darken-1" flat @click.native="$store.commit('closeErrorDialog')">
+                            Close
+                        </v-btn>
+                    </v-card-actions>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+
+        <!-- Error dialog end -->
+
 
     </v-app>
 </template>
