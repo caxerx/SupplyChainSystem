@@ -1,24 +1,18 @@
 <template>
     <v-container>
         <!-- Page title start -->
-        <h1 class="display-1 primary--text">Request Management</h1>
+        <h1 class="display-1 primary--text mb-3">Request Management</h1>
         <!-- Page title end -->
 
-        <!-- Breadcrumbs start -->
-        <div>
-            <v-breadcrumbs divider="/">
-                <v-breadcrumbs-item v-for="item in $store.state.breadcrumbs" :key="item.text" :disabled="item.disabled">
-                    {{ item.text }}
-                </v-breadcrumbs-item>
-            </v-breadcrumbs>
-        </div>
-        <!-- Breadcrumbs end -->
+        <RequestList></RequestList>
     </v-container>
 </template>
 
 <script>
+    import RequestList from "./RequestManagement/RequestList";
     export default {
-        name: "RequestManagement"
+        name: "RequestManagement",
+        components: {RequestList}
     }
 </script>
 

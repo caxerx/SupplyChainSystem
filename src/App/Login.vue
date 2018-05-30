@@ -48,19 +48,13 @@
         },
         methods: {
             login() {
-                this.$http({
-                    method: "post",
-                    url: `${this.$store.state.serverUrl}/api/token`,
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    data: this.loginInfo
-                }).then(res => {
+                this.$http.getToken(this.loginInfo).then(res => {
                     if (res.data.success) {
-                        this.$store.state.token = res.data.responseContent.token;
                         window.localStorage.setItem("token", this.$store.state.token);
-                        this.$store.state.isLoggedIn = true;
-                        // console.log(res.data.responseContent);
+                        this.$store.state.token = res.data.responseContent.token;
+                        this.$store.commit('setLoginState', true);
+                        this.$store.commit('setTokenValidState', true);
+                        console.log(res.data.responseContent);
                     } else {
                         this.isLoginFailed = true;
                         this.loginFailMessage = "Incorrect username or password";

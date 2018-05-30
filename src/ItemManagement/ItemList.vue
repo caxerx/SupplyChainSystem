@@ -19,7 +19,7 @@
 
             <v-btn icon @click="loadData()">
                 <v-icon v-if="!isLoadingData">refresh</v-icon>
-                <v-progress-circular v-else size="25" indeterminate="" color="blue"></v-progress-circular>
+                <v-progress-circular v-else size="25" indeterminate color="blue"></v-progress-circular>
             </v-btn>
         </v-toolbar>
         <!-- Table toolbar end -->
@@ -30,7 +30,7 @@
                 <td>{{ props.item.id }}</td>
                 <td>{{ props.item.supplierItemId }}</td>
                 <td>{{ props.item.itemName }}</td>
-                <td>{{ props.item.supplierId }}</td>
+                <td>{{ props.item.supplierName }}</td>
                 <td>{{ props.item.itemDescription }}</td>
                 <td class="layout px-0">
                     <v-btn icon class="mx-0" @click="editItem(props.item)">
@@ -58,10 +58,19 @@
                     <v-container fluid>
                         <v-layout row>
                             <v-flex xs4>
+                                <v-subheader>Supplier Item Id</v-subheader>
+                            </v-flex>
+                            <v-flex xs8>
+                                <v-text-field v-model="editedItem.supplierItemId"
+                                              label="Supplier Item Id"></v-text-field>
+                            </v-flex>
+                        </v-layout>
+                        <v-layout row>
+                            <v-flex xs4>
                                 <v-subheader>Item Name</v-subheader>
                             </v-flex>
                             <v-flex xs8>
-                                <v-text-field v-model="editedItem.itemName" label="Username"></v-text-field>
+                                <v-text-field v-model="editedItem.itemName" label="Item Name"></v-text-field>
                             </v-flex>
                         </v-layout>
                         <v-layout row>
@@ -69,8 +78,14 @@
                                 <v-subheader>Supplier</v-subheader>
                             </v-flex>
                             <v-flex xs8>
-                                <v-text-field v-model="editedItem.supplierId"
-                                              label="User Type"></v-text-field>
+                                <v-select v-model="editedItem.supplierId"
+                                          :items="suppliers"
+                                          item-text="supplierName"
+                                          item-value="supplierId"
+                                          label="Select a Supplier"
+                                          single-line
+                                >
+                                </v-select>
                             </v-flex>
                         </v-layout>
                         <v-layout row>
@@ -78,14 +93,10 @@
                                 <v-subheader>Description</v-subheader>
                             </v-flex>
                             <v-flex xs8>
-
-                                <v-text-field v-model="editedItem.password" type="password" label="Password"
-                                              clearable hint="Keep empty if password not change"
-                                              persistent-hint></v-text-field>
+                                <v-text-field v-model="editedItem.itemDescription" label="Description"
+                                              multi-line></v-text-field>
                             </v-flex>
                         </v-layout>
-
-
                     </v-container>
                 </v-card-text>
                 <v-card-actions>
@@ -110,7 +121,7 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
-        <!-- Delete Confirm Dialog start -->
+        <!-- Delete Confirm Dialog end -->
     </div>
 </template>
 
@@ -135,20 +146,19 @@
                     },
                     {
                         text: "Supplier Item Id",
-                        align: "left",
                         value: "supplierItemId"
                     },
                     {
                         text: "Item Name",
-                        value: "userName"
+                        value: "itemName"
                     },
                     {
                         text: "Supplier",
-                        value: "supplier"
+                        value: "supplierName"
                     },
                     {
                         text: "Description",
-                        value: "description"
+                        value: "itemDescription"
                     },
                     {
                         text: "Actions",
@@ -160,6 +170,7 @@
                 suppliers: [],
                 editedIndex: -1,
                 removedIndex: -1,
+                editedSupplierItemId: '',
                 editedItem: {
                     id: '',
                     supplierItemId: '',
@@ -168,6 +179,7 @@
                     itemDescription: ''
                 },
                 defaultItem: {
+                    id: '',
                     supplierItemId: '',
                     itemName: '',
                     supplierId: '',
@@ -187,35 +199,35 @@
                         val || this.close();
                     }
                 }
-            },
+            }
         },
 
         methods: {
             loadData() {
                 this.isLoadingData = true;
-                this.$http({
-                    //method: 'post',
-                    method: "get",
-                    url: `${this.$store.state.serverUrl}/api/item`,
-                    headers: {
-                        Authorization: `Bearer ${this.$store.state.token}`
-                    }
-                }).then(res => {
-                    setTimeout(() => {
-                            this.isLoadingData = false;
-                        }
-                        ,
-                        300
-                    )
-                    ;
+                this.$http.get('supplier').then(res => {
                     if (res.data.success) {
-                        this.items = res.data.responseContent;
-                        console.log(res.data.responseContent);
+                        this.suppliers = res.data.responseContent;
+                        console.log(this.suppliers);
                     }
-                })
-                ;
+                }).then(() => {
+                    this.$http.get('item').then(res => {
+                        setTimeout(() => {
+                            this.isLoadingData = false;
+                        }, 300);
+                        if (res.data.success) {
+                            this.items = res.data.responseContent;
+                            console.log(res.data.responseContent);
+                        }
+                    }).then(() => {
+                        this.items.map(obj =>
+                            obj['supplierName'] = this.suppliers.find(supplier =>
+                                supplier.supplierId === obj.supplierId).supplierName);
+                    })
+                });
             },
             editItem(item) {
+                this.editedSupplierItemId = item.supplierItemId;
                 this.editedIndex = this.items.indexOf(item);
                 this.editedItem = Object.assign({}, item);
                 this.isEditDialogShown = true;
@@ -230,19 +242,12 @@
                 this.isConfirmDialogShown = false;
             },
             confirm() {
-                this.$http({
-                    method: "delete",
-                    url: `${this.$store.state.serverUrl}/api/item/${this.items[this.removedIndex].userId}`,
-                    headers: {
-                        Authorization: `Bearer ${this.$store.state.token}`
-                    }
-                }).then(res => {
+                this.$http.delete('item', this.items[this.removedIndex].id).then(res => {
                     console.log(res);
                     if (res.data.success) {
                         this.items.splice(this.removedIndex, 1);
                     }
-                })
-                ;
+                });
                 this.cancel();
             },
 
@@ -252,49 +257,27 @@
 
             close() {
                 this.isEditDialogShown = false;
+                this.editedSupplierItemId = '';
                 setTimeout(() => {
-                        this.editedItem = Object.assign({}, this.defaultItem);
-                        this.editedIndex = -1;
-                    },
-                    300
-                )
-                ;
+                    this.editedItem = Object.assign({}, this.defaultItem);
+                    this.editedIndex = -1;
+                }, 300);
             },
 
             save() {
                 if (this.editedIndex > -1) {
-                    this.$http({
-                        method: "put",
-                        url: `${this.$store.state.serverUrl}/api/user/${this.editedItem.userId}`,
-                        headers: {
-                            Authorization: `Bearer ${this.$store.state.token}`,
-                            "Content-Type": "application/json"
-                        },
-                        data: this.editedItem
-                    }).then(res => {
+                    this.$http.put('item', this.editedSupplierItemId, this.editedItem).then(res => {
                         console.log(res);
                         if (res.data.success) {
                             Object.assign(this.items[this.editedIndex], this.editedItem);
                         }
-                    })
-                    ;
+                    });
                 } else {
-                    console.log(this.editedItem);
-                    this.$http({
-                        method: "post",
-                        url: `${this.$store.state.serverUrl}/api/user`,
-                        headers: {
-                            Authorization: `Bearer ${this.$store.state.token}`,
-                            "Content-Type": "application/json"
-                        },
-                        data: this.editedItem
-                    }).then(res => {
-                        console.log(res);
+                    this.$http.post('item', this.editedItem).then(res => {
                         if (res.data.success) {
                             this.items.push(res.data.responseContent);
                         }
-                    })
-                    ;
+                    });
                 }
                 this.close();
             }

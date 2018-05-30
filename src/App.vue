@@ -27,7 +27,8 @@
 
             <!-- Title toolbar start -->
 
-            <v-toolbar fixed app :clipped-left="$vuetify.breakpoint.lgAndDown" color="primary" dark class="pr-4" style="z-index: 100">
+            <v-toolbar fixed app :clipped-left="$vuetify.breakpoint.lgAndDown" color="primary" dark class="pr-4"
+                       style="z-index: 100">
                 <v-toolbar-title>
                     <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
                     {{ title }}
@@ -36,6 +37,7 @@
                 <v-btn icon @click.stop="fixed = !fixed">
                     <v-icon>notifications</v-icon>
                 </v-btn>
+                <!-- Avatar icon menu start -->
                 <v-menu offset-y>
                     <v-btn fab slot="activator">
                         <v-avatar color="accent">
@@ -51,8 +53,17 @@
                                 <v-list-tile-title>Logout</v-list-tile-title>
                             </v-list-tile-content>
                         </v-list-tile>
+                        <v-list-tile @click.stop="invalid">
+                            <v-list-tile-action>
+                                <v-icon>close</v-icon>
+                            </v-list-tile-action>
+                            <v-list-tile-content>
+                                <v-list-tile-title>Make token invalid</v-list-tile-title>
+                            </v-list-tile-content>
+                        </v-list-tile>
                     </v-list>
                 </v-menu>
+                <!-- Avatar icon menu end -->
 
             </v-toolbar>
 
@@ -80,6 +91,29 @@
         <!-- If the user is NOT logged in -->
 
         <login v-else></login>
+
+        <!-- Session expiry dialog start -->
+
+        <v-dialog v-model="this.$store.state.isLoggedIn&&!this.$store.state.isTokenValid" persistent max-width="500px">
+            <v-card>
+                <v-card-title>
+                    <span class="headline">Warning</span>
+                </v-card-title>
+                <v-card-text>
+                    <v-container fluid>
+                        Session expired
+                    </v-container>
+                </v-card-text>
+                <v-card-actions>
+                    <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn color="blue darken-1" flat @click.native="logout">Logout</v-btn>
+                    </v-card-actions>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+
+        <!-- Session expiry dialog end -->
 
 
     </v-app>
@@ -116,26 +150,26 @@
         methods: {
             checkLoginStatus() {
                 if (this.$store.state.token !== '') {
-                    this.$http({
-                        method: 'get',
-                        url: `${this.$store.state.serverUrl}/api/token`,
-                        headers: {
-                            "Content-Type": "application/json",
-                            authorization: `Bearer ${this.$store.state.token}`
-                        }
-                    }).then(res => {
-                        this.$store.state.isLoggedIn = !!res.data.success;
+                    this.$http.get('token').then(res => {
+                        this.$store.commit('setLoginState', !!res.data.success);
+                        this.$store.commit('setTokenValidState', true);
                     }).catch(err => {
                         // Error Handling
                         console.log(err.message);
-                        this.$store.state.isLoggedIn = false;
+                        this.$store.commit('setLoginState', false);
                     })
                 }
             },
             logout() {
                 window.localStorage.setItem('token', '');
-                this.$store.state.token = '';
-                this.$store.state.isLoggedIn = false;
+                this.$store.commit('setToken', '');
+                this.$store.commit('setLoginState', false);
+            },
+            // For testing purpose only
+            invalid() {
+                window.localStorage.setItem('token', 'apple');
+                this.$store.commit('setToken', 'apple');
+                this.$store.commit('setTokenValidState', false);
             }
         }
     }

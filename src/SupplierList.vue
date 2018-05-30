@@ -2,13 +2,14 @@
     <div>
         <!-- Table toolbar start -->
         <v-toolbar dark color="primary" class="elevation-0" :clipped-left="$vuetify.breakpoint.lgAndUp">
-            <v-toolbar-title class="white--text">User List</v-toolbar-title>
+            <v-toolbar-title class="white--text">Supplier List</v-toolbar-title>
             <v-text-field
                     flat
                     solo-inverted
                     prepend-icon="search"
                     label="Search"
                     class="ml-5"
+                    v-model="search"
             ></v-text-field>
             <v-spacer></v-spacer>
 
@@ -24,12 +25,12 @@
         <!-- Table toolbar end -->
 
         <!-- Table start -->
-        <v-data-table :headers="headers" :items="users" hide-actions class="elevation-1">
+        <v-data-table :headers="headers" :items="suppliers" class="elevation-1" :search="search">
             <template slot="items" slot-scope="props">
-                <td>{{ props.item.userId }}</td>
-                <td>{{ props.item.userName }}</td>
-                <td>{{ props.item.name }}</td>
-                <td>{{ props.item.userType }}</td>
+                <td>{{ props.item.supplierId }}</td>
+                <td>{{ props.item.supplierName }}</td>
+                <td>{{ props.item.supplierPhoneNumber }}</td>
+                <td>{{ props.item.supplierEmail }}</td>
                 <td class="layout px-0">
                     <v-btn icon class="mx-0" @click="editItem(props.item)">
                         <v-icon color="teal">edit</v-icon>
@@ -56,37 +57,27 @@
                     <v-container fluid>
                         <v-layout row>
                             <v-flex xs4>
-                                <v-subheader>Username</v-subheader>
+                                <v-subheader>Supplier Name</v-subheader>
                             </v-flex>
                             <v-flex xs8>
-                                <v-text-field v-model="editedItem.userName" label="Username"></v-text-field>
+                                <v-text-field v-model="editedItem.supplierName" label="Supplier Name"></v-text-field>
                             </v-flex>
                         </v-layout>
                         <v-layout row>
                             <v-flex xs4>
-                                <v-subheader>Name</v-subheader>
+                                <v-subheader>E-Mail</v-subheader>
                             </v-flex>
                             <v-flex xs8>
-                                <v-text-field v-model="editedItem.name" label="Name"></v-text-field>
+                                <v-text-field v-model="editedItem.supplierEmail" type="email"
+                                              label="E-Mail"></v-text-field>
                             </v-flex>
                         </v-layout>
                         <v-layout row>
                             <v-flex xs4>
-                                <v-subheader>User Type</v-subheader>
+                                <v-subheader>Phone Number</v-subheader>
                             </v-flex>
                             <v-flex xs8>
-                                <v-text-field v-model="editedItem.userType"
-                                              label="User Type"></v-text-field>
-                            </v-flex>
-                        </v-layout>
-                        <v-layout row>
-                            <v-flex xs4>
-                                <v-subheader>Password</v-subheader>
-                            </v-flex>
-                            <v-flex xs8>
-                                <v-text-field v-model="editedItem.password" type="password" label="Password"
-                                              clearable hint="Keep empty if password not change"
-                                              persistent-hint></v-text-field>
+                                <v-text-field v-model="editedItem.supplierPhoneNumber" label="Phone Number"></v-text-field>
                             </v-flex>
                         </v-layout>
                     </v-container>
@@ -113,39 +104,39 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
-        <!-- Delete Confirm Dialog start -->
+        <!-- Delete Confirm Dialog end -->
     </div>
 </template>
 
 <script>
     export default {
-        name: "UserList",
+        name: "SupplierList",
         created() {
             this.loadData();
         },
         data() {
             return {
+                search: '',
                 isLoadingData: false, //Loading state
                 isEditDialogShown: false, //Edit dialog
                 isConfirmDialogShown: false, //Confirm dialog
                 headers: [
                     //Table header data
                     {
-                        text: "Id",
-                        align: "left",
-                        value: "userId"
+                        text: "Supplier Id",
+                        value: "supplierId"
                     },
                     {
-                        text: "Username",
-                        value: "userName"
+                        text: "Supplier Name",
+                        value: "supplierName"
                     },
                     {
-                        text: "Name",
-                        value: "name"
+                        text: "E-Mail",
+                        value: "supplierEmail"
                     },
                     {
-                        text: "User Type",
-                        value: "userType"
+                        text: "Phone Number",
+                        value: "supplierPhoneNumber"
                     },
                     {
                         text: "Actions",
@@ -153,22 +144,21 @@
                         sortable: false
                     }
                 ],
-                users: [], // User data from AJAX calls
-                editedIndex: -1, // -1 means it is a new Item
+                suppliers: [],
+                editedIndex: -1,
                 removedIndex: -1,
                 editedItem: {
-                    userId: "1",
-                    userName: "",
-                    name: "",
-                    password: "",
-                    userType: ""
+                    supplierId: '',
+                    supplierName: '',
+                    supplierEmail: '',
+                    supplierPhoneNumber: ''
                 },
                 defaultItem: {
-                    userName: "",
-                    password: "",
-                    userType: ""
-                },
-                drawer: true
+                    supplierId: '',
+                    supplierName: '',
+                    supplierEmail: '',
+                    supplierPhoneNumber: ''
+                }
             };
         },
 
@@ -184,40 +174,41 @@
                     }
                 }
             },
+            isRequired() {
+                return this.editedItem === -1;
+            }
         },
 
         methods: {
             loadData() {
                 this.isLoadingData = true;
-                this.$http.get('user').then(res => {
-                    setTimeout(() => {
-                        this.isLoadingData = false;
-                    }, 300);
+                this.$http.get('supplier').then(res => {
                     if (res.data.success) {
-                        this.users = res.data.responseContent;
-                        console.log(res.data.responseContent);
+                        setTimeout(() => this.isLoadingData = false, 300);
+                        this.suppliers = res.data.responseContent;
+                        console.log(this.suppliers);
                     }
                 });
             },
             editItem(item) {
-                this.editedIndex = this.users.indexOf(item);
+                this.editedIndex = this.suppliers.indexOf(item);
                 this.editedItem = Object.assign({}, item);
                 this.isEditDialogShown = true;
             },
 
             deleteItem(item) {
                 this.isConfirmDialogShown = true;
-                this.removedIndex = this.users.indexOf(item);
+                this.removedIndex = this.suppliers.indexOf(item);
             },
 
             cancel() {
                 this.isConfirmDialogShown = false;
             },
             confirm() {
-                this.$http.delete('user', this.users[this.removedIndex].userId).then(res => {
+                this.$http.delete('supplier', this.suppliers[this.removedIndex].supplierId).then(res => {
                     console.log(res);
                     if (res.data.success) {
-                        this.users.splice(this.removedIndex, 1);
+                        this.items.splice(this.removedIndex, 1);
                     }
                 });
                 this.cancel();
@@ -230,27 +221,23 @@
             close() {
                 this.isEditDialogShown = false;
                 setTimeout(() => {
-                        this.editedItem = Object.assign({}, this.defaultItem);
-                        this.editedIndex = -1;
-                    },
-                    300
-                );
+                    this.editedItem = Object.assign({}, this.defaultItem);
+                    this.editedIndex = -1;
+                }, 300);
             },
 
             save() {
                 if (this.editedIndex > -1) {
-                    this.$http.put('user', this.editedItem.userId, this.editedItem).then(res => {
+                    this.$http.put('supplier', this.editedItem.supplierId, this.editedItem).then(res => {
                         console.log(res);
                         if (res.data.success) {
-                            Object.assign(this.users[this.editedIndex], this.editedItem);
+                            Object.assign(this.suppliers[this.editedIndex], this.editedItem);
                         }
                     });
                 } else {
-                    console.log(this.editedItem);
-                    this.$http.post('user', this.editedItem).then(res => {
-                        console.log(res);
+                    this.$http.post('supplier', this.editedItem).then(res => {
                         if (res.data.success) {
-                            this.users.push(res.data.responseContent);
+                            this.suppliers.push(res.data.responseContent);
                         }
                     });
                 }
@@ -259,7 +246,3 @@
         }
     }
 </script>
-
-<style scoped>
-
-</style>

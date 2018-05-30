@@ -4,12 +4,8 @@ import Vuetify from 'vuetify'
 import 'vuetify/dist/vuetify.css'
 import VueRouter from 'vue-router'
 import Vuex from 'vuex'
-import VueSimpleSpinner from 'vue-simple-spinner'
 import axios from 'axios'
 import colors from 'vuetify/es5/util/colors'
-
-// Set axios to handle HTTP requests
-Vue.prototype.$http = axios;
 
 Vue.use(Vuetify, {
     theme: {
@@ -69,14 +65,15 @@ const routes = [
 ];
 const router = new VueRouter({routes});
 
-// Register global components
-Vue.component('vue-simple-spinner', VueSimpleSpinner);
-
 // Vuex State Management
 const store = new Vuex.Store({
     state: {
         isLoggedIn: false,
+        isTokenValid: false,
         token: '', // Token of api auth
+        // Server settings
+        serverUrl: 'https://sapi.caxerx.com/api',
+        /*
         breadcrumbs: [
             {
                 text: "Dashboard",
@@ -91,16 +88,127 @@ const store = new Vuex.Store({
                 link: "#",
                 disabled: false
             }],
-        // Server settings
-        serverUrl: 'http://219.77.158.36:37370',
+            */
     },
-    mutations: {},
+    mutations: {
+        setLoginState(state, payload) {
+            state.isLoggedIn = payload;
+        },
+        setToken(state, payload) {
+            state.token = payload;
+        },
+        setTokenValidState(state, payload) {
+            state.isTokenValid = payload;
+        }
+    },
     getters: {
         breadcrumbs() {
-            return [{text: 'hi', disabled: false}];
+            return [
+                {
+                    text: 'hi',
+                    disabled: false
+                },
+                {
+                    text: 'hello',
+                    disabled: false
+                }, {
+                    text: 'bonjour',
+                    disabled: false
+                }];
         }
     }
 });
+
+// Use interceptors to do extra stuff when handling things
+axios.interceptors.request.use(config => {
+    // Something to do before request
+    return config;
+}, error => {
+    // Errors at sending a request
+    return Promise.reject(error);
+});
+
+axios.interceptors.response.use(response => {
+    return response;
+}, error => {
+    // Errors from server response
+    // Something to do after receiving response
+    // If it returns 401(Unauthorized), the token becomes invalid
+    // console.log('err');
+    if (error.response) {
+        if (error.response.status === 401) {
+            // alert("Invalid token");
+            console.log('Invalid token');
+            store.commit('setTokenValidState', false);
+        }
+        if (error.response.status === 404) {
+            console.log('404');
+        }
+    } else {
+        console.log('Network Error');
+    }
+    return Promise.reject(error);
+    // Make it resolve the Promise so no catch() is needed
+    // Temporary disable this to remain compatibility
+    // return Promise.resolve(error.response);
+});
+/**
+ *
+ * @type {{getToken(*, *=): *, get(string): *, post(string, object): *, put(string, string, object): *, delete(*, *): *}}
+ */
+Vue.prototype.$http = {
+    getToken(loginData) {
+        return axios({
+            method: "post",
+            url: `${store.state.serverUrl}/token`,
+            headers: {
+                "Content-Type": "application/json"
+            },
+            data: loginData
+        });
+    },
+    get(url) {
+        return axios({
+            method: "get",
+            url: `${store.state.serverUrl}/${url}`,
+            headers: {
+                Authorization: `Bearer ${store.state.token}`
+            }
+        });
+    },
+    post(url, data) {
+        return axios({
+            method: "post",
+            url: `${store.state.serverUrl}/${url}`,
+            headers: {
+                Authorization: `Bearer ${store.state.token}`,
+                "Content-Type": "application/json"
+            },
+            data: data
+        });
+    },
+    put(url, param, data) {
+        return axios({
+            method: "put",
+            url: `${store.state.serverUrl}/${url}/${param}`,
+            headers: {
+                Authorization: `Bearer ${store.state.token}`,
+                "Content-Type": "application/json"
+            },
+            data: data
+        });
+    },
+    delete(url, param) {
+        return axios({
+            method: "delete",
+            url: `${store.state.serverUrl}/${url}/${param}`,
+            headers: {
+                Authorization: `Bearer ${store.state.token}`
+            }
+        });
+    }
+};
+
 
 new Vue({
     el: '#app',
