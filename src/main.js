@@ -11,7 +11,7 @@ Vue.use(Vuetify, {
     theme: {
         primary: colors.grey.darken4,
         secondary: colors.red.lighten1,
-        accent: colors.blue.lighten3
+        accent: colors.blue.darken2
     }
 });
 Vue.use(VueRouter);
@@ -127,6 +127,8 @@ axios.interceptors.request.use(config => {
 });
 
 axios.interceptors.response.use(response => {
+    // If the operation is unsuccessful (e.g. return 200 but success = false)
+    // Show up the error dialog
     if (!response.data.success) {
         store.commit('setErrorMessage', response.data.responseContent);
         store.commit('setErrorDialogState', true);

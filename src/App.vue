@@ -34,9 +34,14 @@
                     {{ title }}
                 </v-toolbar-title>
                 <v-spacer></v-spacer>
-                <v-btn icon @click.stop="fixed = !fixed">
-                    <v-icon>notifications</v-icon>
-                </v-btn>
+
+                <v-badge color="red" overlap>
+                    <span slot="badge">1</span>
+                    <v-btn icon>
+                        <v-icon>notifications</v-icon>
+                    </v-btn>
+                </v-badge>
+
                 <!-- Avatar icon menu start -->
                 <v-menu offset-y>
                     <v-btn fab slot="activator">

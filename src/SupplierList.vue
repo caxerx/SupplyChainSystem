@@ -29,8 +29,8 @@
             <template slot="items" slot-scope="props">
                 <td>{{ props.item.supplierId }}</td>
                 <td>{{ props.item.supplierName }}</td>
-                <td>{{ props.item.supplierPhoneNumber }}</td>
                 <td>{{ props.item.supplierEmail }}</td>
+                <td>{{ props.item.supplierPhoneNumber }}</td>
                 <td class="layout px-0">
                     <v-btn icon class="mx-0" @click="editItem(props.item)">
                         <v-icon color="teal">edit</v-icon>
@@ -77,7 +77,8 @@
                                 <v-subheader>Phone Number</v-subheader>
                             </v-flex>
                             <v-flex xs8>
-                                <v-text-field v-model="editedItem.supplierPhoneNumber" label="Phone Number"></v-text-field>
+                                <v-text-field v-model="editedItem.supplierPhoneNumber"
+                                              label="Phone Number"></v-text-field>
                             </v-flex>
                         </v-layout>
                     </v-container>
@@ -208,7 +209,7 @@
                 this.$http.delete('supplier', this.suppliers[this.removedIndex].supplierId).then(res => {
                     console.log(res);
                     if (res.data.success) {
-                        this.items.splice(this.removedIndex, 1);
+                        this.suppliers.splice(this.removedIndex, 1);
                     }
                 });
                 this.cancel();

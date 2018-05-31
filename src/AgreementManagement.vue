@@ -1,24 +1,19 @@
 <template>
     <v-container>
         <!-- Page title start -->
-        <h1 class="display-1 primary--text">Dashboard</h1>
+        <h1 class="display-1 primary--text mb-3">Agreement Management</h1>
         <!-- Page title end -->
 
-        <!-- Breadcrumbs start -->
-        <div>
-            <v-breadcrumbs divider="/">
-                <v-breadcrumbs-item v-for="item in $store.state.breadcrumbs" :key="item.text" :disabled="item.disabled">
-                    {{ item.text }}
-                </v-breadcrumbs-item>
-            </v-breadcrumbs>
-        </div>
-        <!-- Breadcrumbs end -->
+        <agreement-list></agreement-list>
+
     </v-container>
 </template>
 
 <script>
+    import AgreementList from "./AgreementManagement/AgreementList";
     export default {
-        name: "AgreementManagement"
+        name: "AgreementManagement",
+        components: {AgreementList}
     }
 </script>
 

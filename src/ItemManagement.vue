@@ -5,6 +5,8 @@
         <!-- Page title end -->
         <item-list></item-list>
         <supplier-list></supplier-list>
+        <virtual-item-list></virtual-item-list>
+        <category-list></category-list>
 
     </v-container>
 </template>
@@ -12,8 +14,11 @@
 <script>
     import ItemList from "./ItemManagement/ItemList";
     import SupplierList from "./SupplierList";
+    import VirtualItemList from "./ItemManagement/VirtualItemList";
+    import CategoryList from "./ItemManagement/CategoryList";
+
     export default {
         name: "ItemManagement",
-        components: {SupplierList, ItemList}
+        components: {CategoryList, VirtualItemList, SupplierList, ItemList}
     }
 </script>

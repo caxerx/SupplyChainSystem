@@ -4,7 +4,7 @@
         <h1 class="display-1 primary--text mb-3">Request Management</h1>
         <!-- Page title end -->
 
-        <RequestList></RequestList>
+        <request-list></request-list>
     </v-container>
 </template>
 

@@ -24,7 +24,7 @@
         <!-- Table toolbar end -->
 
         <!-- Table start -->
-        <v-data-table :headers="headers" :items="users" hide-actions class="elevation-1">
+        <v-data-table :headers="headers" :items="users" class="elevation-1">
             <template slot="items" slot-scope="props">
                 <td>{{ props.item.userId }}</td>
                 <td>{{ props.item.userName }}</td>

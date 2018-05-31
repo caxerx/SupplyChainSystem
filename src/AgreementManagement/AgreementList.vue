@@ -28,13 +28,12 @@
 
         <!-- Table start -->
         <!-- TODO bind values -->
-        <v-data-table :headers=""
-                      :items=""
+        <v-data-table :headers="headers"
+                      :items="agreements"
                       class="elevation-1"
         >
-            <template slot="" slot-scope="">
-                <td></td>
-                <td></td>
+            <template slot="items" slot-scope="props">
+                <td>{{ props.item.id }}</td>
                 <td class="layout px-0">
                     <v-btn icon class="mx-0">
                         <v-icon color="teal">edit</v-icon>
@@ -59,7 +58,16 @@
         data() {
             return {
                 isLoadingData: false,
-                headers: [],
+                headers: [
+                    {
+                        text: 'Id',
+                        value: 'id'
+                    },
+                    {
+                        text: 'Actions',
+                        value: 'action'
+                    }
+                ],
                 agreements: []
             }
         }

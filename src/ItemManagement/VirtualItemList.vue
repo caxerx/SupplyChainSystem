@@ -2,7 +2,7 @@
     <div>
         <!-- Table toolbar start -->
         <v-toolbar dark color="primary" class="elevation-0" :clipped-left="$vuetify.breakpoint.lgAndUp">
-            <v-toolbar-title class="white--text">Item List</v-toolbar-title>
+            <v-toolbar-title class="white--text">Virtual Item List</v-toolbar-title>
             <v-text-field
                     flat
                     solo-inverted
@@ -25,14 +25,12 @@
         <!-- Table toolbar end -->
 
         <!-- Table start -->
-        <v-data-table :headers="headers" :items="items" class="elevation-1" :search="search"
-                      :rows-per-page-items="this.$store.state.rowPerPage">
+        <v-data-table :headers="headers" :items="virtualItems" class="elevation-1" :search="search">
             <template slot="items" slot-scope="props">
                 <td>{{ props.item.id }}</td>
-                <td>{{ props.item.supplierItemId }}</td>
-                <td>{{ props.item.itemName }}</td>
-                <td>{{ props.item.supplierName }}</td>
-                <td>{{ props.item.itemDescription }}</td>
+                <td>{{ props.item.virtualItemId }}</td>
+                <td>{{ props.item.virtualItemName }}</td>
+                <td>{{ props.item.virtualItemDescription }}</td>
                 <td class="layout px-0">
                     <v-btn icon class="mx-0" @click="editItem(props.item)">
                         <v-icon color="teal">edit</v-icon>
@@ -59,11 +57,10 @@
                     <v-container fluid>
                         <v-layout row>
                             <v-flex xs4>
-                                <v-subheader>Supplier Item Id</v-subheader>
+                                <v-subheader>Virtual Item Id</v-subheader>
                             </v-flex>
                             <v-flex xs8>
-                                <v-text-field v-model="editedItem.supplierItemId"
-                                              label="Supplier Item Id"></v-text-field>
+                                <v-text-field v-model="editedItem.virtualItemId" label="Virtual Item Id"></v-text-field>
                             </v-flex>
                         </v-layout>
                         <v-layout row>
@@ -71,31 +68,17 @@
                                 <v-subheader>Item Name</v-subheader>
                             </v-flex>
                             <v-flex xs8>
-                                <v-text-field v-model="editedItem.itemName" label="Item Name"></v-text-field>
+                                <v-text-field v-model="editedItem.virtualItemName"
+                                              label="Item Name"></v-text-field>
                             </v-flex>
                         </v-layout>
                         <v-layout row>
                             <v-flex xs4>
-                                <v-subheader>Supplier</v-subheader>
+                                <v-subheader>Item Description</v-subheader>
                             </v-flex>
                             <v-flex xs8>
-                                <v-select v-model="editedItem.supplierId"
-                                          :items="suppliers"
-                                          item-text="supplierName"
-                                          item-value="supplierId"
-                                          label="Select a Supplier"
-                                          single-line
-                                >
-                                </v-select>
-                            </v-flex>
-                        </v-layout>
-                        <v-layout row>
-                            <v-flex xs4>
-                                <v-subheader>Description</v-subheader>
-                            </v-flex>
-                            <v-flex xs8>
-                                <v-text-field v-model="editedItem.itemDescription" label="Description"
-                                              multi-line></v-text-field>
+                                <v-text-field v-model="editedItem.virtualItemDescription"
+                                              label="Item Description" multi-line></v-text-field>
                             </v-flex>
                         </v-layout>
                     </v-container>
@@ -128,7 +111,7 @@
 
 <script>
     export default {
-        name: "ItemList",
+        name: "VirtualItemList",
         created() {
             this.loadData();
         },
@@ -142,25 +125,19 @@
                     //Table header data
                     {
                         text: "Id",
-                        align: "left",
                         value: "id"
                     },
                     {
-                        text: "Supplier Item Id",
-                        value: "supplierItemId"
+                        text: "Virtual Item Id",
+                        value: "virtualItemId"
                     },
                     {
                         text: "Item Name",
-                        value: "itemName"
-                    },
-                    {
-                        text: "Supplier",
-                        value: "supplierName"
+                        value: "virtualItemName"
                     },
                     {
                         text: "Description",
-                        value: "itemDescription",
-                        width: "300"
+                        value: "virtualItemDescription"
                     },
                     {
                         text: "Actions",
@@ -168,24 +145,20 @@
                         sortable: false
                     }
                 ],
-                items: [], //User data, ajax fetch reserve
-                suppliers: [],
+                virtualItems: [],
                 editedIndex: -1,
                 removedIndex: -1,
-                editedSupplierItemId: '',
                 editedItem: {
                     id: '',
-                    supplierItemId: '',
-                    itemName: '',
-                    supplierId: '',
-                    itemDescription: ''
+                    virtualItemId: '',
+                    virtualItemName: '',
+                    virtualItemDescription: ''
                 },
                 defaultItem: {
                     id: '',
-                    supplierItemId: '',
-                    itemName: '',
-                    supplierId: '',
-                    itemDescription: ''
+                    virtualItemId: '',
+                    virtualItemName: '',
+                    virtualItemDescription: ''
                 }
             };
         },
@@ -201,53 +174,42 @@
                         val || this.close();
                     }
                 }
+            },
+            isRequired() {
+                return this.editedItem === -1;
             }
         },
 
         methods: {
             loadData() {
                 this.isLoadingData = true;
-                this.$http.get('supplier').then(res => {
+                this.$http.get('virtualitem').then(res => {
                     if (res.data.success) {
-                        this.suppliers = res.data.responseContent;
-                        console.log(this.suppliers);
+                        setTimeout(() => this.isLoadingData = false, 300);
+                        this.virtualItems = res.data.responseContent;
+                        console.log(this.virtualItems);
                     }
-                }).then(() => {
-                    this.$http.get('item').then(res => {
-                        setTimeout(() => {
-                            this.isLoadingData = false;
-                        }, 300);
-                        if (res.data.success) {
-                            this.items = res.data.responseContent;
-                            console.log(res.data.responseContent);
-                        }
-                    }).then(() => {
-                        this.items.map(obj =>
-                            obj['supplierName'] = this.suppliers.find(supplier =>
-                                supplier.supplierId === obj.supplierId).supplierName);
-                    })
                 });
             },
             editItem(item) {
-                this.editedSupplierItemId = item.supplierItemId;
-                this.editedIndex = this.items.indexOf(item);
+                this.editedIndex = this.virtualItems.indexOf(item);
                 this.editedItem = Object.assign({}, item);
                 this.isEditDialogShown = true;
             },
 
             deleteItem(item) {
                 this.isConfirmDialogShown = true;
-                this.removedIndex = this.items.indexOf(item);
+                this.removedIndex = this.virtualItems.indexOf(item);
             },
 
             cancel() {
                 this.isConfirmDialogShown = false;
             },
             confirm() {
-                this.$http.delete('item', this.items[this.removedIndex].supplierItemId).then(res => {
+                this.$http.delete('supplier', this.virtualItems[this.removedIndex].id).then(res => {
                     console.log(res);
                     if (res.data.success) {
-                        this.items.splice(this.removedIndex, 1);
+                        this.virtualItems.splice(this.removedIndex, 1);
                     }
                 });
                 this.cancel();
@@ -259,7 +221,6 @@
 
             close() {
                 this.isEditDialogShown = false;
-                this.editedSupplierItemId = '';
                 setTimeout(() => {
                     this.editedItem = Object.assign({}, this.defaultItem);
                     this.editedIndex = -1;
@@ -268,19 +229,16 @@
 
             save() {
                 if (this.editedIndex > -1) {
-                    this.$http.put('item', this.editedSupplierItemId, this.editedItem).then(res => {
+                    this.$http.put('virtualitem', this.editedItem.supplierId, this.editedItem).then(res => {
                         console.log(res);
                         if (res.data.success) {
-                            this.editedItem['supplierName'] =
-                                this.suppliers.find(s => s.supplierId === this.editedItem.supplierId).supplierName;
-                            console.log(this.editedItem);
-                            Object.assign(this.items[this.editedIndex], this.editedItem);
+                            Object.assign(this.virtualItems[this.editedIndex], this.editedItem);
                         }
                     });
                 } else {
-                    this.$http.post('item', this.editedItem).then(res => {
+                    this.$http.post('virtualitem', this.editedItem).then(res => {
                         if (res.data.success) {
-                            this.items.push(res.data.responseContent);
+                            this.virtualItems.push(res.data.responseContent);
                         }
                     });
                 }
@@ -289,3 +247,7 @@
         }
     }
 </script>
+
+<style scoped>
+
+</style>

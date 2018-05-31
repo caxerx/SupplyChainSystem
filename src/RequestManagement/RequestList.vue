@@ -3,7 +3,7 @@
         <!-- Table toolbar start -->
         <!-- TODO bind functions -->
         <v-toolbar dark color="primary" class="elevation-0">
-            <v-toolbar-title class="white--text">Agreement List</v-toolbar-title>
+            <v-toolbar-title class="white--text">Request List</v-toolbar-title>
             <v-text-field
                     flat
                     solo-inverted
@@ -32,9 +32,8 @@
                       :items="requests"
                       class="elevation-1"
         >
-            <template slot="item" slot-scope="props">
-                <td></td>
-                <td></td>
+            <template slot="items" slot-scope="props">
+                <td> {{ props.item.id }}</td>
                 <td class="layout px-0">
                     <v-btn icon class="mx-0">
                         <v-icon color="teal">edit</v-icon>
@@ -74,18 +73,12 @@
                     },
                     {
                         text: "Actions",
-                        value: "name",
+                        value: "action",
                         sortable: false
                     }
                 ],
-                requests: [],
-
-
+                requests: []
             }
         }
     }
 </script>
-
-<style scoped>
-
-</style>
