@@ -11,16 +11,49 @@
                     app
             >
                 <v-list>
-                    <v-list-tile value="true"
-                                 v-for="(item, i) in navItems"
-                                 :key="i" :to="item.link">
-                        <v-list-tile-action>
-                            <v-icon>{{ item.icon }}</v-icon>
-                        </v-list-tile-action>
-                        <v-list-tile-content>
-                            <v-list-tile-title>{{ item.title }}</v-list-tile-title>
-                        </v-list-tile-content>
-                    </v-list-tile>
+                    <template v-for="(item, i) in navItems">
+
+                        <v-divider v-if="item.divider"></v-divider>
+
+                        <v-list-group v-else-if="item.children"
+                                      v-model="item.model"
+                                      :key="i"
+                        >
+                            <v-list-tile slot="activator">
+                                <v-list-tile-action>
+                                    <v-icon>{{ item.icon }}</v-icon>
+                                </v-list-tile-action>
+                                <v-list-tile-content>
+                                    <v-list-tile-title>{{ item.text }}</v-list-tile-title>
+                                </v-list-tile-content>
+                            </v-list-tile>
+
+                            <v-list-tile
+                                    v-for="(child, j) in item.children"
+                                    :key="j"
+                                    :to="child.to"
+                            >
+                                <v-list-tile-action>
+                                    <v-icon>{{ child.icon }}</v-icon>
+                                </v-list-tile-action>
+                                <v-list-tile-content>
+                                    <v-list-tile-title>
+                                        {{ child.text }}
+                                    </v-list-tile-title>
+                                </v-list-tile-content>
+                            </v-list-tile>
+                        </v-list-group>
+
+                        <v-list-tile v-else :to="item.to" :key="i">
+                            <v-list-tile-action>
+                                <v-icon>{{ item.icon }}</v-icon>
+                            </v-list-tile-action>
+                            <v-list-tile-content>
+                                <v-list-tile-title>{{ item.text }}</v-list-tile-title>
+                            </v-list-tile-content>
+                        </v-list-tile>
+
+                    </template>
                 </v-list>
             </v-navigation-drawer>
             <!-- Navigation drawer end -->
@@ -80,7 +113,7 @@
                 <v-toolbar dense flat color="grey lighten-3">
                     <v-breadcrumbs class="ml-3">
                         <v-icon slot="divider">chevron_right</v-icon>
-                        <v-breadcrumbs-item v-for="item in $store.getters.breadcrumbs" :key="item.text" :to="item.link"
+                        <v-breadcrumbs-item v-for="item in $store.getters.breadcrumbs" :key="item.text" :to="item.to"
                                             :disabled="item.disabled">
                             {{ item.text }}
                         </v-breadcrumbs-item>
@@ -166,13 +199,74 @@
                 miniVariant: false,
                 // Navigation drawer items
                 navItems: [
-                    {link: '/', icon: 'dashboard', title: 'Dashboard'},
-                    {link: '/item', icon: 'category', title: 'Item Management'},
-                    {link: '/request', icon: 'assignment', title: 'Request Management'},
-                    {link: '/agreement', icon: 'description', title: 'Agreement Management'},
-                    {link: '/user', icon: 'account_circle', title: 'User Management'},
-                    {link: '/setting', icon: 'settings', title: 'Settings'},
-                    {link: '/about', icon: 'info', title: 'About'},
+                    {
+                        to: '/',
+                        icon: 'dashboard',
+                        text: 'Dashboard'
+                    },
+                    {
+                        to: '/item',
+                        icon: 'category',
+                        text: 'Item Management',
+                        model: false,
+                        children:
+                            [
+                                {
+                                    text: 'Supplier Item',
+                                    to: '/item/supplieritem'
+                                },
+                                {
+                                    text: 'Virtual Item',
+                                    to: '/item/virtualitem'
+                                },
+                                {
+                                    text: 'ID Mapping',
+                                    to: '/'
+                                },
+                                {
+                                    text: 'Stock',
+                                    to: '/'
+                                }
+                            ]
+                    },
+                    {
+                        to: '/request',
+                        icon: 'assignment',
+                        text: 'Request Management'
+                    },
+                    {
+                        to: '/agreement',
+                        icon: 'description',
+                        text: 'Agreement Management'
+                    },
+                    {
+                        to: '/restaurant',
+                        icon: 'restaurant',
+                        text: 'Restaurant Management'
+                    },
+                    {
+                        to: '/supplier',
+                        icon: 'shopping_basket',
+                        text: 'Supplier Management'
+                    },
+                    {
+                        to: '/user',
+                        icon: 'account_circle',
+                        text: 'User Management'
+                    },
+                    {
+                        divider: true
+                    },
+                    {
+                        to: '/setting',
+                        icon: 'settings',
+                        text: 'Settings'
+                    },
+                    {
+                        to: '/about',
+                        icon: 'info',
+                        text: 'About'
+                    },
                 ],
                 title: 'Supply Chain System',
             }
@@ -183,6 +277,7 @@
                     this.$http.get('token').then(res => {
                         this.$store.commit('setLoginState', !!res.data.success);
                         this.$store.commit('setTokenValidState', true);
+                        this.$store.commit('setUserType', window.localStorage.getItem("userType"));
                     }).catch(err => {
                         // Error Handling
                         console.log(err.message);

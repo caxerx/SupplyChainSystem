@@ -3,10 +3,12 @@
         <!-- Page title start -->
         <h1 class="display-1 primary--text mb-3">Item Management</h1>
         <!-- Page title end -->
+        <router-view></router-view>
+        <!--
         <item-list></item-list>
-        <supplier-list></supplier-list>
         <virtual-item-list></virtual-item-list>
         <category-list></category-list>
+        -->
 
     </v-container>
 </template>

@@ -22,9 +22,14 @@ import Dashboard from './Dashboard.vue'
 import ItemManagement from './ItemManagement.vue'
 import RequestManagement from './RequestManagement.vue'
 import AgreementManagement from './AgreementManagement.vue'
+import RestaurantManagement from './RestaurantManagement'
+import SupplierManagement from './SupplierManagement'
 import UserManagement from './UserManagement.vue'
 import Settings from './Settings.vue'
 import About from './About.vue'
+// Sub routes
+import ItemList from './ItemManagement/ItemList'
+import VirtualItemList from './ItemManagement/VirtualItemList'
 
 const routes = [
     {
@@ -35,7 +40,18 @@ const routes = [
     {
         path: '/item',
         name: 'Item Management',
-        component: ItemManagement
+        component: ItemManagement,
+        children: [
+            {
+                path: 'supplieritem',
+                name: 'Supplier Item',
+                component: ItemList
+            }, {
+                path: 'virtualitem',
+                name: 'Virtual Item',
+                component: VirtualItemList
+            }
+        ]
     },
     {
         path: '/request',
@@ -46,6 +62,16 @@ const routes = [
         path: '/agreement',
         name: 'Agreement Management',
         component: AgreementManagement
+    },
+    {
+        path: '/restaurant',
+        name: 'Restaurant Management',
+        component: RestaurantManagement
+    },
+    {
+        path: '/supplier',
+        name: 'Supplier Management',
+        component: SupplierManagement
     },
     {
         path: '/user',
@@ -67,55 +93,50 @@ const router = new VueRouter({routes});
 
 // Vuex State Management
 const store = new Vuex.Store({
-    state: {
-        isLoggedIn: false,
-        isTokenValid: false,
-        token: '', // Token of api auth
-        // Server settings
-        serverUrl: 'https://sapi.caxerx.com/api',
-        rowPerPage: [15, 30, 60, {text: 'All', value: -1}],
-        // Error Dialog
-        isErrorDialogShown: false,
-        errorMessage: '',
-    },
-    mutations: {
-        setLoginState(state, payload) {
-            state.isLoggedIn = payload;
+        state: {
+            isLoggedIn: false,
+            isTokenValid: false,
+            userType: 999,
+            token: '', // Token of api auth
+            // Server settings
+            serverUrl: 'https://sapi.caxerx.com/api',
+            rowPerPage: [15, 30, 60, {text: 'All', value: -1}],
+            // Error Dialog
+            isErrorDialogShown: false,
+            errorMessage: '',
         },
-        setToken(state, payload) {
-            state.token = payload;
+        mutations: {
+            setLoginState(state, payload) {
+                state.isLoggedIn = payload;
+            },
+            setToken(state, payload) {
+                state.token = payload;
+            },
+            setTokenValidState(state, payload) {
+                state.isTokenValid = payload;
+            },
+            setErrorDialogState(state, payload) {
+                state.isErrorDialogShown = payload;
+            },
+            setErrorMessage(state, payload) {
+                state.errorMessage = payload;
+            },
+            setUserType(state, payload) {
+                state.userType = payload;
+            },
+            closeErrorDialog(state) {
+                state.isErrorDialogShown = false;
+                setTimeout(() => state.errorMessage = '', 1000);
+            }
         },
-        setTokenValidState(state, payload) {
-            state.isTokenValid = payload;
-        },
-        setErrorDialogState(state, payload) {
-            state.isErrorDialogShown = payload;
-        },
-        setErrorMessage(state, payload) {
-            state.errorMessage = payload;
-        },
-        closeErrorDialog(state) {
-            state.isErrorDialogShown = false;
-            setTimeout(() => state.errorMessage = '', 1000);
+        getters: {
+            breadcrumbs() {
+                return [{text: router.currentRoute.name}];
+                //return [{text: 'hi', disabled: false}];
+            }
         }
-    },
-    getters: {
-        breadcrumbs() {
-            return [
-                {
-                    text: 'hi',
-                    disabled: false
-                },
-                {
-                    text: 'hello',
-                    disabled: false
-                }, {
-                    text: 'bonjour',
-                    disabled: false
-                }];
-        }
-    }
-});
+    })
+;
 
 // Use interceptors to do extra stuff when handling things
 axios.interceptors.request.use(config => {

@@ -54,6 +54,8 @@
                         window.localStorage.setItem("token", this.$store.state.token);
                         this.$store.commit('setLoginState', true);
                         this.$store.commit('setTokenValidState', true);
+                        this.$store.commit('setUserType', res.data.responseContent.userType);
+                        window.localStorage.setItem("userType", this.$store.state.userType);
                         console.log(res.data.responseContent);
                     } else {
                         this.isLoginFailed = true;
