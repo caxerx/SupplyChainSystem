@@ -6,7 +6,7 @@
             <v-navigation-drawer
                     fixed
                     :mini-variant="miniVariant"
-                    :clipped="$vuetify.breakpoint.lgAndDown"
+                    :clipped="$vuetify.breakpoint.smAndUp"
                     v-model="drawer"
                     app
             >
@@ -60,7 +60,7 @@
 
             <!-- Title toolbar start -->
 
-            <v-toolbar fixed app :clipped-left="$vuetify.breakpoint.lgAndDown" color="primary" dark class="pr-4"
+            <v-toolbar fixed app :clipped-left="$vuetify.breakpoint.smAndUp" color="primary" dark class="pr-4"
                        style="z-index: 100">
                 <v-toolbar-title>
                     <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
