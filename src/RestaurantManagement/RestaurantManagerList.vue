@@ -2,14 +2,14 @@
     <div>
         <!-- Table toolbar start -->
         <v-toolbar dark color="primary" class="elevation-0" :clipped-left="$vuetify.breakpoint.lgAndUp">
-            <v-toolbar-title class="white--text">Category Item List</v-toolbar-title>
+            <v-toolbar-title class="white--text">Restaurant Manager List</v-toolbar-title>
             <v-text-field
                     flat
                     solo-inverted
                     prepend-icon="search"
                     label="Search"
-                    v-model="search"
                     class="ml-5"
+                    v-model="search"
             ></v-text-field>
             <v-spacer></v-spacer>
 
@@ -25,11 +25,11 @@
         <!-- Table toolbar end -->
 
         <!-- Table start -->
-        <v-data-table :headers="headers" :items="categoryItems" class="elevation-1" :search="search">
+        <v-data-table :headers="headers" :items="restaurantManagers" class="elevation-1" :search="search"
+                      :rows-per-page-items="this.$store.state.rowPerPage">
             <template slot="items" slot-scope="props">
-                <td>{{ props.item.virtualItemId }}</td>
-                <td>{{ props.item.virtualItemName }}</td>
-                <td>{{ props.item.virtualItemDescription }}</td>
+                <td>{{ props.item.userId }}</td>
+                <td>{{ props.item.userName }}</td>
                 <td class="layout px-0">
                     <v-btn icon class="mx-0" @click="deleteItem(props.item)">
                         <v-icon color="pink">delete</v-icon>
@@ -53,10 +53,19 @@
                     <v-container fluid>
                         <v-layout row>
                             <v-flex xs4>
-                                <v-subheader>Virtual Item ID</v-subheader>
+                                <v-subheader>User Id</v-subheader>
                             </v-flex>
                             <v-flex xs8>
-                                <v-text-field v-model="editedItem.virtualItemId" label="Virtual Item ID"></v-text-field>
+                                <v-text-field v-model="editedItem.id" label="User Id"></v-text-field>
+                            </v-flex>
+                        </v-layout>
+                        <v-layout row>
+                            <v-flex xs4>
+                                <v-subheader>User Name</v-subheader>
+                            </v-flex>
+                            <v-flex xs8>
+                                <v-text-field v-model="editedItem.userName"
+                                              label="User Name"></v-text-field>
                             </v-flex>
                         </v-layout>
                     </v-container>
@@ -84,13 +93,14 @@
             </v-card>
         </v-dialog>
         <!-- Delete Confirm Dialog end -->
-
     </div>
 </template>
 
 <script>
     export default {
-        name: "CategoryItemList",
+        name: "RestaurantManagerList",
+        props: ['restaurant'],
+
         created() {
             this.loadData();
         },
@@ -103,131 +113,102 @@
                 headers: [
                     //Table header data
                     {
-                        text: "Virtual Item Id",
-                        value: "virtualItemId"
+                        text: "User Id",
+                        value: "userId"
                     },
                     {
-                        text: "Item Name",
-                        value: "virtualItemName"
-                    },
-                    {
-                        text: "Item Description",
-                        value: "virtualItemDescription"
+                        text: "User Name",
+                        value: "userName"
                     },
                     {
                         text: "Actions",
-                        value: "name",
+                        value: "action",
                         sortable: false
                     }
                 ],
-                categoryItems: [],
-                virtualItems: [],
+                restaurantManagers: [],
+                users: [],
                 editedIndex: -1,
                 removedIndex: -1,
                 editedItem: {
-                    virtualItemId: ''
+                    id: 0,
                 },
                 defaultItem: {
-                    virtualItemId: ''
+                    id: 0,
                 }
             };
         },
 
         computed: {
             formTitle() {
-                return this.editedIndex === -1 ? "New Item" : "Edit Item";
-            },
-
-            watch() {
-                return {
-                    isEditDialogShown(val) {
-                        val || this.close();
-                    }
-                }
-            },
-            isRequired() {
-                return this.editedItem === -1;
+                return "New Item";
             }
         },
 
-        props: ['category'],
         watch: {
-            category() {
+            restaurant() {
                 this.loadData();
             }
         },
+
         methods: {
             loadData() {
                 this.isLoadingData = true;
-                this.$http.get('virtualitem').then(res => {
+                this.$http.get('user').then(res => {
                     if (res.data.success) {
-                        this.virtualItems = res.data.responseContent;
+                        setTimeout(() => this.isLoadingData = false, 300);
+                        this.users = res.data.responseContent;
                     }
-                    if (this.category) {
-                        this.$http.get(`categoryitem/${this.category}`).then(res => {
-                            if (res.data.success) {
-                                setTimeout(() => this.isLoadingData = false, 300);
-                                this.categoryItems = [];
-                                res.data.responseContent.virtualItemId.forEach(vItem => {
-                                    this.categoryItems.push({virtualItemId: vItem});
-                                });
-                                this.categoryItems.map(cItem => {
-                                        let vItems = this.virtualItems.find(vItem => vItem.virtualItemId === cItem.virtualItemId);
-                                        for (let x in vItems) {
-                                            cItem[x] = vItems[x];
-                                        }
+                    if (this.restaurant) {
+                        this.$http.get(`restaurantmanager/${this.restaurant}`).then(res => {
+                            console.log(res);
+                            this.restaurantManagers = res.data.responseContent.restaurantManager;
+                            this.restaurantManagers.map(rMgr => {
+                                    let users = this.users.find(user => user.userId === rMgr.userId);
+                                    for (let x in users) {
+                                        rMgr[x] = users[x];
                                     }
-                                );
-                                console.log(this.categoryItems);
-                            }
+                                }
+                            );
+                            console.log(this.restaurantManagers);
                         });
                     }
                 });
-            }
-            ,
-            editItem(item) {
-                this.editedIndex = this.categoryItems.indexOf(item);
-                this.editedItem = Object.assign({}, item);
-                this.isEditDialogShown = true;
-            }
-            ,
+            },
 
             deleteItem(item) {
                 this.isConfirmDialogShown = true;
-                this.removedIndex = this.categoryItems.indexOf(item);
-            }
-            ,
+                this.removedIndex = this.restaurantManagers.indexOf(item);
+            },
 
             cancel() {
                 this.isConfirmDialogShown = false;
-            }
-            ,
+            },
+
             confirm() {
-                this.$http.delete('categoryitem', this.categoryItems[this.removedIndex].categoryId).then(res => {
+                this.$http.delete('restaurantmanager', this.restaurant, {id: this.restaurantManagers[this.removedIndex].userId}).then(res => {
                     console.log(res);
                     if (res.data.success) {
-                        this.categoryItems.splice(this.removedIndex, 1);
+                        this.loadData();
                     }
                 });
                 this.cancel();
-            }
-            ,
+            },
 
             addItem() {
                 this.isEditDialogShown = true;
-            }
-            ,
+            },
 
             close() {
                 this.isEditDialogShown = false;
                 setTimeout(() => {
-                    this.loadData();
+                    this.editedItem = Object.assign({}, this.defaultItem);
+                    this.editedIndex = -1;
                 }, 300);
-            }
-            ,
+            },
 
             save() {
-                this.$http.post(`categoryitem/${this.category}`, {id: this.editedItem.virtualItemId}).then(res => {
+                this.$http.post(`restaurantmanager/${this.restaurant}`, this.editedItem).then(res => {
                     if (res.data.success) {
                         this.loadData();
                     }

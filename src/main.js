@@ -27,9 +27,19 @@ import SupplierManagement from './SupplierManagement'
 import UserManagement from './UserManagement.vue'
 import Settings from './Settings.vue'
 import About from './About.vue'
+
 // Sub routes
-import ItemList from './ItemManagement/ItemList'
+// Item Management
+import ItemList from './ItemManagement/SupplierItemList'
 import VirtualItemList from './ItemManagement/VirtualItemList'
+import IdMappingList from './ItemManagement/IdMappingList'
+import StockList from './ItemManagement/StockList'
+import CategoryList from './ItemManagement/CategoryList'
+// Restaurant Management
+import RestaurantList from './RestaurantManagement/RestaurantList'
+import RestaurantTypeList from './RestaurantManagement/RestaurantTypeList'
+import RestaurantManagerList from './RestaurantManagement/RestaurantManagerList'
+
 
 const routes = [
     {
@@ -50,6 +60,19 @@ const routes = [
                 path: 'virtualitem',
                 name: 'Virtual Item',
                 component: VirtualItemList
+            }, {
+                path: 'idmapping',
+                name: 'Item ID Mapping',
+                component: IdMappingList
+            }, {
+                path: 'stock',
+                name: 'Stock',
+                component: StockList
+            },
+            {
+                path: 'category',
+                name: 'Category',
+                component: CategoryList
             }
         ]
     },
@@ -66,7 +89,23 @@ const routes = [
     {
         path: '/restaurant',
         name: 'Restaurant Management',
-        component: RestaurantManagement
+        component: RestaurantManagement,
+        children: [
+            {
+                path: 'list',
+                name: 'Restaurant List',
+                component: RestaurantList
+            },
+            {
+                path: 'type',
+                name: 'Restaurant Type List',
+                component: RestaurantTypeList
+            }, {
+                path: 'manager',
+                name: 'Restaurant Manager List',
+                component: RestaurantManagerList
+            }
+        ]
     },
     {
         path: '/supplier',
@@ -128,12 +167,6 @@ const store = new Vuex.Store({
                 state.isErrorDialogShown = false;
                 setTimeout(() => state.errorMessage = '', 1000);
             }
-        },
-        getters: {
-            breadcrumbs() {
-                return [{text: router.currentRoute.name}];
-                //return [{text: 'hi', disabled: false}];
-            }
         }
     })
 ;
@@ -177,10 +210,7 @@ axios.interceptors.response.use(response => {
     // Temporary disable this to remain compatibility
     // return Promise.resolve(error.response);
 });
-/**
- *
- * @type {{getToken(*, *=): *, get(string): *, post(string, object): *, put(string, string, object): *, delete(*, *): *}}
- */
+
 Vue.prototype.$http = {
     getToken(loginData) {
         return axios({
@@ -192,10 +222,16 @@ Vue.prototype.$http = {
             data: loginData
         });
     },
-    get(url) {
+    get(url, param) {
+        let reqUrl;
+        if (param) {
+            reqUrl = `${store.state.serverUrl}/${url}/${param}`;
+        } else {
+            reqUrl = `${store.state.serverUrl}/${url}`;
+        }
         return axios({
             method: "get",
-            url: `${store.state.serverUrl}/${url}`,
+            url: reqUrl,
             headers: {
                 Authorization: `Bearer ${store.state.token}`
             }
@@ -223,14 +259,26 @@ Vue.prototype.$http = {
             data: data
         });
     },
-    delete(url, param) {
-        return axios({
-            method: "delete",
-            url: `${store.state.serverUrl}/${url}/${param}`,
-            headers: {
-                Authorization: `Bearer ${store.state.token}`
-            }
-        });
+    delete(url, param, data) {
+        if (data) {
+            return axios({
+                method: "delete",
+                url: `${store.state.serverUrl}/${url}/${param}`,
+                headers: {
+                    Authorization: `Bearer ${store.state.token}`
+                },
+                data: data
+            });
+        } else {
+            return axios({
+                method: "delete",
+                url: `${store.state.serverUrl}/${url}/${param}`,
+                headers: {
+                    Authorization: `Bearer ${store.state.token}`
+                }
+            });
+        }
+
     }
 };
 

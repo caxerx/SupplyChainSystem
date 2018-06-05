@@ -70,9 +70,13 @@
 
                 <v-badge color="red" overlap>
                     <span slot="badge">1</span>
-                    <v-btn icon>
-                        <v-icon>notifications</v-icon>
-                    </v-btn>
+                    <v-tooltip bottom>
+                        <v-btn icon slot="activator">
+                            <v-icon>notifications</v-icon>
+                        </v-btn>
+                        <span>Notifications</span>
+                    </v-tooltip>
+
                 </v-badge>
 
                 <!-- Avatar icon menu start -->
@@ -113,12 +117,11 @@
                 <v-toolbar dense flat color="grey lighten-3">
                     <v-breadcrumbs class="ml-3">
                         <v-icon slot="divider">chevron_right</v-icon>
-                        <v-breadcrumbs-item v-for="item in $store.getters.breadcrumbs" :key="item.text" :to="item.to"
+                        <v-breadcrumbs-item v-for="item in breadcrumbs" :key="item.text" :to="item.to"
                                             :disabled="item.disabled">
                             {{ item.text }}
                         </v-breadcrumbs-item>
                     </v-breadcrumbs>
-                    <span class="ml-3"><v-icon>arrow_left</v-icon>Well... fix this later</span>
                 </v-toolbar>
                 <router-view></router-view>
                 <!-- Breadcrumbs end -->
@@ -221,11 +224,15 @@
                                 },
                                 {
                                     text: 'ID Mapping',
-                                    to: '/'
+                                    to: '/item/idmapping'
                                 },
                                 {
                                     text: 'Stock',
-                                    to: '/'
+                                    to: '/item/stock'
+                                },
+                                {
+                                    text: 'Category',
+                                    to: '/item/category'
                                 }
                             ]
                     },
@@ -242,7 +249,19 @@
                     {
                         to: '/restaurant',
                         icon: 'restaurant',
-                        text: 'Restaurant Management'
+                        text: 'Restaurant Management',
+                        model: false,
+                        children:
+                            [ // TODO Fix routes
+                                {
+                                    text: 'Restaurant List',
+                                    to: '/restaurant/list'
+                                },
+                                {
+                                    text: 'Restaurant Type',
+                                    to: '/restaurant/type'
+                                }
+                            ]
                     },
                     {
                         to: '/supplier',
@@ -269,6 +288,16 @@
                     },
                 ],
                 title: 'Supply Chain System',
+            }
+        },
+        computed: {
+            breadcrumbs() {
+                let routes = [];
+                this.$route.matched.forEach(r => {
+                    routes.push({text: r.name, to: r.path, disabled: false});
+                });
+                console.log(routes);
+                return routes;
             }
         },
         methods: {

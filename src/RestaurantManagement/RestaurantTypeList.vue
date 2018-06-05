@@ -2,14 +2,14 @@
     <div>
         <!-- Table toolbar start -->
         <v-toolbar dark color="primary" class="elevation-0" :clipped-left="$vuetify.breakpoint.lgAndUp">
-            <v-toolbar-title class="white--text">Category Item List</v-toolbar-title>
+            <v-toolbar-title class="white--text">Restaurant Type List</v-toolbar-title>
             <v-text-field
                     flat
                     solo-inverted
                     prepend-icon="search"
                     label="Search"
-                    v-model="search"
                     class="ml-5"
+                    v-model="search"
             ></v-text-field>
             <v-spacer></v-spacer>
 
@@ -25,12 +25,14 @@
         <!-- Table toolbar end -->
 
         <!-- Table start -->
-        <v-data-table :headers="headers" :items="categoryItems" class="elevation-1" :search="search">
+        <v-data-table :headers="headers" :items="restaurantTypes" class="elevation-1" :search="search">
             <template slot="items" slot-scope="props">
-                <td>{{ props.item.virtualItemId }}</td>
-                <td>{{ props.item.virtualItemName }}</td>
-                <td>{{ props.item.virtualItemDescription }}</td>
+                <td>{{ props.item.restaurantTypeId }}</td>
+                <td>{{ props.item.restaurantTypeName }}</td>
                 <td class="layout px-0">
+                    <v-btn icon class="mx-0" @click="editItem(props.item)">
+                        <v-icon color="teal">edit</v-icon>
+                    </v-btn>
                     <v-btn icon class="mx-0" @click="deleteItem(props.item)">
                         <v-icon color="pink">delete</v-icon>
                     </v-btn>
@@ -53,10 +55,11 @@
                     <v-container fluid>
                         <v-layout row>
                             <v-flex xs4>
-                                <v-subheader>Virtual Item ID</v-subheader>
+                                <v-subheader>Restaurant Type Name</v-subheader>
                             </v-flex>
                             <v-flex xs8>
-                                <v-text-field v-model="editedItem.virtualItemId" label="Virtual Item ID"></v-text-field>
+                                <v-text-field v-model="editedItem.name"
+                                              label="Restaurant Type Name"></v-text-field>
                             </v-flex>
                         </v-layout>
                     </v-container>
@@ -84,13 +87,12 @@
             </v-card>
         </v-dialog>
         <!-- Delete Confirm Dialog end -->
-
     </div>
 </template>
 
 <script>
     export default {
-        name: "CategoryItemList",
+        name: "RestaurantTypeList",
         created() {
             this.loadData();
         },
@@ -103,32 +105,29 @@
                 headers: [
                     //Table header data
                     {
-                        text: "Virtual Item Id",
-                        value: "virtualItemId"
+                        text: "Restaurant Type Id",
+                        value: "restaurantTypeId"
                     },
                     {
-                        text: "Item Name",
-                        value: "virtualItemName"
-                    },
-                    {
-                        text: "Item Description",
-                        value: "virtualItemDescription"
+                        text: "Restaurant Type Name",
+                        value: "restaurantTypeName"
                     },
                     {
                         text: "Actions",
-                        value: "name",
+                        value: "action",
                         sortable: false
                     }
                 ],
-                categoryItems: [],
-                virtualItems: [],
+                restaurantTypes: [],
                 editedIndex: -1,
                 removedIndex: -1,
                 editedItem: {
-                    virtualItemId: ''
+                    restaurantTypeId:'',
+                    restaurantTypeName: '',
                 },
                 defaultItem: {
-                    virtualItemId: ''
+                    restaurantTypeId:'',
+                    restaurantTypeName: '',
                 }
             };
         },
@@ -150,88 +149,68 @@
             }
         },
 
-        props: ['category'],
-        watch: {
-            category() {
-                this.loadData();
-            }
-        },
         methods: {
             loadData() {
                 this.isLoadingData = true;
-                this.$http.get('virtualitem').then(res => {
+                this.$http.get('restauranttype').then(res => {
                     if (res.data.success) {
-                        this.virtualItems = res.data.responseContent;
-                    }
-                    if (this.category) {
-                        this.$http.get(`categoryitem/${this.category}`).then(res => {
-                            if (res.data.success) {
-                                setTimeout(() => this.isLoadingData = false, 300);
-                                this.categoryItems = [];
-                                res.data.responseContent.virtualItemId.forEach(vItem => {
-                                    this.categoryItems.push({virtualItemId: vItem});
-                                });
-                                this.categoryItems.map(cItem => {
-                                        let vItems = this.virtualItems.find(vItem => vItem.virtualItemId === cItem.virtualItemId);
-                                        for (let x in vItems) {
-                                            cItem[x] = vItems[x];
-                                        }
-                                    }
-                                );
-                                console.log(this.categoryItems);
-                            }
-                        });
+                        setTimeout(() => this.isLoadingData = false, 300);
+                        this.restaurantTypes = res.data.responseContent;
+                        console.log(this.restaurantTypes);
                     }
                 });
-            }
-            ,
+            },
             editItem(item) {
-                this.editedIndex = this.categoryItems.indexOf(item);
+                this.editedIndex = this.restaurantTypes.indexOf(item);
                 this.editedItem = Object.assign({}, item);
                 this.isEditDialogShown = true;
-            }
-            ,
+            },
 
             deleteItem(item) {
                 this.isConfirmDialogShown = true;
-                this.removedIndex = this.categoryItems.indexOf(item);
-            }
-            ,
+                this.removedIndex = this.restaurantTypes.indexOf(item);
+            },
 
             cancel() {
                 this.isConfirmDialogShown = false;
-            }
-            ,
+            },
             confirm() {
-                this.$http.delete('categoryitem', this.categoryItems[this.removedIndex].categoryId).then(res => {
+                this.$http.delete('restauranttype', this.restaurantTypes[this.removedIndex].restaurantTypeId).then(res => {
                     console.log(res);
                     if (res.data.success) {
-                        this.categoryItems.splice(this.removedIndex, 1);
+                        this.restaurantTypes.splice(this.removedIndex, 1);
                     }
                 });
                 this.cancel();
-            }
-            ,
+            },
 
             addItem() {
                 this.isEditDialogShown = true;
-            }
-            ,
+            },
 
             close() {
                 this.isEditDialogShown = false;
                 setTimeout(() => {
-                    this.loadData();
+                    this.editedItem = Object.assign({}, this.defaultItem);
+                    this.editedIndex = -1;
                 }, 300);
-            }
-            ,
+            },
 
             save() {
-                this.$http.post(`categoryitem/${this.category}`, {id: this.editedItem.virtualItemId}).then(res => {
-                    if (res.data.success) {
-                        this.loadData();
-                    }
-                });
+                if (this.editedIndex > -1) {
+                    this.$http.put('restauranttype', this.editedItem.restaurantTypeId, this.editedItem).then(res => {
+                        console.log(res);
+                        if (res.data.success) {
+                            Object.assign(this.restaurantTypes[this.editedIndex], this.editedItem);
+                        }
+                    });
+                } else {
+                    this.$http.post('restauranttype', this.editedItem).then(res => {
+                        if (res.data.success) {
+                            this.restaurantTypes.push(res.data.responseContent);
+                        }
+                    });
+                }
                 this.close();
             }
         }

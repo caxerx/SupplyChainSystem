@@ -2,14 +2,14 @@
     <div>
         <!-- Table toolbar start -->
         <v-toolbar dark color="primary" class="elevation-0" :clipped-left="$vuetify.breakpoint.lgAndUp">
-            <v-toolbar-title class="white--text">Category Item List</v-toolbar-title>
+            <v-toolbar-title class="white--text">Mapped Items</v-toolbar-title>
             <v-text-field
                     flat
                     solo-inverted
                     prepend-icon="search"
                     label="Search"
-                    v-model="search"
                     class="ml-5"
+                    v-model="search"
             ></v-text-field>
             <v-spacer></v-spacer>
 
@@ -25,11 +25,14 @@
         <!-- Table toolbar end -->
 
         <!-- Table start -->
-        <v-data-table :headers="headers" :items="categoryItems" class="elevation-1" :search="search">
+        <v-data-table :headers="headers" :items="mapItems" class="elevation-1" :search="search"
+                      :rows-per-page-items="this.$store.state.rowPerPage">
             <template slot="items" slot-scope="props">
-                <td>{{ props.item.virtualItemId }}</td>
-                <td>{{ props.item.virtualItemName }}</td>
-                <td>{{ props.item.virtualItemDescription }}</td>
+                <td>{{ props.item.id }}</td>
+                <td>{{ props.item.supplierItemId }}</td>
+                <td>{{ props.item.itemName }}</td>
+                <td>{{ props.item.supplierName }}</td>
+                <td>{{ props.item.itemDescription }}</td>
                 <td class="layout px-0">
                     <v-btn icon class="mx-0" @click="deleteItem(props.item)">
                         <v-icon color="pink">delete</v-icon>
@@ -53,10 +56,11 @@
                     <v-container fluid>
                         <v-layout row>
                             <v-flex xs4>
-                                <v-subheader>Virtual Item ID</v-subheader>
+                                <v-subheader>Supplier Item Id</v-subheader>
                             </v-flex>
                             <v-flex xs8>
-                                <v-text-field v-model="editedItem.virtualItemId" label="Virtual Item ID"></v-text-field>
+                                <v-text-field v-model="editedItem.supplierItemId"
+                                              label="Supplier Item Id"></v-text-field>
                             </v-flex>
                         </v-layout>
                     </v-container>
@@ -84,13 +88,13 @@
             </v-card>
         </v-dialog>
         <!-- Delete Confirm Dialog end -->
-
     </div>
 </template>
 
 <script>
     export default {
-        name: "CategoryItemList",
+        name: "IdMapItemList",
+        props: ['vItem'],
         created() {
             this.loadData();
         },
@@ -103,32 +107,52 @@
                 headers: [
                     //Table header data
                     {
-                        text: "Virtual Item Id",
-                        value: "virtualItemId"
+                        text: "Id",
+                        align: "left",
+                        value: "id"
+                    },
+                    {
+                        text: "Supplier Item Id",
+                        value: "supplierItemId"
                     },
                     {
                         text: "Item Name",
-                        value: "virtualItemName"
+                        value: "itemName"
                     },
                     {
-                        text: "Item Description",
-                        value: "virtualItemDescription"
+                        text: "Supplier",
+                        value: "supplierName"
+                    },
+                    {
+                        text: "Description",
+                        value: "itemDescription",
+                        width: "300"
                     },
                     {
                         text: "Actions",
-                        value: "name",
+                        value: "action",
                         sortable: false
                     }
                 ],
-                categoryItems: [],
-                virtualItems: [],
+                items: [], //User data, ajax fetch reserve
+                suppliers: [],
+                mapItems: [],
                 editedIndex: -1,
                 removedIndex: -1,
+                editedSupplierItemId: '',
                 editedItem: {
-                    virtualItemId: ''
+                    id: '',
+                    supplierItemId: '',
+                    itemName: '',
+                    supplierId: '',
+                    itemDescription: ''
                 },
                 defaultItem: {
-                    virtualItemId: ''
+                    id: '',
+                    supplierItemId: '',
+                    itemName: '',
+                    supplierId: '',
+                    itemDescription: ''
                 }
             };
         },
@@ -144,90 +168,97 @@
                         val || this.close();
                     }
                 }
-            },
-            isRequired() {
-                return this.editedItem === -1;
             }
         },
-
-        props: ['category'],
         watch: {
-            category() {
+            vItem() {
                 this.loadData();
             }
         },
+
         methods: {
             loadData() {
                 this.isLoadingData = true;
-                this.$http.get('virtualitem').then(res => {
+                this.mapItems = [];
+                this.$http.get('supplier').then(res => {
                     if (res.data.success) {
-                        this.virtualItems = res.data.responseContent;
+                        this.suppliers = res.data.responseContent;
+                        // console.log(this.suppliers);
                     }
-                    if (this.category) {
-                        this.$http.get(`categoryitem/${this.category}`).then(res => {
-                            if (res.data.success) {
-                                setTimeout(() => this.isLoadingData = false, 300);
-                                this.categoryItems = [];
-                                res.data.responseContent.virtualItemId.forEach(vItem => {
-                                    this.categoryItems.push({virtualItemId: vItem});
-                                });
-                                this.categoryItems.map(cItem => {
-                                        let vItems = this.virtualItems.find(vItem => vItem.virtualItemId === cItem.virtualItemId);
-                                        for (let x in vItems) {
-                                            cItem[x] = vItems[x];
+                }).then(() => {
+                    this.$http.get('item').then(res => {
+                        setTimeout(() => {
+                            this.isLoadingData = false;
+                        }, 300);
+                        if (res.data.success) {
+                            this.items = res.data.responseContent;
+                            // console.log(res.data.responseContent);
+                        }
+                    }).then(() => {
+                        if (this.vItem) {
+                            this.$http.get(`mapitem/${this.vItem}`).then(res => {
+                                if (res.data.success) {
+                                    // console.log(res.data.responseContent);
+                                    res.data.responseContent.forEach(item => {
+                                        this.mapItems.push({supplierItemId: item});
+                                    });
+                                    this.mapItems.map(mItem => {
+                                        let sItem = this.items.find(item => item.supplierItemId === mItem.supplierItemId);
+                                        for (let x in sItem) {
+                                            mItem[x] = sItem[x];
                                         }
-                                    }
-                                );
-                                console.log(this.categoryItems);
-                            }
-                        });
-                    }
+                                        let supp = this.suppliers.find(supp => supp.supplierId === mItem.supplierId);
+                                        for (let x in supp) {
+                                            mItem[x] = supp[x];
+                                        }
+                                    });
+                                    // console.log('mItem: ', this.mapItems);
+                                }
+                            })
+                        }
+                    })
                 });
-            }
-            ,
+            },
             editItem(item) {
-                this.editedIndex = this.categoryItems.indexOf(item);
+                this.editedSupplierItemId = item.supplierItemId;
+                this.editedIndex = this.items.indexOf(item);
                 this.editedItem = Object.assign({}, item);
                 this.isEditDialogShown = true;
-            }
-            ,
+            },
 
             deleteItem(item) {
                 this.isConfirmDialogShown = true;
-                this.removedIndex = this.categoryItems.indexOf(item);
-            }
-            ,
+                this.removedIndex = this.items.indexOf(item);
+            },
 
             cancel() {
                 this.isConfirmDialogShown = false;
-            }
-            ,
+            },
             confirm() {
-                this.$http.delete('categoryitem', this.categoryItems[this.removedIndex].categoryId).then(res => {
+                this.$http.delete('item', this.items[this.removedIndex].supplierItemId).then(res => {
                     console.log(res);
                     if (res.data.success) {
-                        this.categoryItems.splice(this.removedIndex, 1);
+                        this.items.splice(this.removedIndex, 1);
                     }
                 });
                 this.cancel();
-            }
-            ,
+            },
 
             addItem() {
                 this.isEditDialogShown = true;
-            }
-            ,
+            },
 
             close() {
                 this.isEditDialogShown = false;
+                this.editedSupplierItemId = '';
                 setTimeout(() => {
-                    this.loadData();
+                    this.editedItem = Object.assign({}, this.defaultItem);
+                    this.editedIndex = -1;
                 }, 300);
-            }
-            ,
+            },
 
             save() {
-                this.$http.post(`categoryitem/${this.category}`, {id: this.editedItem.virtualItemId}).then(res => {
+                this.$http.post(`mapitem/${this.editedItem.supplierItemId}`, {Id: this.vItem}).then(res => {
                     if (res.data.success) {
                         this.loadData();
                     }

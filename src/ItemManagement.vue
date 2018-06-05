@@ -14,7 +14,7 @@
 </template>
 
 <script>
-    import ItemList from "./ItemManagement/ItemList";
+    import ItemList from "./ItemManagement/SupplierItemList";
     import SupplierList from "./SupplierList";
     import VirtualItemList from "./ItemManagement/VirtualItemList";
     import CategoryList from "./ItemManagement/CategoryList";

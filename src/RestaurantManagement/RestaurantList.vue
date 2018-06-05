@@ -2,7 +2,7 @@
     <div>
         <!-- Table toolbar start -->
         <v-toolbar dark color="primary" class="elevation-0" :clipped-left="$vuetify.breakpoint.lgAndUp">
-            <v-toolbar-title class="white--text">Item List</v-toolbar-title>
+            <v-toolbar-title class="white--text">Restaurant List</v-toolbar-title>
             <v-text-field
                     flat
                     solo-inverted
@@ -25,15 +25,20 @@
         <!-- Table toolbar end -->
 
         <!-- Table start -->
-        <v-data-table :headers="headers" :items="items" class="elevation-1" :search="search"
-                      :rows-per-page-items="this.$store.state.rowPerPage">
+        <v-data-table :headers="headers" :items="restaurants" class="elevation-1" :search="search">
             <template slot="items" slot-scope="props">
-                <td>{{ props.item.id }}</td>
-                <td>{{ props.item.supplierItemId }}</td>
-                <td>{{ props.item.itemName }}</td>
-                <td>{{ props.item.supplierName }}</td>
-                <td>{{ props.item.itemDescription }}</td>
+                <td>{{ props.item.restaurantId }}</td>
+                <td>{{ props.item.restaurantName }}</td>
+                <td>{{ props.item.restaurantLocation }}</td>
+                <td>{{ props.item.restaurantTypeName }}</td>
+                <td>{{ props.item.stockId }}</td>
                 <td class="layout px-0">
+                    <v-btn icon class="mx-0" @click="viewItem(props.item)">
+                        <v-icon color="blue">category</v-icon>
+                    </v-btn>
+                    <v-btn icon class="mx-0" @click="viewManager(props.item)">
+                        <v-icon color="orange">account_circle</v-icon>
+                    </v-btn>
                     <v-btn icon class="mx-0" @click="editItem(props.item)">
                         <v-icon color="teal">edit</v-icon>
                     </v-btn>
@@ -59,43 +64,33 @@
                     <v-container fluid>
                         <v-layout row>
                             <v-flex xs4>
-                                <v-subheader>Supplier Item Id</v-subheader>
+                                <v-subheader>Restaurant Name</v-subheader>
                             </v-flex>
                             <v-flex xs8>
-                                <v-text-field v-model="editedItem.supplierItemId"
-                                              label="Supplier Item Id"></v-text-field>
+                                <v-text-field v-model="editedItem.restaurantName"
+                                              label="Restaurant Name"></v-text-field>
                             </v-flex>
                         </v-layout>
                         <v-layout row>
                             <v-flex xs4>
-                                <v-subheader>Item Name</v-subheader>
+                                <v-subheader>Restaurant Type</v-subheader>
                             </v-flex>
                             <v-flex xs8>
-                                <v-text-field v-model="editedItem.itemName" label="Item Name"></v-text-field>
-                            </v-flex>
-                        </v-layout>
-                        <v-layout row>
-                            <v-flex xs4>
-                                <v-subheader>Supplier</v-subheader>
-                            </v-flex>
-                            <v-flex xs8>
-                                <v-select v-model="editedItem.supplierId"
-                                          :items="suppliers"
-                                          item-text="supplierName"
-                                          item-value="supplierId"
-                                          label="Select a Supplier"
+                                <v-select v-model="editedItem.restaurantTypeId"
+                                          :items="restaurantTypes"
+                                          item-value="restaurantTypeId"
+                                          item-text="restaurantTypeName"
                                           single-line
-                                >
-                                </v-select>
+                                          label="Select a type"></v-select>
                             </v-flex>
                         </v-layout>
                         <v-layout row>
                             <v-flex xs4>
-                                <v-subheader>Description</v-subheader>
+                                <v-subheader>Restaurant Location</v-subheader>
                             </v-flex>
                             <v-flex xs8>
-                                <v-text-field v-model="editedItem.itemDescription" label="Description"
-                                              multi-line></v-text-field>
+                                <v-text-field v-model="editedItem.restaurantLocation"
+                                              label="Restaurant Location" multi-line></v-text-field>
                             </v-flex>
                         </v-layout>
                     </v-container>
@@ -123,12 +118,28 @@
             </v-card>
         </v-dialog>
         <!-- Delete Confirm Dialog end -->
+
+        <v-dialog v-model="isItemDialogShown" max-width="900">
+            <v-card>
+                <stock-item-list :stock="selectedStock"></stock-item-list>
+            </v-card>
+        </v-dialog>
+
+        <v-dialog v-model="isManagerDialogShown" max-width="900">
+            <v-card>
+                <restaurant-manager-list :restaurant="selectedRestaurant"></restaurant-manager-list>
+            </v-card>
+        </v-dialog>
     </div>
 </template>
 
 <script>
+    import StockItemList from '../ItemManagement/StockItemList'
+    import RestaurantManagerList from "./RestaurantManagerList";
+
     export default {
-        name: "ItemList",
+        name: "RestaurantList",
+        components: {RestaurantManagerList, StockItemList},
         created() {
             this.loadData();
         },
@@ -138,29 +149,29 @@
                 isLoadingData: false, //Loading state
                 isEditDialogShown: false, //Edit dialog
                 isConfirmDialogShown: false, //Confirm dialog
+                isItemDialogShown: false,
+                isManagerDialogShown: false,
                 headers: [
                     //Table header data
                     {
-                        text: "Id",
-                        align: "left",
-                        value: "id"
+                        text: "Restaurant Id",
+                        value: "restaurantId"
                     },
                     {
-                        text: "Supplier Item Id",
-                        value: "supplierItemId"
+                        text: "Restaurant Name",
+                        value: "restaurantName"
                     },
                     {
-                        text: "Item Name",
-                        value: "itemName"
+                        text: "Location",
+                        value: "restaurantLocation"
                     },
                     {
-                        text: "Supplier",
-                        value: "supplierName"
+                        text: "Restaurant Type",
+                        value: "restaurantTypeName"
                     },
                     {
-                        text: "Description",
-                        value: "itemDescription",
-                        width: "300"
+                        text: "Stock Id",
+                        value: "stockId"
                     },
                     {
                         text: "Actions",
@@ -168,24 +179,27 @@
                         sortable: false
                     }
                 ],
-                items: [], //User data, ajax fetch reserve
-                suppliers: [],
+                restaurants: [],
+                restaurantTypes: [],
+                selectedStock: '',
+                selectedRestaurant: '',
                 editedIndex: -1,
                 removedIndex: -1,
-                editedSupplierItemId: '',
                 editedItem: {
                     id: '',
-                    supplierItemId: '',
-                    itemName: '',
-                    supplierId: '',
-                    itemDescription: ''
+                    restaurantId: '',
+                    restaurantName: '',
+                    restaurantLocation: '',
+                    restaurantType: '',
+                    stockId: ''
                 },
                 defaultItem: {
                     id: '',
-                    supplierItemId: '',
-                    itemName: '',
-                    supplierId: '',
-                    itemDescription: ''
+                    restaurantId: '',
+                    restaurantName: '',
+                    restaurantLocation: '',
+                    restaurantType: '',
+                    stockId: ''
                 }
             };
         },
@@ -193,61 +207,48 @@
         computed: {
             formTitle() {
                 return this.editedIndex === -1 ? "New Item" : "Edit Item";
-            },
-
-            watch() {
-                return {
-                    isEditDialogShown(val) {
-                        val || this.close();
-                    }
-                }
             }
         },
 
         methods: {
             loadData() {
                 this.isLoadingData = true;
-                this.$http.get('supplier').then(res => {
+                this.$http.get('restauranttype').then(res => {
                     if (res.data.success) {
-                        this.suppliers = res.data.responseContent;
-                        console.log(this.suppliers);
+                        this.restaurantTypes = res.data.responseContent;
                     }
                 }).then(() => {
-                    this.$http.get('item').then(res => {
-                        setTimeout(() => {
-                            this.isLoadingData = false;
-                        }, 300);
+                    this.$http.get('restaurant').then(res => {
                         if (res.data.success) {
-                            this.items = res.data.responseContent;
-                            console.log(res.data.responseContent);
+                            setTimeout(() => this.isLoadingData = false, 300);
+                            this.restaurants = res.data.responseContent;
+                            console.log(this.restaurants);
+                            this.restaurants.map(obj =>
+                                obj.restaurantTypeName = this.restaurantTypes.find(type =>
+                                    type.restaurantTypeId === obj.restaurantTypeId).restaurantTypeName);
                         }
-                    }).then(() => {
-                        this.items.map(obj =>
-                            obj['supplierName'] = this.suppliers.find(supplier =>
-                                supplier.supplierId === obj.supplierId).supplierName);
-                    })
-                });
+                    });
+                })
             },
             editItem(item) {
-                this.editedSupplierItemId = item.supplierItemId;
-                this.editedIndex = this.items.indexOf(item);
+                this.editedIndex = this.restaurants.indexOf(item);
                 this.editedItem = Object.assign({}, item);
                 this.isEditDialogShown = true;
             },
 
             deleteItem(item) {
                 this.isConfirmDialogShown = true;
-                this.removedIndex = this.items.indexOf(item);
+                this.removedIndex = this.restaurants.indexOf(item);
             },
 
             cancel() {
                 this.isConfirmDialogShown = false;
             },
             confirm() {
-                this.$http.delete('item', this.items[this.removedIndex].supplierItemId).then(res => {
+                this.$http.delete('restaurant', this.restaurants[this.removedIndex].restaurantId).then(res => {
                     console.log(res);
                     if (res.data.success) {
-                        this.items.splice(this.removedIndex, 1);
+                        this.restaurants.splice(this.removedIndex, 1);
                     }
                 });
                 this.cancel();
@@ -257,9 +258,18 @@
                 this.isEditDialogShown = true;
             },
 
+            viewItem(item) {
+                this.selectedStock = item.stockId;
+
+                this.isItemDialogShown = true;
+            },
+            viewManager(item) {
+                this.selectedRestaurant = item.restaurantId;
+                this.isManagerDialogShown = true;
+            },
+
             close() {
                 this.isEditDialogShown = false;
-                this.editedSupplierItemId = '';
                 setTimeout(() => {
                     this.editedItem = Object.assign({}, this.defaultItem);
                     this.editedIndex = -1;
@@ -268,19 +278,16 @@
 
             save() {
                 if (this.editedIndex > -1) {
-                    this.$http.put('item', this.editedSupplierItemId, this.editedItem).then(res => {
+                    this.$http.put('restaurant', this.editedItem.restaurantId, this.editedItem).then(res => {
                         console.log(res);
                         if (res.data.success) {
-                            this.editedItem['supplierName'] =
-                                this.suppliers.find(s => s.supplierId === this.editedItem.supplierId).supplierName;
-                            console.log(this.editedItem);
-                            Object.assign(this.items[this.editedIndex], this.editedItem);
+                            Object.assign(this.restaurants[this.editedIndex], this.editedItem);
                         }
                     });
                 } else {
-                    this.$http.post('item', this.editedItem).then(res => {
+                    this.$http.post('restaurant', this.editedItem).then(res => {
                         if (res.data.success) {
-                            this.items.push(res.data.responseContent);
+                            this.restaurants.push(res.data.responseContent);
                         }
                     });
                 }
@@ -289,3 +296,7 @@
         }
     }
 </script>
+
+<style scoped>
+
+</style>

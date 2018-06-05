@@ -2,14 +2,14 @@
     <div>
         <!-- Table toolbar start -->
         <v-toolbar dark color="primary" class="elevation-0" :clipped-left="$vuetify.breakpoint.lgAndUp">
-            <v-toolbar-title class="white--text">Category Item List</v-toolbar-title>
+            <v-toolbar-title class="white--text">Stock Item List</v-toolbar-title>
             <v-text-field
                     flat
                     solo-inverted
                     prepend-icon="search"
                     label="Search"
-                    v-model="search"
                     class="ml-5"
+                    v-model="search"
             ></v-text-field>
             <v-spacer></v-spacer>
 
@@ -25,12 +25,16 @@
         <!-- Table toolbar end -->
 
         <!-- Table start -->
-        <v-data-table :headers="headers" :items="categoryItems" class="elevation-1" :search="search">
+        <v-data-table :headers="headers" :items="stockItems" class="elevation-1" :search="search">
             <template slot="items" slot-scope="props">
                 <td>{{ props.item.virtualItemId }}</td>
                 <td>{{ props.item.virtualItemName }}</td>
                 <td>{{ props.item.virtualItemDescription }}</td>
+                <td>{{ props.item.quantity}}</td>
                 <td class="layout px-0">
+                    <v-btn icon class="mx-0" @click="editItem(props.item)">
+                        <v-icon color="teal">edit</v-icon>
+                    </v-btn>
                     <v-btn icon class="mx-0" @click="deleteItem(props.item)">
                         <v-icon color="pink">delete</v-icon>
                     </v-btn>
@@ -53,10 +57,20 @@
                     <v-container fluid>
                         <v-layout row>
                             <v-flex xs4>
-                                <v-subheader>Virtual Item ID</v-subheader>
+                                <v-subheader>Virtual Item Id</v-subheader>
                             </v-flex>
                             <v-flex xs8>
-                                <v-text-field v-model="editedItem.virtualItemId" label="Virtual Item ID"></v-text-field>
+                                <v-text-field v-model="editedItem.virtualItemId" label="Virtual Item Id"></v-text-field>
+                            </v-flex>
+                        </v-layout>
+                        <v-layout row>
+                            <v-flex xs4>
+                                <v-subheader>Quantity</v-subheader>
+                            </v-flex>
+                            <v-flex xs8>
+                                <v-text-field v-model="editedItem.quantity"
+                                              type="number"
+                                              label="Quantity"></v-text-field>
                             </v-flex>
                         </v-layout>
                     </v-container>
@@ -84,13 +98,12 @@
             </v-card>
         </v-dialog>
         <!-- Delete Confirm Dialog end -->
-
     </div>
 </template>
 
 <script>
     export default {
-        name: "CategoryItemList",
+        name: "StockItemList",
         created() {
             this.loadData();
         },
@@ -111,24 +124,30 @@
                         value: "virtualItemName"
                     },
                     {
-                        text: "Item Description",
+                        text: "Description",
                         value: "virtualItemDescription"
                     },
                     {
+                        text: "Quantity",
+                        value: "quantity"
+                    },
+                    {
                         text: "Actions",
-                        value: "name",
+                        value: "action",
                         sortable: false
                     }
                 ],
-                categoryItems: [],
                 virtualItems: [],
+                stockItems: [],
                 editedIndex: -1,
                 removedIndex: -1,
                 editedItem: {
-                    virtualItemId: ''
+                    virtualItemId: '',
+                    quantity: 0
                 },
                 defaultItem: {
-                    virtualItemId: ''
+                    virtualItemId: '',
+                    quantity: 0
                 }
             };
         },
@@ -149,89 +168,89 @@
                 return this.editedItem === -1;
             }
         },
-
-        props: ['category'],
+        props: ['stock'],
         watch: {
-            category() {
+            stock() {
                 this.loadData();
             }
         },
+
         methods: {
             loadData() {
                 this.isLoadingData = true;
                 this.$http.get('virtualitem').then(res => {
                     if (res.data.success) {
+                        setTimeout(() => this.isLoadingData = false, 300);
                         this.virtualItems = res.data.responseContent;
+                        console.log(this.virtualItems);
                     }
-                    if (this.category) {
-                        this.$http.get(`categoryitem/${this.category}`).then(res => {
-                            if (res.data.success) {
-                                setTimeout(() => this.isLoadingData = false, 300);
-                                this.categoryItems = [];
-                                res.data.responseContent.virtualItemId.forEach(vItem => {
-                                    this.categoryItems.push({virtualItemId: vItem});
-                                });
-                                this.categoryItems.map(cItem => {
-                                        let vItems = this.virtualItems.find(vItem => vItem.virtualItemId === cItem.virtualItemId);
-                                        for (let x in vItems) {
-                                            cItem[x] = vItems[x];
-                                        }
+                    if (this.stock) {
+                        this.$http.get('stockitem', this.stock).then(res => {
+                            this.stockItems = res.data.responseContent.stockItem;
+                            this.stockItems.map(sItems => {
+                                    let vItems = this.virtualItems.find(item => item.id === sItems.virtualItemId);
+                                    for (let x in vItems) {
+                                        sItems[x] = vItems[x];
                                     }
-                                );
-                                console.log(this.categoryItems);
-                            }
+                                }
+                            );
+                            console.log(this.stockItems);
+
                         });
                     }
                 });
-            }
-            ,
+            },
             editItem(item) {
-                this.editedIndex = this.categoryItems.indexOf(item);
+                this.editedIndex = this.stockItems.indexOf(item);
                 this.editedItem = Object.assign({}, item);
                 this.isEditDialogShown = true;
-            }
-            ,
+            },
 
             deleteItem(item) {
                 this.isConfirmDialogShown = true;
-                this.removedIndex = this.categoryItems.indexOf(item);
-            }
-            ,
+                this.removedIndex = this.stockItems.indexOf(item);
+            },
 
             cancel() {
                 this.isConfirmDialogShown = false;
-            }
-            ,
+            },
             confirm() {
-                this.$http.delete('categoryitem', this.categoryItems[this.removedIndex].categoryId).then(res => {
+                this.$http.delete('stockitem', this.stockItems[this.removedIndex].virtualItemId).then(res => {
                     console.log(res);
-                    if (res.data.success) {
-                        this.categoryItems.splice(this.removedIndex, 1);
-                    }
-                });
-                this.cancel();
-            }
-            ,
-
-            addItem() {
-                this.isEditDialogShown = true;
-            }
-            ,
-
-            close() {
-                this.isEditDialogShown = false;
-                setTimeout(() => {
-                    this.loadData();
-                }, 300);
-            }
-            ,
-
-            save() {
-                this.$http.post(`categoryitem/${this.category}`, {id: this.editedItem.virtualItemId}).then(res => {
                     if (res.data.success) {
                         this.loadData();
                     }
                 });
+                this.cancel();
+            },
+
+            addItem() {
+                this.isEditDialogShown = true;
+            },
+
+            close() {
+                this.isEditDialogShown = false;
+                setTimeout(() => {
+                    this.editedItem = Object.assign({}, this.defaultItem);
+                    this.editedIndex = -1;
+                }, 300);
+            },
+
+            save() {
+                if (this.editedIndex > -1) {
+                    this.$http.put('stockitem', this.stock, this.editedItem).then(res => {
+                        console.log(res);
+                        if (res.data.success) {
+                            this.loadData();
+                        }
+                    });
+                } else {
+                    this.$http.post(`stockitem/${this.stock}`, this.editedItem).then(res => {
+                        if (res.data.success) {
+                            this.loadData();
+                        }
+                    });
+                }
                 this.close();
             }
         }

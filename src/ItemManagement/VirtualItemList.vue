@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <v-card>
         <!-- Table toolbar start -->
         <v-toolbar dark color="primary" class="elevation-0" :clipped-left="$vuetify.breakpoint.lgAndUp">
             <v-toolbar-title class="white--text">Virtual Item List</v-toolbar-title>
@@ -106,7 +106,8 @@
             </v-card>
         </v-dialog>
         <!-- Delete Confirm Dialog end -->
-    </div>
+    </v-card>
+
 </template>
 
 <script>
@@ -206,7 +207,7 @@
                 this.isConfirmDialogShown = false;
             },
             confirm() {
-                this.$http.delete('supplier', this.virtualItems[this.removedIndex].id).then(res => {
+                this.$http.delete('virtualitem', this.virtualItems[this.removedIndex].id).then(res => {
                     console.log(res);
                     if (res.data.success) {
                         this.virtualItems.splice(this.removedIndex, 1);
@@ -229,7 +230,7 @@
 
             save() {
                 if (this.editedIndex > -1) {
-                    this.$http.put('virtualitem', this.editedItem.supplierId, this.editedItem).then(res => {
+                    this.$http.put('virtualitem', this.editedItem.virtualItemId, this.editedItem).then(res => {
                         console.log(res);
                         if (res.data.success) {
                             Object.assign(this.virtualItems[this.editedIndex], this.editedItem);
