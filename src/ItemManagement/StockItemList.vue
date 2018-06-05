@@ -69,7 +69,7 @@
                             </v-flex>
                             <v-flex xs8>
                                 <v-text-field v-model="editedItem.quantity"
-                                              type="number"
+                                              type="number" min
                                               label="Quantity"></v-text-field>
                             </v-flex>
                         </v-layout>
@@ -156,14 +156,6 @@
             formTitle() {
                 return this.editedIndex === -1 ? "New Item" : "Edit Item";
             },
-
-            watch() {
-                return {
-                    isEditDialogShown(val) {
-                        val || this.close();
-                    }
-                }
-            },
             isRequired() {
                 return this.editedItem === -1;
             }
@@ -172,6 +164,9 @@
         watch: {
             stock() {
                 this.loadData();
+            },
+            isEditDialogShown(val) {
+                val || this.close();
             }
         },
 
@@ -225,6 +220,7 @@
             },
 
             addItem() {
+                this.editedIndex = -1;
                 this.isEditDialogShown = true;
             },
 
@@ -241,12 +237,14 @@
                     this.$http.put('stockitem', this.stock, this.editedItem).then(res => {
                         console.log(res);
                         if (res.data.success) {
+                            this.editedItem = Object.assign({}, this.defaultItem);
                             this.loadData();
                         }
                     });
                 } else {
                     this.$http.post(`stockitem/${this.stock}`, this.editedItem).then(res => {
                         if (res.data.success) {
+                            this.editedItem = Object.assign({}, this.defaultItem);
                             this.loadData();
                         }
                     });

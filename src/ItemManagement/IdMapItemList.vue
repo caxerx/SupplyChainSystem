@@ -47,29 +47,9 @@
         <!-- Table end -->
 
         <!-- Edit Dialog start -->
-        <v-dialog v-model="isEditDialogShown" max-width="500px">
+        <v-dialog v-model="isEditDialogShown" max-width="900">
             <v-card>
-                <v-card-title>
-                    <span class="headline">{{ formTitle }}</span>
-                </v-card-title>
-                <v-card-text>
-                    <v-container fluid>
-                        <v-layout row>
-                            <v-flex xs4>
-                                <v-subheader>Supplier Item Id</v-subheader>
-                            </v-flex>
-                            <v-flex xs8>
-                                <v-text-field v-model="editedItem.supplierItemId"
-                                              label="Supplier Item Id"></v-text-field>
-                            </v-flex>
-                        </v-layout>
-                    </v-container>
-                </v-card-text>
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn color="blue darken-1" flat @click.native="close">Cancel</v-btn>
-                    <v-btn color="blue darken-1" flat @click.native="save">Save</v-btn>
-                </v-card-actions>
+                <supplier-item-select :channel="itemSelect"></supplier-item-select>
             </v-card>
         </v-dialog>
         <!-- Edit Dialog end -->
@@ -92,14 +72,25 @@
 </template>
 
 <script>
+    import {bus} from "../main";
+    import SupplierItemSelect from "./SupplierItemSelect";
+
     export default {
         name: "IdMapItemList",
+        components: {SupplierItemSelect},
         props: ['vItem'],
         created() {
             this.loadData();
+            let component = this;
+            bus.$on(this.itemSelect, function (item) {
+                component.editedItem.supplierItemId = item;
+                component.save();
+                // component.loadData();
+            });
         },
         data() {
             return {
+                itemSelect: 'idmapitemselect',
                 search: '',
                 isLoadingData: false, //Loading state
                 isEditDialogShown: false, //Edit dialog
@@ -221,30 +212,31 @@
             },
             editItem(item) {
                 this.editedSupplierItemId = item.supplierItemId;
-                this.editedIndex = this.items.indexOf(item);
+                this.editedIndex = this.mapItems.indexOf(item);
                 this.editedItem = Object.assign({}, item);
                 this.isEditDialogShown = true;
             },
 
             deleteItem(item) {
                 this.isConfirmDialogShown = true;
-                this.removedIndex = this.items.indexOf(item);
+                this.removedIndex = this.mapItems.indexOf(item);
             },
 
             cancel() {
                 this.isConfirmDialogShown = false;
             },
             confirm() {
-                this.$http.delete('item', this.items[this.removedIndex].supplierItemId).then(res => {
+                this.$http.delete('mapitem', this.mapItems[this.removedIndex].supplierItemId, {id: this.vItem}).then(res => {
                     console.log(res);
                     if (res.data.success) {
-                        this.items.splice(this.removedIndex, 1);
+                        this.mapItems.splice(this.removedIndex, 1);
                     }
                 });
                 this.cancel();
             },
 
             addItem() {
+                this.editedIndex = -1;
                 this.isEditDialogShown = true;
             },
 

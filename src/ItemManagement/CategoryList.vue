@@ -201,6 +201,7 @@
             },
 
             addItem() {
+                this.editedIndex = -1;
                 this.isEditDialogShown = true;
             },
 

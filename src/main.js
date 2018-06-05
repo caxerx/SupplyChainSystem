@@ -289,3 +289,5 @@ new Vue({
     router,
     store
 });
+
+export const bus = new Vue();

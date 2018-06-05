@@ -220,12 +220,11 @@
                         if (res.data.success) {
                             this.items = res.data.responseContent;
                             console.log(res.data.responseContent);
+                            this.items.map(obj =>
+                                obj['supplierName'] = this.suppliers.find(supplier =>
+                                    supplier.supplierId === obj.supplierId).supplierName);
                         }
-                    }).then(() => {
-                        this.items.map(obj =>
-                            obj['supplierName'] = this.suppliers.find(supplier =>
-                                supplier.supplierId === obj.supplierId).supplierName);
-                    })
+                    });
                 });
             },
             editItem(item) {

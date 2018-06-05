@@ -44,37 +44,9 @@
         <!-- Table end -->
 
         <!-- Edit Dialog start -->
-        <v-dialog v-model="isEditDialogShown" max-width="500px">
+        <v-dialog v-model="isEditDialogShown" max-width="900">
             <v-card>
-                <v-card-title>
-                    <span class="headline">{{ formTitle }}</span>
-                </v-card-title>
-                <v-card-text>
-                    <v-container fluid>
-                        <v-layout row>
-                            <v-flex xs4>
-                                <v-subheader>User Id</v-subheader>
-                            </v-flex>
-                            <v-flex xs8>
-                                <v-text-field v-model="editedItem.id" label="User Id"></v-text-field>
-                            </v-flex>
-                        </v-layout>
-                        <v-layout row>
-                            <v-flex xs4>
-                                <v-subheader>User Name</v-subheader>
-                            </v-flex>
-                            <v-flex xs8>
-                                <v-text-field v-model="editedItem.userName"
-                                              label="User Name"></v-text-field>
-                            </v-flex>
-                        </v-layout>
-                    </v-container>
-                </v-card-text>
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn color="blue darken-1" flat @click.native="close">Cancel</v-btn>
-                    <v-btn color="blue darken-1" flat @click.native="save">Save</v-btn>
-                </v-card-actions>
+                <user-select :channel="managerSelect"></user-select>
             </v-card>
         </v-dialog>
         <!-- Edit Dialog end -->
@@ -97,15 +69,26 @@
 </template>
 
 <script>
+    import UserSelect from "../UserManagement/UserSelect";
+    import {bus} from "../main";
+
     export default {
         name: "RestaurantManagerList",
+        components: {UserSelect},
         props: ['restaurant'],
 
         created() {
             this.loadData();
+            let component = this;
+            bus.$on(this.managerSelect, function (user) {
+                component.selectedUser = user;
+                component.save();
+                component.loadData();
+            });
         },
         data() {
             return {
+                managerSelect: 'selectrestaurantmanager',
                 search: '',
                 isLoadingData: false, //Loading state
                 isEditDialogShown: false, //Edit dialog
@@ -128,13 +111,16 @@
                 ],
                 restaurantManagers: [],
                 users: [],
+
+                selectedUser: '',
+
                 editedIndex: -1,
                 removedIndex: -1,
                 editedItem: {
-                    id: 0,
+                    id: '',
                 },
                 defaultItem: {
-                    id: 0,
+                    id: '',
                 }
             };
         },
@@ -208,7 +194,7 @@
             },
 
             save() {
-                this.$http.post(`restaurantmanager/${this.restaurant}`, this.editedItem).then(res => {
+                this.$http.post(`restaurantmanager/${this.restaurant}`, {id: this.selectedUser}).then(res => {
                     if (res.data.success) {
                         this.loadData();
                     }

@@ -2,14 +2,13 @@
     <div>
         <!-- Table toolbar start -->
         <v-toolbar dark color="primary" class="elevation-0" :clipped-left="$vuetify.breakpoint.lgAndUp">
-            <v-toolbar-title class="white--text">Item ID Mapping List</v-toolbar-title>
+            <v-toolbar-title class="white--text">User List</v-toolbar-title>
             <v-text-field
                     flat
                     solo-inverted
                     prepend-icon="search"
                     label="Search"
                     class="ml-5"
-                    v-model="search"
             ></v-text-field>
             <v-spacer></v-spacer>
 
@@ -21,15 +20,15 @@
         <!-- Table toolbar end -->
 
         <!-- Table start -->
-        <v-data-table :headers="headers" :items="itemMaps" class="elevation-1" :search="search">
+        <v-data-table :headers="headers" :items="users" class="elevation-1">
             <template slot="items" slot-scope="props">
-                <td>{{ props.item.id }}</td>
-                <td>{{ props.item.virtualItemId }}</td>
-                <td>{{ props.item.virtualItemName }}</td>
-                <td>{{ props.item.virtualItemDescription }}</td>
+                <td>{{ props.item.userId }}</td>
+                <td>{{ props.item.userName }}</td>
+                <td>{{ props.item.name }}</td>
+                <td>{{ props.item.userType }}</td>
                 <td class="layout px-0">
-                    <v-btn icon class="mx-0" @click="viewItem(props.item)">
-                        <v-icon color="blue">category</v-icon>
+                    <v-btn icon class="mx-0" @click="selectUser(props.item)">
+                        <v-icon color="blue">add</v-icon>
                     </v-btn>
                 </td>
             </template>
@@ -39,70 +38,66 @@
             </template>
         </v-data-table>
         <!-- Table end -->
-        <v-dialog v-model="isItemDialogShown" max-width="900">
-            <v-card>
-                <id-map-item-list :v-item="selectedItem"></id-map-item-list>
-            </v-card>
-        </v-dialog>
     </div>
 </template>
 
 <script>
-    import IdMapItemList from "./IdMapItemList";
+    import {bus} from '../main';
 
     export default {
-        name: "IdMapping",
-        components: {IdMapItemList},
+        name: "UserSelect",
         created() {
             this.loadData();
         },
+        props: ['channel'],
         data() {
             return {
                 search: '',
-                isLoadingData: false, //Loading state
-                isItemDialogShown: false,
+                isLoadingData: false,
+                users: [],
                 headers: [
                     //Table header data
                     {
                         text: "Id",
-                        value: "id"
+                        align: "left",
+                        value: "userId"
                     },
                     {
-                        text: "Virtual Item Id",
-                        value: "virtualItemId"
+                        text: "Username",
+                        value: "userName"
                     },
                     {
-                        text: "Item Name",
-                        value: "virtualItemName"
+                        text: "Name",
+                        value: "name"
                     },
                     {
-                        text: "Description",
-                        value: "virtualItemDescription"
+                        text: "User Type",
+                        value: "userType"
                     },
                     {
                         text: "Actions",
-                        value: "action",
+                        value: "name",
                         sortable: false
                     }
                 ],
-                itemMaps: [],
-                selectedItem: ''
-            };
+            }
         },
         methods: {
             loadData() {
                 this.isLoadingData = true;
-                this.$http.get('virtualitem').then(res => {
+                this.$http.get('user').then(res => {
+                    setTimeout(() => {
+                        this.isLoadingData = false;
+                    }, 300);
                     if (res.data.success) {
-                        setTimeout(() => this.isLoadingData = false, 300);
-                        this.itemMaps = res.data.responseContent;
-                        console.log(this.itemMaps);
+                        this.users = res.data.responseContent;
+                        console.log(res.data.responseContent);
                     }
                 });
             },
-            viewItem(item) {
-                this.selectedItem = item.virtualItemId;
-                this.isItemDialogShown = true;
+            selectUser(item) {
+                // console.log('User select sent');
+                bus.$emit(this.channel, item.userId);
             }
         }
     }

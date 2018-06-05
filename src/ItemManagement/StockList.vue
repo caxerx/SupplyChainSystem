@@ -13,10 +13,6 @@
             ></v-text-field>
             <v-spacer></v-spacer>
 
-            <v-btn icon @click="addItem()">
-                <v-icon>add</v-icon>
-            </v-btn>
-
             <v-btn icon @click="loadData()">
                 <v-icon v-if="!isLoadingData">refresh</v-icon>
                 <v-progress-circular v-else size="25" indeterminate color="blue"></v-progress-circular>
