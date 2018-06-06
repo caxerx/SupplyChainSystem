@@ -79,6 +79,11 @@
                 ],
                 requests: []
             }
+        },
+        methods: {
+            loadData(){
+
+            }
         }
     }
 </script>

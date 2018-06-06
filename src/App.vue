@@ -296,7 +296,7 @@
                 this.$route.matched.forEach(r => {
                     routes.push({text: r.name, to: r.path, disabled: false});
                 });
-                console.log(routes);
+                console.log('Current route:',routes);
                 return routes;
             }
         },

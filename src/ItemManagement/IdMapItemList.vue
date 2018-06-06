@@ -47,7 +47,7 @@
         <!-- Table end -->
 
         <!-- Edit Dialog start -->
-        <v-dialog v-model="isEditDialogShown" max-width="900">
+        <v-dialog v-model="isEditDialogShown" max-width="1000">
             <v-card>
                 <supplier-item-select :channel="itemSelect"></supplier-item-select>
             </v-card>
@@ -83,7 +83,8 @@
             this.loadData();
             let component = this;
             bus.$on(this.itemSelect, function (item) {
-                component.editedItem.supplierItemId = item;
+                console.log('Mapped Item list received msg:', item);
+                component.selectedSupplierItemId = item;
                 component.save();
                 // component.loadData();
             });
@@ -128,55 +129,27 @@
                 items: [], //User data, ajax fetch reserve
                 suppliers: [],
                 mapItems: [],
-                editedIndex: -1,
                 removedIndex: -1,
-                editedSupplierItemId: '',
-                editedItem: {
-                    id: '',
-                    supplierItemId: '',
-                    itemName: '',
-                    supplierId: '',
-                    itemDescription: ''
-                },
-                defaultItem: {
-                    id: '',
-                    supplierItemId: '',
-                    itemName: '',
-                    supplierId: '',
-                    itemDescription: ''
-                }
+                selectedSupplierItemId: '',
             };
-        },
-
-        computed: {
-            formTitle() {
-                return this.editedIndex === -1 ? "New Item" : "Edit Item";
-            },
-
-            watch() {
-                return {
-                    isEditDialogShown(val) {
-                        val || this.close();
-                    }
-                }
-            }
         },
         watch: {
             vItem() {
                 this.loadData();
+            },
+            isEditDialogShown(val) {
+                val || this.close();
             }
         },
 
         methods: {
             loadData() {
                 this.isLoadingData = true;
-                this.mapItems = [];
                 this.$http.get('supplier').then(res => {
                     if (res.data.success) {
                         this.suppliers = res.data.responseContent;
                         // console.log(this.suppliers);
                     }
-                }).then(() => {
                     this.$http.get('item').then(res => {
                         setTimeout(() => {
                             this.isLoadingData = false;
@@ -185,11 +158,11 @@
                             this.items = res.data.responseContent;
                             // console.log(res.data.responseContent);
                         }
-                    }).then(() => {
                         if (this.vItem) {
                             this.$http.get(`mapitem/${this.vItem}`).then(res => {
                                 if (res.data.success) {
                                     // console.log(res.data.responseContent);
+                                    this.mapItems = [];
                                     res.data.responseContent.forEach(item => {
                                         this.mapItems.push({supplierItemId: item});
                                     });
@@ -203,20 +176,12 @@
                                             mItem[x] = supp[x];
                                         }
                                     });
-                                    // console.log('mItem: ', this.mapItems);
                                 }
                             })
                         }
                     })
                 });
             },
-            editItem(item) {
-                this.editedSupplierItemId = item.supplierItemId;
-                this.editedIndex = this.mapItems.indexOf(item);
-                this.editedItem = Object.assign({}, item);
-                this.isEditDialogShown = true;
-            },
-
             deleteItem(item) {
                 this.isConfirmDialogShown = true;
                 this.removedIndex = this.mapItems.indexOf(item);
@@ -227,30 +192,27 @@
             },
             confirm() {
                 this.$http.delete('mapitem', this.mapItems[this.removedIndex].supplierItemId, {id: this.vItem}).then(res => {
-                    console.log(res);
                     if (res.data.success) {
-                        this.mapItems.splice(this.removedIndex, 1);
+                        // this.mapItems.splice(this.removedIndex, 1);
+                        this.loadData();
                     }
                 });
                 this.cancel();
             },
 
             addItem() {
-                this.editedIndex = -1;
                 this.isEditDialogShown = true;
             },
 
             close() {
                 this.isEditDialogShown = false;
-                this.editedSupplierItemId = '';
-                setTimeout(() => {
-                    this.editedItem = Object.assign({}, this.defaultItem);
-                    this.editedIndex = -1;
-                }, 300);
+                this.selectedSupplierItemId = '';
+                this.loadData();
             },
 
             save() {
-                this.$http.post(`mapitem/${this.editedItem.supplierItemId}`, {Id: this.vItem}).then(res => {
+                console.log(`Trying to map item ${this.selectedSupplierItemId} to`, this.vItem);
+                this.$http.post(`mapitem/${this.selectedSupplierItemId}`, {Id: this.vItem}).then(res => {
                     if (res.data.success) {
                         this.loadData();
                     }
@@ -260,7 +222,3 @@
         }
     }
 </script>
-
-<style scoped>
-
-</style>

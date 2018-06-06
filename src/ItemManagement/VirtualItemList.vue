@@ -149,6 +149,7 @@
                 virtualItems: [],
                 editedIndex: -1,
                 removedIndex: -1,
+                editedVirtualItemID: '',
                 editedItem: {
                     id: '',
                     virtualItemId: '',
@@ -167,17 +168,6 @@
         computed: {
             formTitle() {
                 return this.editedIndex === -1 ? "New Item" : "Edit Item";
-            },
-
-            watch() {
-                return {
-                    isEditDialogShown(val) {
-                        val || this.close();
-                    }
-                }
-            },
-            isRequired() {
-                return this.editedItem === -1;
             }
         },
 
@@ -188,13 +178,15 @@
                     if (res.data.success) {
                         setTimeout(() => this.isLoadingData = false, 300);
                         this.virtualItems = res.data.responseContent;
-                        console.log(this.virtualItems);
+                        console.log('Virtual item list:', this.virtualItems);
                     }
                 });
             },
             editItem(item) {
                 this.editedIndex = this.virtualItems.indexOf(item);
                 this.editedItem = Object.assign({}, item);
+                this.editedVirtualItemID = item.virtualItemId;
+                console.log(this.editedVirtualItemID);
                 this.isEditDialogShown = true;
             },
 
@@ -230,10 +222,10 @@
 
             save() {
                 if (this.editedIndex > -1) {
-                    this.$http.put('virtualitem', this.editedItem.virtualItemId, this.editedItem).then(res => {
-                        console.log(res);
+                    this.$http.put('virtualitem', this.editedVirtualItemID, this.editedItem).then(res => {
+                        console.log('Edit item result:',res);
                         if (res.data.success) {
-                            Object.assign(this.virtualItems[this.editedIndex], this.editedItem);
+                            this.loadData();
                         }
                     });
                 } else {

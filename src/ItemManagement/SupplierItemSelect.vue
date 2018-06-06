@@ -98,7 +98,6 @@
                 this.$http.get('supplier').then(res => {
                     if (res.data.success) {
                         this.suppliers = res.data.responseContent;
-                        console.log(this.suppliers);
                     }
                 }).then(() => {
                     this.$http.get('item').then(res => {
@@ -107,7 +106,6 @@
                         }, 300);
                         if (res.data.success) {
                             this.items = res.data.responseContent;
-                            console.log(res.data.responseContent);
                             this.items.map(obj =>
                                 obj['supplierName'] = this.suppliers.find(supplier =>
                                     supplier.supplierId === obj.supplierId).supplierName);
@@ -116,6 +114,7 @@
                 });
             },
             selectItem(item) {
+                console.log('Item Select:', item.supplierItemId);
                 bus.$emit(this.channel, item.supplierItemId)
             }
         }

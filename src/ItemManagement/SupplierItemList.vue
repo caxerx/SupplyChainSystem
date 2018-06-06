@@ -270,10 +270,7 @@
                     this.$http.put('item', this.editedSupplierItemId, this.editedItem).then(res => {
                         console.log(res);
                         if (res.data.success) {
-                            this.editedItem['supplierName'] =
-                                this.suppliers.find(s => s.supplierId === this.editedItem.supplierId).supplierName;
-                            console.log(this.editedItem);
-                            Object.assign(this.items[this.editedIndex], this.editedItem);
+                            this.loadData();
                         }
                     });
                 } else {

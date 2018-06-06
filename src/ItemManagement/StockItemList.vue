@@ -55,24 +55,42 @@
                 </v-card-title>
                 <v-card-text>
                     <v-container fluid>
-                        <v-layout row>
-                            <v-flex xs4>
-                                <v-subheader>Virtual Item Id</v-subheader>
-                            </v-flex>
-                            <v-flex xs8>
-                                <v-text-field v-model="editedItem.virtualItemId" label="Virtual Item Id"></v-text-field>
-                            </v-flex>
-                        </v-layout>
-                        <v-layout row>
-                            <v-flex xs4>
-                                <v-subheader>Quantity</v-subheader>
-                            </v-flex>
-                            <v-flex xs8>
-                                <v-text-field v-model="editedItem.quantity"
-                                              type="number" min
-                                              label="Quantity"></v-text-field>
-                            </v-flex>
-                        </v-layout>
+                        <!-- Edit Item -->
+                        <template v-if="editedIndex>-1">
+                            <v-layout row>
+                                <v-flex xs4>
+                                    <v-subheader>Quantity</v-subheader>
+                                </v-flex>
+                                <v-flex xs8>
+                                    <v-text-field v-model="editedItem.quantity" type="number"
+                                                  label="Quantity"></v-text-field>
+                                </v-flex>
+                            </v-layout>
+                        </template>
+                        <!-- Add Item -->
+                        <template v-else>
+                            <v-layout row>
+                                <v-flex xs4>
+                                    <v-subheader>Virtual Item Id</v-subheader>
+                                </v-flex>
+                                <v-flex xs4>
+                                    <v-text-field v-model="editedItem.virtualItemId" label="Virtual Item Id"
+                                                  readonly></v-text-field>
+                                </v-flex>
+                                <v-flex xs4 class="pl-3">
+                                    <v-btn block @click.native="selectItem">Select Item</v-btn>
+                                </v-flex>
+                            </v-layout>
+                            <v-layout row>
+                                <v-flex xs4>
+                                    <v-subheader>Quantity</v-subheader>
+                                </v-flex>
+                                <v-flex xs8>
+                                    <v-text-field v-model="editedItem.quantity" type="number"
+                                                  label="Quantity"></v-text-field>
+                                </v-flex>
+                            </v-layout>
+                        </template>
                     </v-container>
                 </v-card-text>
                 <v-card-actions>
@@ -98,21 +116,41 @@
             </v-card>
         </v-dialog>
         <!-- Delete Confirm Dialog end -->
+
+        <!-- Item Select Dialog start -->
+        <v-dialog v-model="isItemDialogShown" max-width="900">
+            <v-card>
+                <virtual-item-select :channel="selectChannel"></virtual-item-select>
+            </v-card>
+        </v-dialog>
+        <!-- Item Select Dialog end -->
     </div>
 </template>
 
 <script>
+    import {bus} from "../main";
+    import VirtualItemSelect from "./VirtualItemSelect";
+
     export default {
         name: "StockItemList",
+        components: {VirtualItemSelect},
         created() {
             this.loadData();
+            let component = this;
+            bus.$on(this.selectChannel, function (data) {
+                console.log('Stock Item List received msg:', data);
+                component.editedItem.virtualItemId = data;
+                component.isItemDialogShown = false;
+            });
         },
         data() {
             return {
+                selectChannel: 'stockItemSelect',
                 search: '',
                 isLoadingData: false, //Loading state
                 isEditDialogShown: false, //Edit dialog
                 isConfirmDialogShown: false, //Confirm dialog
+                isItemDialogShown: false,
                 headers: [
                     //Table header data
                     {
@@ -206,11 +244,15 @@
                 this.removedIndex = this.stockItems.indexOf(item);
             },
 
+            selectItem() {
+                this.isItemDialogShown = true;
+            },
+
             cancel() {
                 this.isConfirmDialogShown = false;
             },
             confirm() {
-                this.$http.delete('stockitem', this.stockItems[this.removedIndex].virtualItemId).then(res => {
+                this.$http.delete('stockitem', this.stock, {id: this.stockItems[this.removedIndex].virtualItemId}).then(res => {
                     console.log(res);
                     if (res.data.success) {
                         this.loadData();
