@@ -122,6 +122,8 @@
                             {{ item.text }}
                         </v-breadcrumbs-item>
                     </v-breadcrumbs>
+                    <v-spacer></v-spacer>
+                    <span class="mr-3">{{ datetime }}</span>
                 </v-toolbar>
                 <router-view></router-view>
                 <!-- Breadcrumbs end -->
@@ -191,11 +193,13 @@
     export default {
         components: {Login},
         created() {
+            setInterval(this.updateTime, 1000);
             this.$store.state.token = window.localStorage.getItem('token');
             this.checkLoginStatus();
         },
         data() {
             return {
+                datetime: '',
                 // Vuetify UI Component settings
                 drawer: true,
                 fixed: false,
@@ -296,11 +300,15 @@
                 this.$route.matched.forEach(r => {
                     routes.push({text: r.name, to: r.path, disabled: false});
                 });
-                console.log('Current route:',routes);
+                console.log('Current route:', routes);
                 return routes;
-            }
+            },
         },
         methods: {
+            updateTime() {
+                let cd = new Date();
+                this.datetime = `${cd.toDateString()} ${cd.toTimeString()}`;
+            },
             checkLoginStatus() {
                 if (this.$store.state.token !== '') {
                     this.$http.get('token').then(res => {
