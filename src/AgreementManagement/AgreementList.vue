@@ -13,7 +13,7 @@
                     v-model="search"
             ></v-text-field>
             <v-spacer></v-spacer>
-            <v-btn icon>
+            <v-btn icon @click.native="addItem">
                 <v-icon>add</v-icon>
             </v-btn>
             <v-btn icon @click.native="loadData">
@@ -68,15 +68,35 @@
                 <agreement-detail :agreement="selectedAgreement"></agreement-detail>
             </v-card>
         </v-dialog>
+
+        <v-dialog v-model="isEditDialogShown" max-width="1200">
+            <v-card>
+                <agreement-item-list></agreement-item-list>
+            </v-card>
+        </v-dialog>
+
+        <v-dialog v-model="isConfirmDialogShown">
+            <v-card>
+                <v-card-title class="headline">Delete Item</v-card-title>
+                <v-card-text>Are you sure to delete this item? This action is irreversible.
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="green darken-1" flat @click.native="cancel">Cancel</v-btn>
+                    <v-btn color="green darken-1" flat @click.native="confirm">Confirm</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </div>
 </template>
 
 <script>
     import AgreementDetail from "./AgreementDetail";
+    import AgreementItemList from "./AgreementItemList";
 
     export default {
         name: "AgreementList",
-        components: {AgreementDetail},
+        components: {AgreementItemList, AgreementDetail},
         created() {
             this.loadData();
         },
@@ -85,6 +105,8 @@
                 search: '',
                 isLoadingData: false,
                 isDetailDialogShown: false,
+                isEditDialogShown: false,
+                isConfirmDialogShown: false,
                 selectedAgreement: {},
                 headers: [
                     {
@@ -185,6 +207,9 @@
             viewDetail(item) {
                 this.selectedAgreement = item;
                 this.isDetailDialogShown = true;
+            },
+            addItem() {
+                this.isEditDialogShown = true;
             }
         }
     }

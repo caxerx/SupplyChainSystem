@@ -84,7 +84,7 @@
 <script>
     import {bus} from "../main";
     import VirtualItemSelect from "../ItemManagement/VirtualItemSelect";
-    import NumberInput from "../ItemManagement/NumberInput";
+    import NumberInput from "../ItemManagement/InlineInput";
 
     export default {
         name: "RequestItemList",

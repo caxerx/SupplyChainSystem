@@ -68,7 +68,7 @@
                 </v-toolbar-title>
                 <v-spacer></v-spacer>
 
-                <v-badge color="red" overlap>
+                <v-badge color="red" overlap v-model="$store.state.devMode">
                     <span slot="badge">1</span>
                     <v-tooltip bottom>
                         <v-btn icon slot="activator">

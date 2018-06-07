@@ -1,14 +1,15 @@
 <template>
     <div>
-        <input type="number" :value="value" @input="$emit('input', $event.target.value)" :placeholder="label">
+        <input type="number" :value="value" @input="$emit('input', $event.target.value)" :placeholder="label"
+               :type="type">
     </div>
 
 </template>
 
 <script>
     export default {
-        name: "NumberInput",
-        props: ['value', 'label']
+        name: "InlineInput",
+        props: ['value', 'label', 'type']
     }
 </script>
 
