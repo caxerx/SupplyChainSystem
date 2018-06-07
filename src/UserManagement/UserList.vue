@@ -29,7 +29,7 @@
                 <td>{{ props.item.userId }}</td>
                 <td>{{ props.item.userName }}</td>
                 <td>{{ props.item.name }}</td>
-                <td>{{ props.item.userType }}</td>
+                <td>{{ props.item.userTypeName }}</td>
                 <td class="layout px-0">
                     <v-btn icon class="mx-0" @click="editItem(props.item)">
                         <v-icon color="teal">edit</v-icon>
@@ -75,8 +75,12 @@
                                 <v-subheader>User Type</v-subheader>
                             </v-flex>
                             <v-flex xs8>
+                                <v-select v-model="editedItem.userType" :items="userTypes" item-text="text"
+                                          item-value="code" label="Select a user type"></v-select>
+                                <!--
                                 <v-text-field v-model="editedItem.userType"
                                               label="User Type"></v-text-field>
+                                              -->
                             </v-flex>
                         </v-layout>
                         <v-layout row>
@@ -145,13 +149,19 @@
                     },
                     {
                         text: "User Type",
-                        value: "userType"
+                        value: "userTypeName"
                     },
                     {
                         text: "Actions",
                         value: "name",
                         sortable: false
                     }
+                ],
+                userTypes: [
+                    {code: 0, text: "Administrator"},
+                    {code: 1, text: "Restaurant Manager"},
+                    {code: 2, text: "Category Manager"},
+                    {code: 3, text: "Purchase Manager"}
                 ],
                 users: [], // User data from AJAX calls
                 editedIndex: -1, // -1 means it is a new Item
@@ -183,7 +193,7 @@
                         val || this.close();
                     }
                 }
-            },
+            }
         },
 
         methods: {
@@ -195,6 +205,7 @@
                     }, 300);
                     if (res.data.success) {
                         this.users = res.data.responseContent;
+                        this.users.map(user => user.userTypeName = this.getUserTypeName(user.userType));
                         console.log(res.data.responseContent);
                     }
                 });
@@ -242,7 +253,7 @@
                     this.$http.put('user', this.editedItem.userId, this.editedItem).then(res => {
                         console.log(res);
                         if (res.data.success) {
-                            Object.assign(this.users[this.editedIndex], this.editedItem);
+                            this.loadData();
                         }
                     });
                 } else {
@@ -250,11 +261,27 @@
                     this.$http.post('user', this.editedItem).then(res => {
                         console.log(res);
                         if (res.data.success) {
-                            this.users.push(res.data.responseContent);
+                            this.loadData();
                         }
                     });
                 }
                 this.close();
+            },
+            getUserTypeName(id) {
+                switch (id.toString()) {
+                    case "0":
+                        return "Administrator";
+                    case "1":
+                        return "Restaurant Manager";
+                    case "2":
+                        return "Category Manager";
+                    case "3":
+                        return "Purchase Manager";
+                    case "999":
+                        return "Debug user";
+                    default:
+                        return "User";
+                }
             }
         }
     }

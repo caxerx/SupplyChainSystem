@@ -25,7 +25,7 @@
                 <td>{{ props.item.userId }}</td>
                 <td>{{ props.item.userName }}</td>
                 <td>{{ props.item.name }}</td>
-                <td>{{ props.item.userType }}</td>
+                <td>{{ props.item.userTypeName }}</td>
                 <td class="layout px-0">
                     <v-btn icon class="mx-0" @click="selectUser(props.item)">
                         <v-icon color="blue">add</v-icon>
@@ -72,7 +72,7 @@
                     },
                     {
                         text: "User Type",
-                        value: "userType"
+                        value: "userTypeName"
                     },
                     {
                         text: "Actions",
@@ -91,13 +91,30 @@
                     }, 300);
                     if (res.data.success) {
                         this.users = res.data.responseContent;
-                        console.log(res.data.responseContent);
+                        this.users.map(user => user.userTypeName = this.getUserTypeName(user.userType));
+                        console.log('User data:', res.data.responseContent);
                     }
                 });
             },
             selectUser(item) {
                 // console.log('User select sent');
                 bus.$emit(this.channel, item.userId);
+            },
+            getUserTypeName(id) {
+                switch (id.toString()) {
+                    case "0":
+                        return "Administrator";
+                    case "1":
+                        return "Restaurant Manager";
+                    case "2":
+                        return "Category Manager";
+                    case "3":
+                        return "Purchase Manager";
+                    case "999":
+                        return "Debug user";
+                    default:
+                        return "User";
+                }
             }
         }
     }

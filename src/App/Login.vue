@@ -77,10 +77,12 @@
                         window.localStorage.setItem("token", this.$store.state.token);
                         this.$store.commit('setLoginState', true);
                         this.$store.commit('setTokenValidState', true);
-                        this.$store.commit('setUserType', res.data.responseContent.user.userType);
+                        this.$store.commit('setUserId', res.data.responseContent.user.userId);
                         this.$store.commit('setUserName', res.data.responseContent.user.name);
-                        window.localStorage.setItem("userType", this.$store.state.userType);
+                        this.$store.commit('setUserType', res.data.responseContent.user.userType);
+                        window.localStorage.setItem("userId", this.$store.state.userId);
                         window.localStorage.setItem("userName", this.$store.state.userName);
+                        window.localStorage.setItem("userType", this.$store.state.userType);
                         console.log('Login data:', res.data.responseContent);
                     } else {
                         this.isLoginFailed = true;

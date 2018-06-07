@@ -108,9 +108,6 @@
                 editMode: false,
                 search: '',
                 isLoadingData: false, //Loading state
-                isEditDialogShown: false, //Edit dialog
-                isConfirmDialogShown: false, //Confirm dialog
-                isItemDialogShown: false,
                 requestHeaders: [
                     //Table header data
                     {
@@ -180,7 +177,7 @@
             addItem(item) {
                 // console.log('Request items:', this.requestItems);
                 if (this.requestItems.find(x => x.virtualItemId === item.virtualItemId) || !item.quantity) {
-                    // TODO FUCKING TO DO ERROR CHECKING
+                    // TODO ERROR CHECKING
                     item.quantity = undefined;
                     return false;
                 }

@@ -139,6 +139,7 @@ const store = new Vuex.Store({
             isLoggedIn: false,
             isTokenValid: false,
             // User data start
+            userId: 0,
             userName: '',
             userType: 999,
             // User data end
@@ -166,6 +167,9 @@ const store = new Vuex.Store({
             setErrorMessage(state, payload) {
                 state.errorMessage = payload;
             },
+            setUserId(state, payload) {
+                state.userId = payload;
+            },
             setUserType(state, payload) {
                 state.userType = payload;
             },
@@ -179,7 +183,7 @@ const store = new Vuex.Store({
         },
         getters: {
             getUserType(state) {
-                switch (state.userType) {
+                switch (state.userType.toString()) {
                     case "0":
                         return "Administrator";
                     case "1":
