@@ -13,7 +13,8 @@
                     </v-list-tile>
                     <v-list-tile>
                         <v-list-tile-content>Created On:</v-list-tile-content>
-                        <v-list-tile-content class="align-end">{{ requestDetail.createTime }}</v-list-tile-content>
+                        <v-list-tile-content class="align-end">{{ requestDetail.createTime.replace('T',' ') }}
+                        </v-list-tile-content>
                     </v-list-tile>
                     <v-list-tile>
                         <v-list-tile-content>Created By:</v-list-tile-content>
@@ -56,8 +57,16 @@
 </template>
 
 <script>
+    import {bus} from "../main";
+
     export default {
         name: "RequestDetail",
+        created() {
+            let component = this;
+            bus.$on('refreshRequestDetail', function () {
+                component.loadData();
+            });
+        },
         props: ['request'],
         data() {
             return {
@@ -77,6 +86,7 @@
                     }
                 ],
                 requestDetail: {
+                    createTime: '',
                     user: {
                         name: ''
                     }
@@ -91,16 +101,18 @@
         },
         methods: {
             loadData() {
-                this.$http.get(`restaurantrequest/${this.request}`).then(res => {
-                    if (res.data.success) {
-                        this.requestDetail = res.data.responseContent;
-                        this.requestItems = res.data.responseContent.requestItem;
-                        let req = res.data.responseContent.requestItem;
-                        req.map(x => {
-                            x.virtualItemId = x.requestVirtualItemId;
-                        });
-                    }
-                })
+                if (this.request) {
+                    this.$http.get(`restaurantrequest/${this.request}`).then(res => {
+                        if (res.data.success) {
+                            this.requestDetail = res.data.responseContent;
+                            this.requestItems = res.data.responseContent.requestItem;
+                            let req = res.data.responseContent.requestItem;
+                            req.map(x => {
+                                x.virtualItemId = x.requestVirtualItemId;
+                            });
+                        }
+                    });
+                }
             },
             editItem() {
 

@@ -205,6 +205,7 @@
             viewItem(item) {
                 this.selectedRequest = item.requestId;
                 this.isDetailDialogShown = true;
+                bus.$emit('refreshRequestDetail')
             },
             moment: moment
         }
