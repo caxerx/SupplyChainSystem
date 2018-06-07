@@ -56,7 +56,14 @@
                                 <v-subheader>Virtual Item ID</v-subheader>
                             </v-flex>
                             <v-flex xs8>
-                                <v-text-field v-model="editedItem.virtualItemId" label="Virtual Item ID"></v-text-field>
+                                <v-select v-model="editedItem.virtualItemId"
+                                          :items="virtualItems"
+                                          item-text="virtualItemName"
+                                          item-value="virtualItemId"
+                                          label="Select a Virtual Item"
+                                          single-line
+                                >
+                                </v-select>
                             </v-flex>
                         </v-layout>
                     </v-container>
