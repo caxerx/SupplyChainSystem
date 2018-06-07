@@ -31,6 +31,8 @@
                 <td>{{ props.item.supplierName }}</td>
                 <td>{{ props.item.supplierEmail }}</td>
                 <td>{{ props.item.supplierPhoneNumber }}</td>
+                <td>{{ props.item.supplierAddress }}</td>
+                <td>{{ props.item.supplierContactPerson }}</td>
                 <td class="layout px-0">
                     <v-btn icon class="mx-0" @click="editItem(props.item)">
                         <v-icon color="teal">edit</v-icon>
@@ -79,6 +81,24 @@
                             <v-flex xs8>
                                 <v-text-field v-model="editedItem.supplierPhoneNumber"
                                               label="Phone Number"></v-text-field>
+                            </v-flex>
+                        </v-layout>
+                        <v-layout row>
+                            <v-flex xs4>
+                                <v-subheader>Address</v-subheader>
+                            </v-flex>
+                            <v-flex xs8>
+                                <v-text-field v-model="editedItem.supplierAddress" multi-line
+                                              label="Address"></v-text-field>
+                            </v-flex>
+                        </v-layout>
+                        <v-layout row>
+                            <v-flex xs4>
+                                <v-subheader>Contact Person</v-subheader>
+                            </v-flex>
+                            <v-flex xs8>
+                                <v-text-field v-model="editedItem.supplierContactPerson"
+                                              label="Contact Person"></v-text-field>
                             </v-flex>
                         </v-layout>
                     </v-container>
@@ -140,6 +160,14 @@
                         value: "supplierPhoneNumber"
                     },
                     {
+                        text: "Address",
+                        value: "supplierAddress"
+                    },
+                    {
+                        text: "Contact Person",
+                        value: "supplierContactPerson"
+                    },
+                    {
                         text: "Actions",
                         value: "name",
                         sortable: false
@@ -152,13 +180,17 @@
                     supplierId: '',
                     supplierName: '',
                     supplierEmail: '',
-                    supplierPhoneNumber: ''
+                    supplierPhoneNumber: '',
+                    supplierAddress: '',
+                    supplierContactPerson: ''
                 },
                 defaultItem: {
                     supplierId: '',
                     supplierName: '',
                     supplierEmail: '',
-                    supplierPhoneNumber: ''
+                    supplierPhoneNumber: '',
+                    supplierAddress: '',
+                    supplierContactPerson: ''
                 }
             };
         },
