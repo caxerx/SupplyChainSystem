@@ -59,9 +59,6 @@
     export default {
         name: "RequestDetail",
         props: ['request'],
-        created() {
-            this.loadData();
-        },
         data() {
             return {
                 requestHeaders: [
@@ -79,7 +76,11 @@
                         value: "quantity"
                     }
                 ],
-                requestDetail: {},
+                requestDetail: {
+                    user: {
+                        name: ''
+                    }
+                },
                 requestItems: []
             }
         },

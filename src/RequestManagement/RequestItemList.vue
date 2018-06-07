@@ -27,9 +27,12 @@
                         <td>{{ props.item.virtualItemId }}</td>
                         <td>{{ props.item.virtualItemName }}</td>
                         <td>{{ props.item.virtualItemDescription }}</td>
-                        <td class="layout px-0">
+                        <td class="layout px-0" style="vertical-align: middle">
+                            <!--
                             <v-text-field v-model="props.item.quantity" label="Quantity" single-line
                                           type="number" min="1"></v-text-field>
+                                          -->
+                            <number-input v-model="props.item.quantity" label="Quantity"></number-input>
                             <v-btn icon class="mx-0" @click="addItem(props.item)">
                                 <v-icon color="blue">add</v-icon>
                             </v-btn>
@@ -40,8 +43,9 @@
                         No Data!
                     </template>
                 </v-data-table>
+                <!-- Table end -->
             </v-flex>
-            <!-- Table end -->
+
             <v-flex xs6>
                 <!-- Table toolbar start -->
                 <v-toolbar dark color="primary" class="elevation-0" :clipped-left="$vuetify.breakpoint.lgAndUp">
@@ -55,7 +59,7 @@
                 <!-- Table toolbar end -->
 
                 <!-- Table start -->
-                <v-data-table :headers="requestHeaders" :items="requestItems" class="elevation-1">
+                <v-data-table :headers="requestHeaders" :items="requestItems" class="elevation-1" hide-actions>
                     <template slot="items" slot-scope="props">
                         <td>{{ props.item.virtualItemId }}</td>
                         <td>{{ props.item.virtualItemName }}</td>
@@ -80,16 +84,18 @@
 <script>
     import {bus} from "../main";
     import VirtualItemSelect from "../ItemManagement/VirtualItemSelect";
+    import NumberInput from "../ItemManagement/NumberInput";
 
     export default {
         name: "RequestItemList",
-        components: {VirtualItemSelect},
+        components: {NumberInput, VirtualItemSelect},
         created() {
             this.loadData();
             let component = this;
             bus.$on('editRequestItem', function (data) {
                 component.editMode = true;
                 component.requestItems = data;
+                component.loadData();
             })
         },
         data() {
@@ -187,7 +193,7 @@
             save() {
                 if (this.editMode) {
                     this.$http.put(`restaurantrequest`, this.request, this.requestItems).then(res => {
-                        if (res.data.success){
+                        if (res.data.success) {
                             console.log('Request Item edited');
                             bus.$emit('saveRequestItem');
                         }
