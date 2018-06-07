@@ -63,7 +63,7 @@
                                 </v-flex>
                                 <v-flex xs8>
                                     <v-text-field v-model="editedItem.quantity" type="number"
-                                                  label="Quantity" min="0"></v-text-field>
+                                                  label="Quantity" min="1"></v-text-field>
                                 </v-flex>
                             </v-layout>
                         </template>
@@ -86,7 +86,7 @@
                                     <v-subheader>Quantity</v-subheader>
                                 </v-flex>
                                 <v-flex xs8>
-                                    <v-text-field v-model="editedItem.quantity" type="number"
+                                    <v-text-field v-model="editedItem.quantity" type="number" min="1"
                                                   label="Quantity"></v-text-field>
                                 </v-flex>
                             </v-layout>

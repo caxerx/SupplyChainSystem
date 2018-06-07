@@ -56,7 +56,14 @@
                                 <v-subheader>Virtual Item ID</v-subheader>
                             </v-flex>
                             <v-flex xs8>
-                                <v-text-field v-model="editedItem.virtualItemId" label="Virtual Item ID"></v-text-field>
+                                <v-select v-model="editedItem.virtualItemId"
+                                          :items="virtualItems"
+                                          item-text="virtualItemName"
+                                          item-value="virtualItemId"
+                                          label="Select a Virtual Item"
+                                          single-line
+                                >
+                                </v-select>
                             </v-flex>
                         </v-layout>
                     </v-container>
@@ -203,7 +210,7 @@
             }
             ,
             confirm() {
-                this.$http.delete('categoryitem', this.categoryItems[this.removedIndex].categoryId).then(res => {
+                this.$http.delete('categoryitem', this.category, {id: this.categoryItems[this.removedIndex].virtualItemId}).then(res => {
                     console.log(res);
                     if (res.data.success) {
                         this.categoryItems.splice(this.removedIndex, 1);
