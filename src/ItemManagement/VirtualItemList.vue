@@ -60,7 +60,11 @@
                                 <v-subheader>Virtual Item Id</v-subheader>
                             </v-flex>
                             <v-flex xs8>
-                                <v-text-field v-model="editedItem.virtualItemId" label="Virtual Item Id"></v-text-field>
+                                <v-text-field v-model="editedItem.virtualItemId" label="Virtual Item Id"
+                                              :error-messages="virtualItemIdError"
+                                              required
+                                              @input="$v.fvVirtualItemId.$touch()"
+                                              @blur="$v.fvVirtualItemId.$touch()"></v-text-field>
                             </v-flex>
                         </v-layout>
                         <v-layout row>
@@ -69,7 +73,11 @@
                             </v-flex>
                             <v-flex xs8>
                                 <v-text-field v-model="editedItem.virtualItemName"
-                                              label="Item Name"></v-text-field>
+                                              label="Item Name"
+                                              :error-messages="virtualItemNameError"
+                                              required
+                                              @input="$v.fvVirtualItemName.$touch()"
+                                              @blur="$v.fvVirtualItemName.$touch()"></v-text-field>
                             </v-flex>
                         </v-layout>
                         <v-layout row>
@@ -111,6 +119,9 @@
 </template>
 
 <script>
+    import {validationMixin} from 'vuelidate'
+    import {required} from 'vuelidate/lib/validators'
+
     export default {
         name: "VirtualItemList",
         created() {
@@ -118,6 +129,8 @@
         },
         data() {
             return {
+                mixins: [validationMixin],
+
                 search: '',
                 isLoadingData: false, //Loading state
                 isEditDialogShown: false, //Edit dialog
@@ -166,12 +179,37 @@
         },
 
         watch: {
-            isEditDialogShown(val) {
+            isEditDialogShown: function (val) {
                 val || this.close();
             }
         },
-
+        validations: {
+            fvVirtualItemName: {
+                required
+            },
+            fvVirtualItemId: {
+                required
+            }
+        },
         computed: {
+            fvVirtualItemName() {
+                return this.editedItem.virtualItemName;
+            },
+            fvVirtualItemId() {
+                return this.editedItem.virtualItemId;
+            },
+            virtualItemNameError() {
+                const errors = [];
+                if (!this.$v.fvVirtualItemName.$dirty) return errors;
+                !this.$v.fvVirtualItemName.required && errors.push('Virtual Item Name is required');
+                return errors
+            },
+            virtualItemIdError() {
+                const errors = [];
+                if (!this.$v.fvVirtualItemId.$dirty) return errors;
+                !this.$v.fvVirtualItemId.required && errors.push('Virtual Item ID is required');
+                return errors
+            },
             formTitle() {
                 return this.editedIndex === -1 ? "New Item" : "Edit Item";
             }
@@ -190,7 +228,7 @@
             },
             editItem(item) {
                 this.editedIndex = this.virtualItems.indexOf(item);
-                this.editedItem = Object.assign(this.defaultItem, item);
+                this.editedItem = Object.assign({}, item);
                 this.editedVirtualItemID = item.virtualItemId;
                 console.log(this.editedVirtualItemID);
                 this.isEditDialogShown = true;
@@ -227,6 +265,8 @@
             },
 
             save() {
+                this.$v.$touch();
+                if (this.$v.$invalid) return;
                 if (this.editedIndex > -1) {
                     this.$http.put('virtualitem', this.editedVirtualItemID, this.editedItem).then(res => {
                         console.log('Edit item result:', res);
