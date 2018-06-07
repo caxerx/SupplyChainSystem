@@ -1,57 +1,6 @@
 <template>
     <div>
-        <!-- Table toolbar start -->
-        <v-toolbar dark color="primary" class="elevation-0" :clipped-left="$vuetify.breakpoint.lgAndUp">
-            <v-toolbar-title class="white--text">Stock List</v-toolbar-title>
-            <v-text-field
-                    flat
-                    solo-inverted
-                    prepend-icon="search"
-                    label="Search"
-                    class="ml-5"
-                    v-model="search"
-            ></v-text-field>
-            <v-spacer></v-spacer>
-
-            <v-btn icon @click="loadData()">
-                <v-icon v-if="!isLoadingData">refresh</v-icon>
-                <v-progress-circular v-else size="25" indeterminate color="blue"></v-progress-circular>
-            </v-btn>
-        </v-toolbar>
-        <!-- Table toolbar end -->
-
-        <!-- Table start -->
-        <v-data-table :headers="headers" :items="stockItems" class="elevation-1" :search="search"
-                      :rows-per-page-items="this.$store.state.rowPerPage">
-            <template slot="items" slot-scope="props">
-                <td>{{ props.item.stockId }}</td>
-                <td>{{ props.item.stockType }}</td>
-                <td class="layout px-0">
-                    <v-btn icon class="mx-0" @click="viewItem(props.item)">
-                        <v-icon color="blue">category</v-icon>
-                    </v-btn>
-                    <!-- You should not be able to delete a stock directly ?
-                    <v-btn icon class="mx-0" @click="editItem(props.item)">
-                        <v-icon color="teal">edit</v-icon>
-                    </v-btn>
-                    <v-btn icon class="mx-0" @click="deleteItem(props.item)">
-                        <v-icon color="pink">delete</v-icon>
-                    </v-btn>
-                    -->
-                </td>
-            </template>
-
-            <template slot="no-data">
-                No Data!
-            </template>
-        </v-data-table>
-        <!-- Table end -->
-
-        <v-dialog v-model="isItemDialogShown" max-width="900">
-            <v-card>
-                <stock-item-list :stock="selectedStock"></stock-item-list>
-            </v-card>
-        </v-dialog>
+        <stock-item-list :stock="$store.state.workingRestaurantStock"></stock-item-list>
     </div>
 </template>
 
@@ -136,5 +85,52 @@
 </script>
 
 <style scoped>
+    /*
+    <!-- Table toolbar start -->
+            <v-toolbar dark color="primary" class="elevation-0" :clipped-left="$vuetify.breakpoint.lgAndUp">
+                <v-toolbar-title class="white--text">Stock List</v-toolbar-title>
+                <v-text-field
+                        flat
+                        solo-inverted
+                        prepend-icon="search"
+                        label="Search"
+                        class="ml-5"
+                        v-model="search"
+                ></v-text-field>
+                <v-spacer></v-spacer>
 
+                <v-btn icon @click="loadData()">
+                    <v-icon v-if="!isLoadingData">refresh</v-icon>
+                    <v-progress-circular v-else size="25" indeterminate color="blue"></v-progress-circular>
+                </v-btn>
+            </v-toolbar>
+            <!-- Table toolbar end -->
+
+            <!-- Table start -->
+            <v-data-table :headers="headers" :items="stockItems" class="elevation-1" :search="search"
+                          :rows-per-page-items="this.$store.state.rowPerPage">
+                <template slot="items" slot-scope="props">
+                    <td>{{ props.item.stockId }}</td>
+                    <td>{{ props.item.stockType }}</td>
+                    <td class="layout px-0">
+                        <v-btn icon class="mx-0" @click="viewItem(props.item)">
+                            <v-icon color="blue">category</v-icon>
+                        </v-btn>
+                        <!-- You should not be able to delete a stock directly ?
+                        <v-btn icon class="mx-0" @click="editItem(props.item)">
+                            <v-icon color="teal">edit</v-icon>
+                        </v-btn>
+                        <v-btn icon class="mx-0" @click="deleteItem(props.item)">
+                            <v-icon color="pink">delete</v-icon>
+                        </v-btn>
+                        -->
+                    </td>
+                </template>
+
+                <template slot="no-data">
+                    No Data!
+                </template>
+            </v-data-table>
+            <!-- Table end -->
+     */
 </style>

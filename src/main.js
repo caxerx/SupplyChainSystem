@@ -23,6 +23,7 @@ Vue.use(Vuelidate);
 import Dashboard from './Dashboard.vue'
 import ItemManagement from './ItemManagement.vue'
 import RequestManagement from './RequestManagement.vue'
+import FullRequestManagement from './FullRequestManagement.vue'
 import AgreementManagement from './AgreementManagement.vue'
 import RestaurantManagement from './RestaurantManagement'
 import SupplierManagement from './SupplierManagement'
@@ -84,6 +85,11 @@ const routes = [
         component: RequestManagement
     },
     {
+        path: '/fullrequest',
+        name: 'Request Management(Full)',
+        component: FullRequestManagement
+    },
+    {
         path: '/agreement',
         name: 'Agreement Management',
         component: AgreementManagement
@@ -142,6 +148,8 @@ const store = new Vuex.Store({
             userId: 0,
             userName: '',
             userType: 999,
+            workingRestaurant: -1,
+            workingRestaurantStock: -1,
             // User data end
             token: '', // Token of api auth
             // Server settings
@@ -175,6 +183,12 @@ const store = new Vuex.Store({
             },
             setUserName(state, payload) {
                 state.userName = payload;
+            },
+            setWorkingRestaurant(state,payload){
+                state.workingRestaurant=payload;
+            },
+            setWorkingRestaurantStock(state,payload){
+                state.workingRestaurantStock=payload;
             },
             closeErrorDialog(state) {
                 state.isErrorDialogShown = false;

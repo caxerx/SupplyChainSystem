@@ -36,15 +36,18 @@
                     <v-btn icon class="mx-0" @click="viewItem(props.item)">
                         <v-icon color="blue">category</v-icon>
                     </v-btn>
-                    <v-btn icon class="mx-0" @click="viewManager(props.item)">
-                        <v-icon color="orange">account_circle</v-icon>
-                    </v-btn>
-                    <v-btn icon class="mx-0" @click="editItem(props.item)">
-                        <v-icon color="teal">edit</v-icon>
-                    </v-btn>
-                    <v-btn icon class="mx-0" @click="deleteItem(props.item)">
-                        <v-icon color="pink">delete</v-icon>
-                    </v-btn>
+                    <template v-if="[999,0].includes($store.state.userType)">
+                        <v-btn icon class="mx-0" @click="viewManager(props.item)">
+                            <v-icon color="orange">account_circle</v-icon>
+                        </v-btn>
+                        <v-btn icon class="mx-0" @click="editItem(props.item)">
+                            <v-icon color="teal">edit</v-icon>
+                        </v-btn>
+                        <v-btn icon class="mx-0" @click="deleteItem(props.item)">
+                            <v-icon color="pink">delete</v-icon>
+                        </v-btn>
+                    </template>
+
                 </td>
             </template>
 

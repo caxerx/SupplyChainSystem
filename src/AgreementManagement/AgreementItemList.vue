@@ -14,14 +14,15 @@
                     <v-layout class="px-3" row>
                         <v-flex xs4 class="px-3">
                             <h3>Agreement Type</h3>
-                            <v-radio-group v-model="agreementType" required>
-                                <v-radio label="Blanket Purchase Agreement" value="0"></v-radio>
-                                <v-radio label="Contract Purchase Agreement" value="1"></v-radio>
-                                <v-radio label="Planned Purchase Agreement" value="2"></v-radio>
+                            <v-radio-group v-model="agreementType" :error-messages="agreementTypeError"
+                                           required :disabled="editMode">
+                                <v-radio label="Blanket Purchase Agreement" value="0" :disabled="editMode"></v-radio>
+                                <v-radio label="Contract Purchase Agreement" value="1" :disabled="editMode"></v-radio>
+                                <v-radio label="Planned Purchase Agreement" value="2" :disabled="editMode"></v-radio>
                             </v-radio-group>
                         </v-flex>
                         <v-flex xs4 class="px-3">
-                            <h3>Currency</h3>
+                            <h3>Currency and Supplier</h3>
                             <v-text-field label="Currency" required
                                           prepend-icon="attach_money"
                                           v-model="currency"></v-text-field>
@@ -34,7 +35,7 @@
                                       placeholder="Select a supplier"></v-select>
                         </v-flex>
                         <v-flex xs4 class="px-3">
-                            <h3>Start Date</h3>
+                            <h3>Effective Period</h3>
                             <v-menu
                                     ref="startDateMenu"
                                     :close-on-content-click="false"
@@ -84,13 +85,13 @@
                         </v-flex>
                     </v-layout>
 
-                    <v-btn color="primary" @click.native="step = 2">Continue</v-btn>
+                    <v-btn color="primary" @click.native="nextStep">Continue</v-btn>
                     <v-btn flat @click.native="close">Cancel</v-btn>
                 </v-stepper-content>
 
                 <v-stepper-content step="2">
                     <v-layout>
-                        <v-flex xs6 class="mx-auto">
+                        <v-flex xs6 class="pa-3">
                             <template v-if="agreementType==='0'">
                                 <v-layout row>
                                     <v-flex xs4>
@@ -167,9 +168,13 @@
                                 </v-layout>
                             </template>
                         </v-flex>
+                        <v-flex xs6 class="pa-3">
+                            <v-text-field multi-line label="Terms and Condition" rows="7"
+                                          v-model="termsAndCondition"></v-text-field>
+                        </v-flex>
                     </v-layout>
                     <v-btn color="primary" @click.native="step = 1">Back</v-btn>
-                    <v-btn color="primary" @click.native="step = 3">Continue</v-btn>
+                    <v-btn color="primary" @click.native="nextStep">Continue</v-btn>
                     <v-btn flat @click.native="close">Cancel</v-btn>
                 </v-stepper-content>
 
@@ -197,7 +202,7 @@
                                             ></v-progress-circular>
                                         </v-btn>
                                     </v-toolbar>
-                                    <v-data-table :items="supplierItems" :headers="supplierItemHeaders">
+                                    <v-data-table :items="filteredSupplierItems" :headers="supplierItemHeaders">
                                         <template slot="items" slot-scope="props">
                                             <td>{{ props.item.supplierItemId }}</td>
                                             <td>{{ props.item.itemName }}</td>
@@ -277,6 +282,10 @@
 <script>
     import InlineInput from "../ItemManagement/InlineInput";
     import {bus} from "../main";
+    import moment from "moment"
+
+    import {validationMixin} from 'vuelidate'
+    import {required, minLength} from 'vuelidate/lib/validators'
 
     export default {
         name: "AgreementItemList",
@@ -290,16 +299,80 @@
                 component.currency = '';
                 component.startDate = '';
                 component.expiryDate = '';
+                component.termsAndCondition = '';
                 component.details.purchaseOrderRevision = '';
                 component.details.account = '';
                 component.details.amount = '';
                 component.details.period = '';
                 component.details.timeUnit = '';
                 component.step = 1;
+                component.agreementId = '';
+                component.agreementItems = [];
             });
+
+            bus.$on('editAgreementStepperData', (data) => {
+                console.log('Edit Agreement data:', data);
+                component.editMode = true;
+                component.agreementType = data.agreementType.toString();
+                component.supplierId = data.supplierId;
+                component.currency = data.currency;
+                component.startDate = data.startDate;
+                component.expiryDate = data.expiryDate;
+
+                component.startDate = moment(component.startDate).format('YYYY-MM-DD');
+                component.expiryDate = moment(component.expiryDate).format('YYYY-MM-DD');
+
+                component.termsAndCondition = data.termsAndCondition;
+                component.agreementId = data.agreementId;
+                switch (component.agreementType) {
+                    case '0':
+                        component.details.purchaseOrderRevision = data.blanketPurchaseAgreementDetails.purchaseOrderRevision;
+                        component.details.account = data.blanketPurchaseAgreementDetails.account;
+                        component.details.amount = data.blanketPurchaseAgreementDetails.amountAgreed;
+                        console.log('BPA Lines:', data.blanketPurchaseAgreementLines);
+                        data.blanketPurchaseAgreementLines.map(bpaItem => {
+                            for (let x in bpaItem.item) {
+                                bpaItem[x] = bpaItem.item[x];
+                            }
+                        });
+                        component.agreementItems = data.blanketPurchaseAgreementLines;
+                        console.log('Agreement Items:', component.agreementItems);
+                        break;
+                    case '1':
+                        component.details.account = data.contractPurchaseAgreementDetails.account;
+                        data.contractPurchaseAgreementLines.map(cpaItem => {
+                            for (let x in cpaItem.item) {
+                                cpaItem[x] = cpaItem.item[x];
+                            }
+                        });
+                        component.agreementItems = data.contractPurchaseAgreementLines;
+                        break;
+                    case '2':
+                        component.details.purchaseOrderRevision = data.plannedPurchaseAgreementDetails.purchaseOrderRevision;
+                        component.details.account = data.plannedPurchaseAgreementDetails.account;
+                        component.details.period = data.plannedPurchaseAgreementDetails.period;
+                        component.details.timeUnit = data.plannedPurchaseAgreementDetails.timeUnit;
+                        data.plannedPurchaseAgreementLines.map(ppaItem => {
+                            for (let x in ppaItem.item) {
+                                ppaItem[x] = ppaItem.item[x];
+                            }
+                        });
+                        component.agreementItems = data.plannedPurchaseAgreementLines;
+                }
+                component.step = 1;
+            });
+        },
+        validations: {
+            agreementType: {
+                required
+            }
         },
         data() {
             return {
+                mixins: [validationMixin],
+
+                editMode: false,
+
                 search: '',
                 date: '',
                 step: 0,
@@ -339,14 +412,13 @@
                         sortable: false
                     }
                 ],
+                agreementId: '',
                 agreementType: '',
                 supplierId: '',
                 currency: '',
-                startDateMenu: false,
                 startDate: '',
                 expiryDate: '',
-
-                expiryDateMenu: false,
+                termsAndCondition: '',
 
                 details: {
                     purchaseOrderRevision: '',
@@ -355,10 +427,25 @@
                     period: '',
                     timeUnit: ''
                 },
+
+                startDateMenu: false,
+                expiryDateMenu: false,
+
                 suppliers: [],
                 supplierItems: [],
                 agreementItems: []
 
+            }
+        },
+        computed: {
+            filteredSupplierItems() {
+                return this.supplierItems.filter(supp => supp.supplierId === this.supplierId);
+            },
+            agreementTypeError() {
+                const errors = [];
+                if (!this.$v.agreementType.$dirty) return errors;
+                !this.$v.agreementType.required && errors.push('Agreement Type is required');
+                return errors
             }
         },
         methods: {
@@ -381,25 +468,53 @@
                 this.agreementItems.splice(this.agreementItems[this.agreementItems.indexOf(item), 1]);
             },
             submit() {
-                this.$http.post('agreement', {
-                    agreementType: this.agreementType,
-                    currency: this.currency,
-                    supplierId: this.supplierId,
-                    startDate: this.startDate,
-                    expiryDate: this.expiryDate,
-                    details: this.details,
-                    items: this.agreementItems
-                }).then(res => {
-                    if (res.data.success) {
-                        console.log('Agreement saved successfully:', res);
-                    } else {
-                        console.log('Failed to save agreement:', res)
-                    }
-                    this.close();
-                });
+                if (this.editMode) {
+                    this.$http.put('agreement', this.agreementId, {
+                        agreementType: this.agreementType,
+                        currency: this.currency,
+                        supplierId: this.supplierId,
+                        startDate: this.startDate,
+                        expiryDate: this.expiryDate,
+                        termsAndCondition: this.termsAndCondition,
+                        details: this.details,
+                        items: this.agreementItems
+                    }).then(res => {
+                        if (res.data.success) {
+                            console.log('Agreement saved successfully:', res);
+                        } else {
+                            console.log('Failed to save agreement:', res)
+                        }
+                        this.close();
+                    });
+                } else {
+                    this.$http.post('agreement', {
+                        agreementType: this.agreementType,
+                        currency: this.currency,
+                        supplierId: this.supplierId,
+                        startDate: this.startDate,
+                        expiryDate: this.expiryDate,
+                        termsAndCondition: this.termsAndCondition,
+                        details: this.details,
+                        items: this.agreementItems
+                    }).then(res => {
+                        if (res.data.success) {
+                            console.log('Agreement saved successfully:', res);
+                        } else {
+                            console.log('Failed to save agreement:', res)
+                        }
+                        this.close();
+                    });
+                }
+
             },
             close() {
+                this.editMode = false;
                 bus.$emit('closeAgreementStepper');
+            },
+            nextStep() {
+                this.$v.$touch();
+                if (this.$v.$invalid) return;
+                this.step++;
             }
         }
     }

@@ -22,7 +22,7 @@
                     </v-list-tile>
                     <v-list-tile>
                         <v-list-tile-content>Status:</v-list-tile-content>
-                        <v-list-tile-content class="align-end">{{ requestDetail.requestStatus }}</v-list-tile-content>
+                        <v-list-tile-content class="align-end">{{ requestStatusName }}</v-list-tile-content>
                     </v-list-tile>
                 </v-list>
             </v-flex>
@@ -116,6 +116,22 @@
             },
             editItem() {
 
+            }
+        },
+        computed:{
+            requestStatusName(){
+                switch(this.requestDetail.requestStatus){
+                    case 0:
+                        return "Waiting For Process";
+                    case 1:
+                        return "Processing";
+                    case 2:
+                        return "Ordered";
+                    case 3:
+                        return "Delivering";
+                    case 4:
+                        return "Delivered";
+                }
             }
         }
 

@@ -40,7 +40,7 @@
                 <td>{{ props.item.agreementTypeName }}</td>
                 <td>{{ props.item.startDate }}</td>
                 <td>{{ props.item.expiryDate }}</td>
-                <td>{{ props.item.userName }}</td>
+                <td>{{ props.item.name }}</td>
                 <td v-if="props.item.status==='Expired'" class="red--text">{{ props.item.status }}</td>
                 <td v-else-if="props.item.status==='Active'" class="green--text">{{ props.item.status }}</td>
                 <td v-else>{{ props.item.status }}</td>
@@ -48,10 +48,10 @@
                     <v-btn icon class="mx-0" @click.native="viewDetail(props.item)">
                         <v-icon color="blue">info</v-icon>
                     </v-btn>
-                    <v-btn icon class="mx-0">
+                    <v-btn icon class="mx-0" @click.native="editItem(props.item)">
                         <v-icon color="teal">edit</v-icon>
                     </v-btn>
-                    <v-btn icon class="mx-0">
+                    <v-btn icon class="mx-0" @click.native="deleteItem(props.item)">
                         <v-icon color="pink">delete</v-icon>
                     </v-btn>
                 </td>
@@ -75,7 +75,7 @@
             </v-card>
         </v-dialog>
 
-        <v-dialog v-model="isConfirmDialogShown">
+        <v-dialog v-model="isConfirmDialogShown" max-width="300">
             <v-card>
                 <v-card-title class="headline">Delete Item</v-card-title>
                 <v-card-text>Are you sure to delete this item? This action is irreversible.
@@ -102,7 +102,9 @@
             this.loadData();
             bus.$on('closeAgreementStepper', () => {
                 this.isEditDialogShown = false;
+                this.loadData();
             })
+
         },
         data() {
             return {
@@ -135,7 +137,7 @@
                     },
                     {
                         text: 'Creator',
-                        value: 'userName'
+                        value: 'name'
                     },
                     {
                         text: 'Status',
@@ -148,7 +150,8 @@
                 ],
                 agreements: [],
                 users: [],
-                suppliers: []
+                suppliers: [],
+                removedIndex: -1
             }
         },
         watch: {
@@ -219,6 +222,27 @@
             },
             addItem() {
                 this.isEditDialogShown = true;
+            },
+            editItem(item) {
+                this.isEditDialogShown = true;
+                bus.$emit('editAgreementStepperData', item)
+            },
+            confirm() {
+                this.$http.delete('agreement', this.agreements[this.removedIndex].agreementId, {}).then(res => {
+                    if (res.data.success) {
+                        console.log(`Agreement with id ${this.agreements[this.removedIndex].agreementId} deleted`);
+                    }
+                    this.loadData();
+                    this.cancel();
+                });
+            },
+            cancel() {
+                this.isConfirmDialogShown = false;
+                this.removedIndex = -1;
+            },
+            deleteItem(item) {
+                this.removedIndex = this.agreements.indexOf(item);
+                this.isConfirmDialogShown = true;
             },
             close() {
                 this.isEditDialogShown = false;

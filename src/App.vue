@@ -11,7 +11,7 @@
                     app
             >
                 <v-list>
-                    <template v-for="(item, i) in navItems">
+                    <template v-for="(item, i) in nav">
 
                         <v-divider v-if="item.divider"></v-divider>
 
@@ -208,6 +208,7 @@
             setInterval(this.updateTime, 1000);
             this.$store.state.token = window.localStorage.getItem('token');
             this.checkLoginStatus();
+            console.log('Computed nav', this.nav);
         },
         data() {
             return {
@@ -221,30 +222,35 @@
                     {
                         to: '/',
                         icon: 'dashboard',
-                        text: 'Dashboard'
+                        text: 'Dashboard',
                     },
                     {
                         to: '/item',
                         icon: 'category',
                         text: 'Item Management',
                         model: false,
+                        access: [1, 2, 3],
                         children:
                             [
                                 {
                                     text: 'Supplier Item',
-                                    to: '/item/supplieritem'
+                                    to: '/item/supplieritem',
+                                    access: [2, 3]
                                 },
                                 {
                                     text: 'Virtual Item',
-                                    to: '/item/virtualitem'
+                                    to: '/item/virtualitem',
+                                    access: [2, 3]
                                 },
                                 {
                                     text: 'ID Mapping',
-                                    to: '/item/idmapping'
+                                    to: '/item/idmapping',
+                                    access: [2]
                                 },
                                 {
                                     text: 'Stock',
-                                    to: '/item/stock'
+                                    to: '/item/stock',
+                                    access: [1]
                                 },
                                 {
                                     text: 'Category',
@@ -255,18 +261,26 @@
                     {
                         to: '/request',
                         icon: 'assignment',
-                        text: 'Request Management'
+                        text: 'Request Management',
+                        access: [1, 3]
+                    },
+                    {
+                        to: '/fullrequest',
+                        icon: 'assignment',
+                        text: 'Request Management(Full)'
                     },
                     {
                         to: '/agreement',
                         icon: 'description',
-                        text: 'Agreement Management'
+                        text: 'Agreement Management',
+                        access: [3]
                     },
                     {
                         to: '/restaurant',
                         icon: 'restaurant',
                         text: 'Restaurant Management',
                         model: false,
+                        access: [0, 2, 3],
                         children:
                             [
                                 {
@@ -275,19 +289,22 @@
                                 },
                                 {
                                     text: 'Restaurant Type',
-                                    to: '/restaurant/type'
+                                    to: '/restaurant/type',
+                                    access: [0]
                                 }
                             ]
                     },
                     {
                         to: '/supplier',
                         icon: 'shopping_basket',
-                        text: 'Supplier Management'
+                        text: 'Supplier Management',
+                        access: [0]
                     },
                     {
                         to: '/user',
                         icon: 'account_circle',
-                        text: 'User Management'
+                        text: 'User Management',
+                        access: [0]
                     },
                     {
                         divider: true
@@ -315,6 +332,31 @@
                 console.log('Current route:', routes);
                 return routes;
             },
+            nav() {
+                if (this.$store.state.userType === 999) {
+                    return this.navItems;
+                }
+                let items = [];
+                this.navItems.forEach(item => {
+                    if (item.children) {
+                        item.children = item.children.filter(child => {
+                            if (this.$store.state.userType === 999) {
+                                return true;
+                            }
+                            if (child.access) {
+                                return child.access.includes(Number.parseInt(this.$store.state.userType));
+                            }
+                            return true;
+                        });
+                    }
+                    if (item.access === undefined) {
+                        items.push(item);
+                    } else if (item.access.includes(Number.parseInt(this.$store.state.userType))) {
+                        items.push(item);
+                    }
+                });
+                return items;
+            }
         },
         methods: {
             updateTime() {
@@ -341,6 +383,18 @@
                         window.localStorage.setItem("userId", this.$store.state.userId);
                         window.localStorage.setItem("userName", this.$store.state.userName);
                         window.localStorage.setItem("userType", this.$store.state.userType);
+                        if (res.data.responseContent.workplace) {
+                            this.$store.commit('setWorkingRestaurant', res.data.responseContent.workplace.restaurantId);
+                            this.$store.commit('setWorkingRestaurantStock', res.data.responseContent.workplace.stockId);
+                            window.localStorage.setItem("workingRestaurant", this.$store.state.workingRestaurant);
+                            window.localStorage.setItem("workingRestaurantStock", this.$store.state.workingRestaurantStock);
+                        } else {
+
+                            this.$store.commit('setWorkingRestaurant', '-1');
+                            this.$store.commit('setWorkingRestaurantStock', '-1');
+                            window.localStorage.setItem("workingRestaurant", '-1');
+                            window.localStorage.setItem("workingRestaurantStock", '-1');
+                        }
                         // console.log('Login data:', res.data.responseContent);
                     }).catch(err => {
                         // Error Handling
@@ -360,6 +414,9 @@
                 window.localStorage.setItem('token', 'apple');
                 this.$store.commit('setToken', 'apple');
                 this.$store.commit('setTokenValidState', false);
+            },
+            isAccessible(access) {
+                return access.includes(Number.parseInt(this.$store.state.userType)) || access.includes(-1);
             }
         }
     }

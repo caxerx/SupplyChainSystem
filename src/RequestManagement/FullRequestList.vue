@@ -14,12 +14,6 @@
             ></v-text-field>
             <v-spacer></v-spacer>
             <v-tooltip top>
-                <v-btn icon @click.native="addItem" slot="activator">
-                    <v-icon>add</v-icon>
-                </v-btn>
-                <span>Create Request</span>
-            </v-tooltip>
-            <v-tooltip top>
                 <v-btn icon @click.native="loadData" slot="activator">
                     <v-icon v-if="!isLoadingData">refresh</v-icon>
                     <v-progress-circular
@@ -55,12 +49,10 @@
                         <span>View Detail</span>
                     </v-tooltip>
                     <v-tooltip top>
-                        <v-btn icon class="mx-0" @click.native="editItem(props.item)" slot="activator"
-                               :disabled="props.item.requestCreator!=$store.state.userId">
+                        <v-btn icon class="mx-0" @click.native="editItem(props.item)" slot="activator">
                             <v-icon color="teal">edit</v-icon>
                         </v-btn>
-                        <span v-if="props.item.requestCreator==$store.state.userId">Edit</span>
-                        <span v-else>You are not the creator</span>
+                        <span>Edit</span>
                     </v-tooltip>
                 </td>
             </template>
@@ -94,7 +86,7 @@
     import RequestDetail from "./RequestDetail";
 
     export default {
-        name: "RequestList",
+        name: "FullRequestList",
         components: {RequestDetail, RequestItemList},
         created() {
             this.loadData();
@@ -156,8 +148,8 @@
             }
         },
         methods: {
-            getRequestType(typeId){
-                switch(typeId){
+            getRequestType(typeId) {
+                switch (typeId) {
                     case 0:
                         return "Waiting For Process";
                     case 1:
@@ -180,7 +172,7 @@
                         if (res.data.success) {
                             this.restaurants = res.data.responseContent;
                         }
-                        this.$http.get('restaurantrequest').then(res => {
+                        this.$http.get('purchaserequest').then(res => {
                             if (res.data.success) {
                                 this.requests = res.data.responseContent;
                                 console.log('Request list:', res.data.responseContent);
@@ -196,8 +188,8 @@
                                     }
                                 });
 
-                                this.requests.map(req=>{
-                                    req.requestStatusName=this.getRequestType(req.requestStatus);
+                                this.requests.map(req => {
+                                    req.requestStatusName = this.getRequestType(req.requestStatus);
                                 });
                             }
                         });
@@ -209,7 +201,7 @@
             },
             editItem(item) {
                 this.selectedRequest = item.requestId;
-                this.$http.get(`restaurantrequest/${item.requestId}`).then(res => {
+                this.$http.get(`purchaserequest/${item.requestId}`).then(res => {
                     if (res.data.success) {
                         console.log('Request Items:', res);
                         let req = res.data.responseContent.requestItem;
