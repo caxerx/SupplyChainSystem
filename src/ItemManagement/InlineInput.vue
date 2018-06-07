@@ -1,6 +1,6 @@
 <template>
     <div>
-        <input type="number" :value="value" @input="$emit('input', $event.target.value)" :placeholder="label"
+        <input type="number" :value="value" @input="$emit('input', $event.target.value)" :placeholder="label" min="1"
                :type="type">
     </div>
 
