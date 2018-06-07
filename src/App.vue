@@ -87,13 +87,19 @@
                         </v-avatar>
                     </v-btn>
                     <v-list>
-                        <v-list-tile @click.stop="logout">
-                            <v-list-tile-action>
-                                <v-icon>exit_to_app</v-icon>
-                            </v-list-tile-action>
+                        <v-list-tile avatar>
                             <v-list-tile-content>
-                                <v-list-tile-title>Logout</v-list-tile-title>
+                                <v-list-tile-title>John Leider</v-list-tile-title>
+                                <v-list-tile-sub-title>Founder of Vuetify.js</v-list-tile-sub-title>
                             </v-list-tile-content>
+                            <v-list-tile-action>
+                                <v-btn
+                                        icon
+                                        @click="logout"
+                                >
+                                    <v-icon>exit_to_app</v-icon>
+                                </v-btn>
+                            </v-list-tile-action>
                         </v-list-tile>
                         <v-list-tile @click.stop="invalid">
                             <v-list-tile-action>
