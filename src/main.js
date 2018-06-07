@@ -135,9 +135,13 @@ const router = new VueRouter({routes});
 // Vuex State Management
 const store = new Vuex.Store({
         state: {
+            devMode: false,
             isLoggedIn: false,
             isTokenValid: false,
+            // User data start
+            userName: '',
             userType: 999,
+            // User data end
             token: '', // Token of api auth
             // Server settings
             serverUrl: 'https://sapi.caxerx.com/api',
@@ -165,9 +169,30 @@ const store = new Vuex.Store({
             setUserType(state, payload) {
                 state.userType = payload;
             },
+            setUserName(state, payload) {
+                state.userName = payload;
+            },
             closeErrorDialog(state) {
                 state.isErrorDialogShown = false;
                 setTimeout(() => state.errorMessage = '', 1000);
+            }
+        },
+        getters: {
+            getUserType(state) {
+                switch (state.userType) {
+                    case "0":
+                        return "Administrator";
+                    case "1":
+                        return "Restaurant Manager";
+                    case "2":
+                        return "Category Manager";
+                    case "3":
+                        return "Purchase Manager";
+                    case "999":
+                        return "Debug user";
+                    default:
+                        return "User";
+                }
             }
         }
     })

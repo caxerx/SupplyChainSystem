@@ -173,7 +173,7 @@
                     if (res.data.success) {
                         setTimeout(() => this.isLoadingData = false, 300);
                         this.virtualItems = res.data.responseContent;
-                        console.log(this.virtualItems);
+                        // console.log(this.virtualItems);
                     }
                 });
             },

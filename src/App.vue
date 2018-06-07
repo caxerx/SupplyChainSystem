@@ -89,19 +89,20 @@
                     <v-list>
                         <v-list-tile avatar>
                             <v-list-tile-content>
-                                <v-list-tile-title>John Leider</v-list-tile-title>
-                                <v-list-tile-sub-title>Founder of Vuetify.js</v-list-tile-sub-title>
+                                <v-list-tile-title>{{ $store.state.userName }}</v-list-tile-title>
+                                <v-list-tile-sub-title>{{ $store.getters.getUserType }}</v-list-tile-sub-title>
                             </v-list-tile-content>
                             <v-list-tile-action>
-                                <v-btn
-                                        icon
-                                        @click="logout"
-                                >
-                                    <v-icon>exit_to_app</v-icon>
-                                </v-btn>
+                                <v-tooltip top>
+                                    <v-btn icon slot="activator"
+                                           @click="logout">
+                                        <v-icon>exit_to_app</v-icon>
+                                    </v-btn>
+                                    <span>Logout</span>
+                                </v-tooltip>
                             </v-list-tile-action>
                         </v-list-tile>
-                        <v-list-tile @click.stop="invalid">
+                        <v-list-tile @click.stop="invalid" v-if="$store.state.devMode">
                             <v-list-tile-action>
                                 <v-icon>close</v-icon>
                             </v-list-tile-action>
@@ -262,7 +263,7 @@
                         text: 'Restaurant Management',
                         model: false,
                         children:
-                            [ // TODO Fix routes
+                            [
                                 {
                                     text: 'Restaurant List',
                                     to: '/restaurant/list'
@@ -318,9 +319,11 @@
             checkLoginStatus() {
                 if (this.$store.state.token !== '') {
                     this.$http.get('token').then(res => {
+                        console.log('Auto Login:', res);
                         this.$store.commit('setLoginState', !!res.data.success);
                         this.$store.commit('setTokenValidState', true);
                         this.$store.commit('setUserType', window.localStorage.getItem("userType"));
+                        this.$store.commit('setUserName', window.localStorage.getItem("userName"));
                     }).catch(err => {
                         // Error Handling
                         console.log(err.message);
@@ -332,6 +335,7 @@
                 window.localStorage.setItem('token', '');
                 this.$store.commit('setToken', '');
                 this.$store.commit('setLoginState', false);
+                this.$router.push('/');
             },
             // For testing purpose only
             invalid() {
