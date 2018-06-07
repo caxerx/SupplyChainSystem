@@ -184,7 +184,7 @@
             },
             editItem(item) {
                 this.editedIndex = this.virtualItems.indexOf(item);
-                this.editedItem = Object.assign({}, item);
+                this.editedItem = Object.assign(this.defaultItem, item);
                 this.editedVirtualItemID = item.virtualItemId;
                 console.log(this.editedVirtualItemID);
                 this.isEditDialogShown = true;
@@ -199,7 +199,7 @@
                 this.isConfirmDialogShown = false;
             },
             confirm() {
-                this.$http.delete('virtualitem', this.virtualItems[this.removedIndex].id).then(res => {
+                this.$http.delete('virtualitem', this.virtualItems[this.removedIndex].virtualItemId).then(res => {
                     console.log(res);
                     if (res.data.success) {
                         this.virtualItems.splice(this.removedIndex, 1);
