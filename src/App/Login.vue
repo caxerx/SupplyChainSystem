@@ -63,8 +63,7 @@
                 required
             },
             password: {
-                required,
-                minLength: minLength(4)
+                required
             }
         },
         methods: {
@@ -104,7 +103,6 @@
                 const errors = [];
                 if (!this.$v.password.$dirty) return errors;
                 !this.$v.password.required && errors.push('Password is required');
-                !this.$v.password.minLength && errors.push('Password must be at least 8 characters long');
                 return errors
             }
         }
