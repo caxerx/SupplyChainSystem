@@ -63,7 +63,7 @@
                                 </v-flex>
                                 <v-flex xs8>
                                     <v-text-field v-model="editedItem.quantity" type="number"
-                                                  label="Quantity"></v-text-field>
+                                                  label="Quantity" min="0"></v-text-field>
                                 </v-flex>
                             </v-layout>
                         </template>

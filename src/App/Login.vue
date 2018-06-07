@@ -11,10 +11,18 @@
                         <v-form @submit="login" @submit.prevent class="pa-3">
                             <v-card-text>
                                 <v-text-field prepend-icon="person" name="login" label="Login" type="text"
-                                              v-model="loginInfo.userName"></v-text-field>
+                                              v-model="userName"
+                                              required
+                                              :error-messages="userNameError"
+                                              @input="$v.userName.$touch()"
+                                              @blur="$v.userName.$touch()"></v-text-field>
                                 <v-text-field id="password" prepend-icon="lock" name="password" label="Password"
-                                              type="password" v-model="loginInfo.password"
-                                              autocomplete="current-password"></v-text-field>
+                                              type="password" v-model="password"
+                                              autocomplete="current-password"
+                                              :error-messages="passwordError"
+                                              required
+                                              @input="$v.password.$touch()"
+                                              @blur="$v.password.$touch()"></v-text-field>
                             </v-card-text>
                             <v-card-actions>
                                     <span v-if="isLoginFailed" class="red--text ml-4">
@@ -33,22 +41,37 @@
 </template>
 
 <script>
+    import {validationMixin} from 'vuelidate'
+    import {required, minLength} from 'vuelidate/lib/validators'
+
     export default {
         name: "Login",
         data() {
             return {
+                mixins: [validationMixin],
+
                 // Login data
-                loginInfo: {
-                    userName: '',
-                    password: ''
-                },
+                userName: '',
+                password: '',
+
                 isLoginFailed: false,
                 loginFailMessage: ""
             }
         },
+        validations: {
+            userName: {
+                required
+            },
+            password: {
+                required,
+                minLength: minLength(4)
+            }
+        },
         methods: {
             login() {
-                this.$http.getToken(this.loginInfo).then(res => {
+                this.$v.$touch();
+                if (this.$v.$invalid) return;
+                this.$http.getToken({userName: this.userName, password: this.password}).then(res => {
                     if (res.data.success) {
                         this.$store.commit('setToken', res.data.responseContent.token);
                         window.localStorage.setItem("token", this.$store.state.token);
@@ -70,6 +93,20 @@
                     this.loginFailMessage = "Network Error";
                 });
             },
+        }, computed: {
+            userNameError() {
+                const errors = [];
+                if (!this.$v.userName.$dirty) return errors;
+                !this.$v.userName.required && errors.push('Username is required');
+                return errors
+            },
+            passwordError() {
+                const errors = [];
+                if (!this.$v.password.$dirty) return errors;
+                !this.$v.password.required && errors.push('Password is required');
+                !this.$v.password.minLength && errors.push('Password must be at least 8 characters long');
+                return errors
+            }
         }
     }
 </script>
