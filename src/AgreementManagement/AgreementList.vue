@@ -93,12 +93,16 @@
 <script>
     import AgreementDetail from "./AgreementDetail";
     import AgreementItemList from "./AgreementItemList";
+    import {bus} from "../main";
 
     export default {
         name: "AgreementList",
         components: {AgreementItemList, AgreementDetail},
         created() {
             this.loadData();
+            bus.$on('closeAgreementStepper', () => {
+                this.isEditDialogShown = false;
+            })
         },
         data() {
             return {
@@ -145,6 +149,11 @@
                 agreements: [],
                 users: [],
                 suppliers: []
+            }
+        },
+        watch: {
+            isEditDialogShown(val) {
+                val || this.close();
             }
         },
 
@@ -210,6 +219,10 @@
             },
             addItem() {
                 this.isEditDialogShown = true;
+            },
+            close() {
+                this.isEditDialogShown = false;
+                bus.$emit('clearAgreementStepperData');
             }
         }
     }

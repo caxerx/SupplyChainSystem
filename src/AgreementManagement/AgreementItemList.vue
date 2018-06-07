@@ -8,6 +8,7 @@
                 <v-divider></v-divider>
                 <v-stepper-step step="3">Select Items</v-stepper-step>
             </v-stepper-header>
+
             <v-stepper-items>
                 <v-stepper-content step="1">
                     <v-layout class="px-3" row>
@@ -84,8 +85,9 @@
                     </v-layout>
 
                     <v-btn color="primary" @click.native="step = 2">Continue</v-btn>
-                    <v-btn flat>Cancel</v-btn>
+                    <v-btn flat @click.native="close">Cancel</v-btn>
                 </v-stepper-content>
+
                 <v-stepper-content step="2">
                     <v-layout>
                         <v-flex xs6 class="mx-auto">
@@ -168,65 +170,104 @@
                     </v-layout>
                     <v-btn color="primary" @click.native="step = 1">Back</v-btn>
                     <v-btn color="primary" @click.native="step = 3">Continue</v-btn>
-                    <v-btn flat>Cancel</v-btn>
+                    <v-btn flat @click.native="close">Cancel</v-btn>
                 </v-stepper-content>
+
                 <v-stepper-content step="3">
                     <template>
-                        <v-layout row>
+                        <v-layout row class="px-1 pb-4">
                             <v-flex xs4>
-                                <v-toolbar dark color="primary" class="elevation-0">
-                                    <v-toolbar-title class="white--text">Items</v-toolbar-title>
-                                    <v-text-field
-                                            flat
-                                            solo-inverted
-                                            prepend-icon="search"
-                                            label="Search"
-                                            class="ml-3"
-                                            v-model="search"
-                                    ></v-text-field>
-                                    <v-btn icon @click.native="loadData">
-                                        <v-icon v-if="!isLoadingData">refresh</v-icon>
-                                        <v-progress-circular
-                                                v-else size="25"
-                                                indeterminate
-                                                color="blue"
-                                        ></v-progress-circular>
-                                    </v-btn>
-                                </v-toolbar>
-                                <v-data-table :items="supplierItems" :headers="supplierItemHeaders">
-                                    <template slot="items" slot-scope="props">
-                                        <td>{{ props.item.supplierItemId }}</td>
-                                        <td>{{ props.item.itemName }}</td>
-                                        <td class="layout px-0">
-                                            <v-btn icon class="mx-0" @click="editItem(props.item)">
-                                                <v-icon color="teal">edit</v-icon>
-                                            </v-btn>
-                                            <v-btn icon class="mx-0" @click="deleteItem(props.item)">
-                                                <v-icon color="pink">delete</v-icon>
-                                            </v-btn>
-                                        </td>
-                                    </template>
-                                </v-data-table>
+                                <v-card>
+                                    <v-toolbar dark color="primary" class="elevation-0">
+                                        <v-toolbar-title class="white--text">Items</v-toolbar-title>
+                                        <v-text-field
+                                                flat
+                                                solo-inverted
+                                                prepend-icon="search"
+                                                label="Search"
+                                                class="ml-3"
+                                                v-model="search"
+                                        ></v-text-field>
+                                        <v-btn icon @click.native="loadData">
+                                            <v-icon v-if="!isLoadingData">refresh</v-icon>
+                                            <v-progress-circular
+                                                    v-else size="25"
+                                                    indeterminate
+                                                    color="blue"
+                                            ></v-progress-circular>
+                                        </v-btn>
+                                    </v-toolbar>
+                                    <v-data-table :items="supplierItems" :headers="supplierItemHeaders">
+                                        <template slot="items" slot-scope="props">
+                                            <td>{{ props.item.supplierItemId }}</td>
+                                            <td>{{ props.item.itemName }}</td>
+                                            <td class="layout px-0">
+                                                <v-btn icon class="mx-0" @click="addItem(props.item)">
+                                                    <v-icon color="blue">add</v-icon>
+                                                </v-btn>
+                                            </td>
+                                        </template>
+                                    </v-data-table>
+                                </v-card>
                             </v-flex>
-                            <v-flex xs8>
-                                <v-toolbar dark color="primary" class="elevation-0">
-                                    <v-toolbar-title class="white--text">Agreement Item List</v-toolbar-title>
-                                    <v-text-field
-                                            flat
-                                            solo-inverted
-                                            prepend-icon="search"
-                                            label="Search"
-                                            class="ml-5"
-                                            v-model="search"
-                                    ></v-text-field>
-                                </v-toolbar>
-                                <v-data-table :items="[]"></v-data-table>
+                            <v-flex xs8 class="ml-3">
+                                <v-card>
+                                    <v-toolbar dark color="primary" class="elevation-0">
+                                        <v-toolbar-title class="white--text">Agreement Item List</v-toolbar-title>
+                                        <v-text-field
+                                                flat
+                                                solo-inverted
+                                                prepend-icon="search"
+                                                label="Search"
+                                                class="ml-5"
+                                                v-model="search"
+                                        ></v-text-field>
+                                    </v-toolbar>
+                                    <v-data-table :items="agreementItems" :headers="agreementLinesHeaders">
+                                        <template slot="items" slot-scope="props">
+                                            <td>{{ props.item.supplierItemId }}</td>
+                                            <td>{{ props.item.itemName }}</td>
+                                            <td class="layout px-0">
+                                                <div v-if="agreementType==='1'" class="table-cell">
+                                                    No line details is required
+                                                </div>
+
+                                                <template v-else>
+                                                    <template v-if="agreementType==='0'">
+                                                        <inline-input class="px-1" type="number" max-width="100px"
+                                                                      label="Promised Qty"
+                                                                      v-model="props.item.promisedQuantity"></inline-input>
+                                                        <inline-input class="px-1" type="number" max-width="80px"
+                                                                      label="Min Qty"
+                                                                      v-model="props.item.minimumQuantity"></inline-input>
+                                                    </template>
+                                                    <template v-else-if="agreementType==='2'">
+                                                        <inline-input class="px-1" type="number"
+                                                                      max-width="60px" label="Qty"
+                                                                      v-model="props.item.quantity"></inline-input>
+                                                    </template>
+                                                    <inline-input class="px-1"
+                                                                  label="Unit" max-width="40px"
+                                                                  v-model="props.item.unit"></inline-input>
+                                                    <inline-input class="px-1" type="number" max-width="60px"
+                                                                  label="Price"
+                                                                  v-model="props.item.price"></inline-input>
+                                                </template>
+                                            </td>
+                                            <td>
+                                                <v-btn icon class="mx-0" @click="deleteItem(props.item)">
+                                                    <v-icon color="pink">delete</v-icon>
+                                                </v-btn>
+                                            </td>
+                                        </template>
+                                    </v-data-table>
+                                </v-card>
                             </v-flex>
                         </v-layout>
                     </template>
                     <v-btn color="primary" @click.native="step = 2">Back</v-btn>
-                    <v-btn color="primary" @click.native="step = 1">Continue</v-btn>
-                    <v-btn flat>Cancel</v-btn>
+                    <v-btn color="primary" @click.native="submit">Submit</v-btn>
+                    <v-btn flat @click.native="close">Cancel</v-btn>
                 </v-stepper-content>
             </v-stepper-items>
         </v-stepper>
@@ -234,14 +275,33 @@
 </template>
 
 <script>
+    import InlineInput from "../ItemManagement/InlineInput";
+    import {bus} from "../main";
+
     export default {
         name: "AgreementItemList",
+        components: {InlineInput},
         created() {
             this.loadData();
+            let component = this;
+            bus.$on('clearAgreementStepperData', () => {
+                component.agreementType = '';
+                component.supplierId = '';
+                component.currency = '';
+                component.startDate = '';
+                component.expiryDate = '';
+                component.details.purchaseOrderRevision = '';
+                component.details.account = '';
+                component.details.amount = '';
+                component.details.period = '';
+                component.details.timeUnit = '';
+                component.step = 1;
+            });
         },
         data() {
             return {
                 search: '',
+                date: '',
                 step: 0,
                 isLoadingData: false,
                 supplierItemHeaders: [
@@ -252,6 +312,26 @@
                     {
                         text: "Item Name",
                         value: "itemName"
+                    },
+                    {
+                        text: "Actions",
+                        value: "action",
+                        sortable: false
+                    }
+                ],
+                agreementLinesHeaders: [
+                    {
+                        text: "Id",
+                        value: "supplierItemId"
+                    },
+                    {
+                        text: "Item Name",
+                        value: "itemName"
+                    },
+                    {
+                        text: "Line Detail",
+                        align: "left",
+                        value: "lineDetail"
                     },
                     {
                         text: "Actions",
@@ -276,7 +356,8 @@
                     timeUnit: ''
                 },
                 suppliers: [],
-                supplierItems: []
+                supplierItems: [],
+                agreementItems: []
 
             }
         },
@@ -292,11 +373,45 @@
                         this.supplierItems = res.data.responseContent;
                     }
                 })
+            },
+            addItem(item) {
+                this.agreementItems.push(item);
+            },
+            deleteItem(item) {
+                this.agreementItems.splice(this.agreementItems[this.agreementItems.indexOf(item), 1]);
+            },
+            submit() {
+                this.$http.post('agreement', {
+                    agreementType: this.agreementType,
+                    currency: this.currency,
+                    supplierId: this.supplierId,
+                    startDate: this.startDate,
+                    expiryDate: this.expiryDate,
+                    details: this.details,
+                    items: this.agreementItems
+                }).then(res => {
+                    if (res.data.success) {
+                        console.log('Agreement saved successfully:', res);
+                    } else {
+                        console.log('Failed to save agreement:', res)
+                    }
+                    this.close();
+                });
+            },
+            close() {
+                bus.$emit('closeAgreementStepper');
             }
         }
     }
 </script>
 
 <style scoped>
-
+    .table-cell {
+        height: 100%;
+        font-style: italic;
+        color: gray;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
 </style>

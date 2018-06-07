@@ -1,7 +1,7 @@
 <template>
     <div>
         <input type="number" :value="value" @input="$emit('input', $event.target.value)" :placeholder="label"
-               :type="type">
+               :type="type" :style="style">
     </div>
 
 </template>
@@ -9,7 +9,16 @@
 <script>
     export default {
         name: "InlineInput",
-        props: ['value', 'label', 'type']
+        props: ['value', 'label', 'type', 'maxWidth'],
+        computed: {
+            style() {
+                if (this.maxWidth){
+                    return `max-width: ${this.maxWidth}`
+                } else {
+                    return '';
+                }
+            }
+        }
     }
 </script>
 
