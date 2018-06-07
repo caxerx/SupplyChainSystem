@@ -276,7 +276,7 @@
                 } else {
                     this.$http.post('item', this.editedItem).then(res => {
                         if (res.data.success) {
-                            this.items.push(res.data.responseContent);
+                            this.loadData();
                         }
                     });
                 }

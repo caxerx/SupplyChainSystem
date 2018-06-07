@@ -232,7 +232,7 @@
                     this.$http.put('supplier', this.editedItem.supplierId, this.editedItem).then(res => {
                         console.log(res);
                         if (res.data.success) {
-                            Object.assign(this.suppliers[this.editedIndex], this.editedItem);
+                            this.suppliers.push(res.data.responseContent);
                         }
                     });
                 } else {
