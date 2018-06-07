@@ -6,6 +6,7 @@ import VueRouter from 'vue-router'
 import Vuex from 'vuex'
 import axios from 'axios'
 import colors from 'vuetify/es5/util/colors'
+import Vuelidate from 'vuelidate'
 
 Vue.use(Vuetify, {
     theme: {
@@ -16,6 +17,7 @@ Vue.use(Vuetify, {
 });
 Vue.use(VueRouter);
 Vue.use(Vuex);
+Vue.use(Vuelidate);
 
 // Vue Router Routes
 import Dashboard from './Dashboard.vue'
