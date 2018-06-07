@@ -165,6 +165,12 @@
             };
         },
 
+        watch: {
+            isEditDialogShown(val) {
+                val || this.close();
+            }
+        },
+
         computed: {
             formTitle() {
                 return this.editedIndex === -1 ? "New Item" : "Edit Item";
@@ -223,7 +229,7 @@
             save() {
                 if (this.editedIndex > -1) {
                     this.$http.put('virtualitem', this.editedVirtualItemID, this.editedItem).then(res => {
-                        console.log('Edit item result:',res);
+                        console.log('Edit item result:', res);
                         if (res.data.success) {
                             this.loadData();
                         }

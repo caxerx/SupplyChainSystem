@@ -145,6 +145,14 @@
                 restaurants: []
             }
         },
+        watch: {
+            isEditDialogShown(val) {
+                val || bus.$emit('resetRequestItem');
+            },
+            isDetailDialogShown(val) {
+                val || bus.$emit('refreshRequestDetail');
+            }
+        },
         methods: {
             loadData() {
                 this.isLoadingData = true;

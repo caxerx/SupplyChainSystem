@@ -96,7 +96,12 @@
                 component.editMode = true;
                 component.requestItems = data;
                 component.loadData();
-            })
+            });
+            bus.$on('resetRequestItem', function () {
+                component.loadData();
+                component.editMode = false;
+                component.requestItems = [];
+            });
         },
         data() {
             return {
@@ -160,7 +165,6 @@
                 return this.editedIndex === -1 ? "New Item" : "Edit Item";
             }
         },
-        watch: {},
 
         methods: {
             loadData() {
