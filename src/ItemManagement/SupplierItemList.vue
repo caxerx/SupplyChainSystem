@@ -63,7 +63,11 @@
                             </v-flex>
                             <v-flex xs8>
                                 <v-text-field v-model="editedItem.supplierItemId"
-                                              label="Supplier Item Id"></v-text-field>
+                                              :error-messages="supplierItemIdError"
+                                              label="Supplier Item Id"
+                                              required
+                                              @input="$v.fvSupplierItemId.$touch()"
+                                              @blur="$v.fvSupplierItemId.$touch()"></v-text-field>
                             </v-flex>
                         </v-layout>
                         <v-layout row>
@@ -71,7 +75,11 @@
                                 <v-subheader>Item Name</v-subheader>
                             </v-flex>
                             <v-flex xs8>
-                                <v-text-field v-model="editedItem.itemName" label="Item Name"></v-text-field>
+                                <v-text-field v-model="editedItem.itemName" label="Item Name"
+                                              :error-messages="itemNameError"
+                                              required
+                                              @input="$v.fvItemName.$touch()"
+                                              @blur="$v.fvItemName.$touch()"></v-text-field>
                             </v-flex>
                         </v-layout>
                         <v-layout row>
@@ -85,6 +93,10 @@
                                           item-value="supplierId"
                                           label="Select a Supplier"
                                           single-line
+                                          :error-messages="supplierError"
+                                          required
+                                          @change="$v.fvSupplier.$touch()"
+                                          @blur="$v.fvSupplier.$touch()"
                                 >
                                 </v-select>
                             </v-flex>
@@ -127,13 +139,29 @@
 </template>
 
 <script>
+    import {validationMixin} from 'vuelidate'
+    import {required} from 'vuelidate/lib/validators'
+
     export default {
         name: "ItemList",
+        validations: {
+            fvItemName: {
+                required
+            },
+            fvSupplierItemId: {
+                required
+            },
+            fvSupplier: {
+                required
+            }
+        },
         created() {
             this.loadData();
         },
         data() {
             return {
+                mixins: [validationMixin],
+
                 search: '',
                 isLoadingData: false, //Loading state
                 isEditDialogShown: false, //Edit dialog
@@ -191,16 +219,40 @@
         },
 
         computed: {
+            fvItemName() {
+                return this.editedItem.itemName;
+            },
+            fvSupplier() {
+                return this.editedItem.supplierId;
+            },
+            fvSupplierItemId() {
+                return this.editedItem.supplierItemId;
+            },
+            itemNameError() {
+                const errors = [];
+                if (!this.$v.fvItemName.$dirty) return errors;
+                !this.$v.fvItemName.required && errors.push('Item Name is required');
+                return errors
+            },
+            supplierError() {
+                const errors = [];
+                if (!this.$v.fvSupplier.$dirty) return errors;
+                !this.$v.fvSupplier.required && errors.push('Supplier is required');
+                return errors
+            },
+            supplierItemIdError() {
+                const errors = [];
+                if (!this.$v.fvSupplierItemId.$dirty) return errors;
+                !this.$v.fvSupplierItemId.required && errors.push('Supplier Item ID is required');
+                return errors
+            },
             formTitle() {
                 return this.editedIndex === -1 ? "New Item" : "Edit Item";
-            },
-
-            watch() {
-                return {
-                    isEditDialogShown(val) {
-                        val || this.close();
-                    }
-                }
+            }
+        },
+        watch: {
+            isEditDialogShown: function (val) {
+                val || this.close();
             }
         },
 
@@ -260,12 +312,15 @@
                 this.isEditDialogShown = false;
                 this.editedSupplierItemId = '';
                 setTimeout(() => {
+                    this.$v.$reset();
                     this.editedItem = Object.assign({}, this.defaultItem);
                     this.editedIndex = -1;
                 }, 300);
             },
 
             save() {
+                this.$v.$touch();
+                if (this.$v.$invalid) return;
                 if (this.editedIndex > -1) {
                     this.$http.put('item', this.editedSupplierItemId, this.editedItem).then(res => {
                         console.log(res);
