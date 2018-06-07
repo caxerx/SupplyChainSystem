@@ -210,7 +210,7 @@
             }
             ,
             confirm() {
-                this.$http.delete('categoryitem', this.categoryItems[this.removedIndex].categoryId).then(res => {
+                this.$http.delete('categoryitem', this.category, {id: this.categoryItems[this.removedIndex].virtualItemId}).then(res => {
                     console.log(res);
                     if (res.data.success) {
                         this.categoryItems.splice(this.removedIndex, 1);
