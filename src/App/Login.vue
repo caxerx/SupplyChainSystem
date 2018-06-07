@@ -69,6 +69,8 @@
         },
         methods: {
             login() {
+                this.$v.$touch();
+                if (this.$v.$invalid) return;
                 this.$http.getToken({userName: this.userName, password: this.password}).then(res => {
                     if (res.data.success) {
                         this.$store.commit('setToken', res.data.responseContent.token);
