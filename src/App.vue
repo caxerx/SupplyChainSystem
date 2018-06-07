@@ -102,15 +102,20 @@
                                 </v-tooltip>
                             </v-list-tile-action>
                         </v-list-tile>
-                        <v-list-tile @click.stop="invalid" v-if="$store.state.devMode">
-                            <v-list-tile-action>
-                                <v-icon>close</v-icon>
-                            </v-list-tile-action>
-                            <v-list-tile-content>
-                                <v-list-tile-title>Make token invalid</v-list-tile-title>
-                            </v-list-tile-content>
-                        </v-list-tile>
                     </v-list>
+                    <template v-if="$store.state.devMode">
+                        <v-divider></v-divider>
+                        <v-list>
+                            <v-list-tile @click.stop="invalid">
+                                <v-list-tile-action>
+                                    <v-icon>close</v-icon>
+                                </v-list-tile-action>
+                                <v-list-tile-content>
+                                    <v-list-tile-title>Make token invalid</v-list-tile-title>
+                                </v-list-tile-content>
+                            </v-list-tile>
+                        </v-list>
+                    </template>
                 </v-menu>
                 <!-- Avatar icon menu end -->
 
@@ -320,10 +325,23 @@
                 if (this.$store.state.token !== '') {
                     this.$http.get('token').then(res => {
                         console.log('Auto Login:', res);
+                        /*
                         this.$store.commit('setLoginState', !!res.data.success);
                         this.$store.commit('setTokenValidState', true);
                         this.$store.commit('setUserType', window.localStorage.getItem("userType"));
                         this.$store.commit('setUserName', window.localStorage.getItem("userName"));
+                        */
+                        this.$store.commit('setToken', res.data.responseContent.token);
+                        window.localStorage.setItem("token", this.$store.state.token);
+                        this.$store.commit('setLoginState', true);
+                        this.$store.commit('setTokenValidState', true);
+                        this.$store.commit('setUserId', res.data.responseContent.dbUser.userId);
+                        this.$store.commit('setUserName', res.data.responseContent.dbUser.name);
+                        this.$store.commit('setUserType', res.data.responseContent.dbUser.userType);
+                        window.localStorage.setItem("userId", this.$store.state.userId);
+                        window.localStorage.setItem("userName", this.$store.state.userName);
+                        window.localStorage.setItem("userType", this.$store.state.userType);
+                        // console.log('Login data:', res.data.responseContent);
                     }).catch(err => {
                         // Error Handling
                         console.log(err.message);

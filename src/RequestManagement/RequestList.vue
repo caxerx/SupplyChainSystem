@@ -55,10 +55,12 @@
                         <span>View Detail</span>
                     </v-tooltip>
                     <v-tooltip top>
-                        <v-btn icon class="mx-0" @click.native="editItem(props.item)" slot="activator">
+                        <v-btn icon class="mx-0" @click.native="editItem(props.item)" slot="activator"
+                               :disabled="props.item.requestCreator!=$store.state.userId">
                             <v-icon color="teal">edit</v-icon>
                         </v-btn>
-                        <span>Edit</span>
+                        <span v-if="props.item.requestCreator==$store.state.userId">Edit</span>
+                        <span v-else>You are not the creator</span>
                     </v-tooltip>
                 </td>
             </template>
@@ -89,7 +91,7 @@
     import moment from 'moment';
     import RequestItemList from "./RequestItemList";
     import {bus} from "../main";
-    import RequestDetail from "../ItemManagement/RequestDetail";
+    import RequestDetail from "./RequestDetail";
 
     export default {
         name: "RequestList",
