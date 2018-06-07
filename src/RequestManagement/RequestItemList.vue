@@ -32,7 +32,7 @@
                             <v-text-field v-model="props.item.quantity" label="Quantity" single-line
                                           type="number" min="1"></v-text-field>
                                           -->
-                            <number-input v-model="props.item.quantity" label="Quantity"></number-input>
+                            <inline-input v-model="props.item.quantity" label="Quantity" type="number"></inline-input>
                             <v-btn icon class="mx-0" @click="addItem(props.item)">
                                 <v-icon color="blue">add</v-icon>
                             </v-btn>
@@ -84,11 +84,11 @@
 <script>
     import {bus} from "../main";
     import VirtualItemSelect from "../ItemManagement/VirtualItemSelect";
-    import NumberInput from "../ItemManagement/InlineInput";
+    import InlineInput from "../ItemManagement/InlineInput";
 
     export default {
         name: "RequestItemList",
-        components: {NumberInput, VirtualItemSelect},
+        components: {InlineInput, VirtualItemSelect},
         created() {
             this.loadData();
             let component = this;
