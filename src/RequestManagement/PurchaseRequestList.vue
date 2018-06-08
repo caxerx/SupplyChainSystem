@@ -38,7 +38,7 @@
                 <td>{{ props.item.requestId }}</td>
                 <td>{{ props.item.restaurantName }} ({{ props.item.restaurantId }})</td>
                 <td>{{ props.item.name }}</td>
-                <td>{{ props.item.requestStatusName }}</td>
+                <td><span v-if="props.item.requestStatus==-1" class="red--text">{{ props.item.requestStatusName }}</span><template v-else>{{ props.item.requestStatusName }}</template></td>
                 <td>{{ moment(props.item.createTime).format("YYYY-MM-DD HH:mm:ss")}}
                 </td>
                 <td class="layout px-0">
@@ -49,11 +49,13 @@
                         <span>View Detail</span>
                     </v-tooltip>
                     <v-tooltip top>
-                        <v-btn icon class="mx-0" @click.native="editItem(props.item)" slot="activator">
+                        <v-btn icon class="mx-0" @click.native="editItem(props.item)" slot="activator" :disabled="props.item.requestStatus==-1">
                             <v-icon color="teal">edit</v-icon>
                         </v-btn>
-                        <span>Edit</span>
+                        <span v-if="props.item.requestStatus==-1">Request Cancelled</span>
+                        <span v-else>Edit</span>
                     </v-tooltip>
+
                 </td>
             </template>
             <template slot="no-data">
@@ -95,6 +97,11 @@
                 console.log('Msg received');
                 component.isEditDialogShown = false;
                 component.loadData();
+            });
+            bus.$on('requestListEditRequest', function () {
+                console.log("edit request received");
+                component.editItem(component.requests.find(i => i.requestId === component.selectedRequest));
+                component.isDetailDialogShown = false;
             });
         },
         data() {
@@ -150,6 +157,8 @@
         methods: {
             getRequestType(typeId) {
                 switch (typeId) {
+                    case -1:
+                        return "Cancelled";
                     case 0:
                         return "Waiting For Process";
                     case 1:
