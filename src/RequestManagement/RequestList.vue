@@ -44,7 +44,7 @@
                 <td>{{ props.item.requestId }}</td>
                 <td>{{ props.item.restaurantName }} ({{ props.item.restaurantId }})</td>
                 <td>{{ props.item.name }}</td>
-                <td>{{ props.item.requestStatusName }}</td>
+                <td><span v-if="props.item.requestStatus==-1" class="red--text">{{ props.item.requestStatusName }}</span><template v-else>{{ props.item.requestStatusName }}</template></td>
                 <td>{{ moment(props.item.createTime).format("YYYY-MM-DD HH:mm:ss")}}
                 </td>
                 <td class="layout px-0">
@@ -62,6 +62,17 @@
                         <span v-if="props.item.requestCreator==$store.state.userId">Edit</span>
                         <span v-else>You are not the creator</span>
                     </v-tooltip>
+
+                    <v-tooltip top>
+                        <v-btn icon class="mx-0" @click.native="cancelRequest(props.item)" slot="activator"
+                               :disabled="!isCancellable(props.item)">
+                            <v-icon color="red">clear</v-icon>
+                        </v-btn>
+                        <span v-if="isCancellable(props.item)">Cancel</span>
+                        <span v-else-if="props.item.requestCreator != $store.state.userId">You are not the creator</span>
+                        <span v-else>Only can cancel before process</span>
+                    </v-tooltip>
+
                 </td>
             </template>
             <template slot="no-data">
@@ -84,6 +95,20 @@
             </v-card>
         </v-dialog>
         <!-- Detail dialog end -->
+        <!-- Cancel Confirm Dialog start -->
+        <v-dialog v-model="isCancelDialogShown" max-width="290">
+            <v-card>
+                <v-card-title class="headline">Cancel Request</v-card-title>
+                <v-card-text>Are you sure to cancel the request? This action is irreversible.
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="green darken-1" flat @click.native="cancel">Cancel</v-btn>
+                    <v-btn color="green darken-1" flat @click.native="confirm">Confirm</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+        <!-- Cancel Confirm Dialog end -->
     </div>
 </template>
 
@@ -104,6 +129,11 @@
                 component.isEditDialogShown = false;
                 component.loadData();
             });
+            bus.$on('requestListEditRequest', function () {
+                console.log("edit request received");
+                component.editItem(component.requests.find(i => i.requestId === component.selectedRequest));
+                component.isDetailDialogShown = false;
+            });
         },
         data() {
             return {
@@ -111,6 +141,7 @@
                 isLoadingData: false,
                 isEditDialogShown: false,
                 isDetailDialogShown: false,
+                isCancelDialogShown: false,
 
                 selectedRequest: '',
                 // Table Data
@@ -156,8 +187,10 @@
             }
         },
         methods: {
-            getRequestType(typeId){
-                switch(typeId){
+            getRequestType(typeId) {
+                switch (typeId) {
+                    case -1:
+                        return "Cancelled";
                     case 0:
                         return "Waiting For Process";
                     case 1:
@@ -196,8 +229,8 @@
                                     }
                                 });
 
-                                this.requests.map(req=>{
-                                    req.requestStatusName=this.getRequestType(req.requestStatus);
+                                this.requests.map(req => {
+                                    req.requestStatusName = this.getRequestType(req.requestStatus);
                                 });
                             }
                         });
@@ -222,10 +255,31 @@
                 });
 
             },
+            cancelRequest(item) {
+                this.selectedRequest = item.requestId;
+                this.isCancelDialogShown = true;
+            },
+            confirm() {
+                this.$http.post(`requeststatus/${this.selectedRequest}`, {status: -1}).then(res => {
+                    if (res.data.success) {
+                        this.loadData();
+                    }
+                });
+                this.isCancelDialogShown = false;
+            },
+            cancel() {
+                this.isCancelDialogShown = false;
+            },
             viewItem(item) {
                 this.selectedRequest = item.requestId;
                 this.isDetailDialogShown = true;
                 bus.$emit('refreshRequestDetail')
+            },
+            isCancellable(item) {
+                if (item.requestStatus == 0 && item.requestCreator == this.$store.state.userId) {
+                    return true;
+                }
+                return false;
             },
             moment: moment
         }

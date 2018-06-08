@@ -89,6 +89,9 @@
                 // component.loadData();
             });
         },
+        beforeDestroy(){
+            bus.$off(this.itemSelect);
+        },
         data() {
             return {
                 itemSelect: 'idmapitemselect',

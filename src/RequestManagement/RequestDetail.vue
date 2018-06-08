@@ -115,12 +115,12 @@
                 }
             },
             editItem() {
-
+                bus.$emit("requestListEditRequest");
             }
         },
-        computed:{
-            requestStatusName(){
-                switch(this.requestDetail.requestStatus){
+        computed: {
+            requestStatusName() {
+                switch (this.requestDetail.requestStatus) {
                     case 0:
                         return "Waiting For Process";
                     case 1:

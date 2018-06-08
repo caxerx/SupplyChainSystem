@@ -259,6 +259,7 @@
             close() {
                 this.isEditDialogShown = false;
                 setTimeout(() => {
+                    this.$v.$reset();
                     this.editedItem = Object.assign({}, this.defaultItem);
                     this.editedIndex = -1;
                 }, 300);

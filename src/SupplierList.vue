@@ -264,13 +264,13 @@
                     this.$http.put('supplier', this.editedItem.supplierId, this.editedItem).then(res => {
                         console.log(res);
                         if (res.data.success) {
-                            this.suppliers.push(res.data.responseContent);
+                            this.loadData();
                         }
                     });
                 } else {
                     this.$http.post('supplier', this.editedItem).then(res => {
                         if (res.data.success) {
-                            this.suppliers.push(res.data.responseContent);
+                            this.loadData();
                         }
                     });
                 }

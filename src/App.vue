@@ -254,7 +254,8 @@
                                 },
                                 {
                                     text: 'Category',
-                                    to: '/item/category'
+                                    to: '/item/category',
+                                    access: [2, 3]
                                 }
                             ]
                     },
@@ -262,12 +263,13 @@
                         to: '/request',
                         icon: 'assignment',
                         text: 'Request Management',
-                        access: [1, 3]
+                        access: [1]
                     },
                     {
-                        to: '/fullrequest',
+                        to: '/purchaserequest',
                         icon: 'assignment',
-                        text: 'Request Management(Full)'
+                        text: 'Request Management',
+                        access: [3]
                     },
                     {
                         to: '/agreement',

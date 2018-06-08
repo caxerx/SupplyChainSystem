@@ -23,7 +23,7 @@ Vue.use(Vuelidate);
 import Dashboard from './Dashboard.vue'
 import ItemManagement from './ItemManagement.vue'
 import RequestManagement from './RequestManagement.vue'
-import FullRequestManagement from './FullRequestManagement.vue'
+import PurchaseRequestManagement from './PurchaseRequestManagement.vue'
 import AgreementManagement from './AgreementManagement.vue'
 import RestaurantManagement from './RestaurantManagement'
 import SupplierManagement from './SupplierManagement'
@@ -85,9 +85,9 @@ const routes = [
         component: RequestManagement
     },
     {
-        path: '/fullrequest',
-        name: 'Request Management(Full)',
-        component: FullRequestManagement
+        path: '/purchaserequest',
+        name: 'Request Management',
+        component: PurchaseRequestManagement
     },
     {
         path: '/agreement',
