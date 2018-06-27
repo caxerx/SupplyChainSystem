@@ -115,7 +115,7 @@
                                         <v-subheader>Amount Agreed</v-subheader>
                                     </v-flex>
                                     <v-flex xs8>
-                                        <v-text-field label="Amount" v-model="details.amount"
+                                        <v-text-field label="Amount" v-model="details.amountAgreed"
                                                       type="number"></v-text-field>
                                     </v-flex>
                                 </v-layout>
@@ -302,7 +302,7 @@
                 component.termsAndCondition = '';
                 component.details.purchaseOrderRevision = '';
                 component.details.account = '';
-                component.details.amount = '';
+                component.details.amountAgreed = '';
                 component.details.period = '';
                 component.details.timeUnit = '';
                 component.step = 1;
@@ -328,7 +328,7 @@
                     case '0':
                         component.details.purchaseOrderRevision = data.blanketPurchaseAgreementDetails.purchaseOrderRevision;
                         component.details.account = data.blanketPurchaseAgreementDetails.account;
-                        component.details.amount = data.blanketPurchaseAgreementDetails.amountAgreed;
+                        component.details.amountAgreed = data.blanketPurchaseAgreementDetails.amountAgreed;
                         console.log('BPA Lines:', data.blanketPurchaseAgreementLines);
                         data.blanketPurchaseAgreementLines.map(bpaItem => {
                             for (let x in bpaItem.item) {
@@ -423,7 +423,7 @@
                 details: {
                     purchaseOrderRevision: '',
                     account: '',
-                    amount: '',
+                    amountAgreed: '',
                     period: '',
                     timeUnit: ''
                 },
