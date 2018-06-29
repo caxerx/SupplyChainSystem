@@ -33,7 +33,7 @@
                         <v-icon color="blue">info</v-icon>
                     </v-btn>
 
-                    <v-btn icon class="mx-0" @click="createDeliveryNote(props.item)">
+                    <v-btn icon class="mx-0" @click="createDeliveryNote(props.item)" :disabled="!canFinish(props.item)">
                         <v-icon color="green">check</v-icon>
                     </v-btn>
                 </td>
@@ -122,6 +122,9 @@
                 this.$http.put('despatchinstruction', item.despatchInstructionId).then(res => {
                     this.loadData();
                 });
+            },
+            canFinish(item) {
+                return item.despatchInstructionStatus == 0;
             },
             getStatusName(status) {
                 switch (status) {
