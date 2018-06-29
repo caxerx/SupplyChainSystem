@@ -63,7 +63,7 @@
         name: "RequestDetail",
         created() {
             let component = this;
-            bus.$on('refreshRequestDetail', function () {
+            bus.$on('refreshRequestDetail', () => {
                 component.loadData();
             });
         },

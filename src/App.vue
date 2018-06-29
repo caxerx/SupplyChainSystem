@@ -61,7 +61,7 @@
             <!-- Title toolbar start -->
 
             <v-toolbar fixed app :clipped-left="$vuetify.breakpoint.smAndUp" color="primary" dark class="pr-4"
-                       style="z-index: 100">
+                       style="z-index: 100" prominent>
                 <v-toolbar-title>
                     <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
                     {{ title }}
@@ -263,13 +263,24 @@
                         to: '/request',
                         icon: 'assignment',
                         text: 'Request Management',
+                        children: [
+                            {
+                                to: '/request',
+                                text: 'Request List',
+                                access: [1]
+                            },
+                            {
+                                to: '/requestmapping',
+                                text: 'Request Mapping'
+                            }
+                            ,
+                            {
+                                to: '/purchaserequest',
+                                text: 'Request Queue',
+                                access: [3]
+                            }
+                        ],
                         access: [1]
-                    },
-                    {
-                        to: '/purchaserequest',
-                        icon: 'assignment',
-                        text: 'Request Management',
-                        access: [3]
                     },
                     {
                         to: '/agreement',
@@ -307,6 +318,25 @@
                         icon: 'account_circle',
                         text: 'User Management',
                         access: [0]
+                    },
+                    {
+                        to: '/purchaseorder',
+                        icon: 'receipt',
+                        text: 'Order Management',
+                        children: [
+                            {
+                                to: '/purchaseorder/blanketpurchaseorder',
+                                text: 'Blanket Purchase Order'
+                            },
+                            {
+                                to: '/purchaseorder/standardpurchaseorder',
+                                text: 'Standard Purchase Order'
+                            },
+                            {
+                                to: '/purchaseorder/scheduledrelease',
+                                text: 'Scheduled Release'
+                            }
+                        ]
                     },
                     {
                         divider: true
@@ -410,6 +440,7 @@
                 this.$store.commit('setToken', '');
                 this.$store.commit('setLoginState', false);
                 this.$router.push('/');
+                window.location.reload();
             },
             // For testing purpose only
             invalid() {

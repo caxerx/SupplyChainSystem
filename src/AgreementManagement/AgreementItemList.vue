@@ -362,6 +362,10 @@
                 component.step = 1;
             });
         },
+        destroyed() {
+            bus.$off('clearAgreementStepperData');
+            bus.$off('editAgreementStepperData');
+        },
         validations: {
             agreementType: {
                 required

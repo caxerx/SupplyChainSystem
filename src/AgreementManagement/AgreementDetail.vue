@@ -30,7 +30,9 @@
                                     Terms and Condition:
                                 </v-list-tile-content>
                                 <v-list-tile-content class="align-end">
-                                    <v-btn @click.native="isTermsAndConditionShown=true" small depressed color="grey lighten-2">View</v-btn>
+                                    <v-btn @click.native="isTermsAndConditionShown=true" small depressed
+                                           color="grey lighten-2">View
+                                    </v-btn>
                                 </v-list-tile-content>
                             </v-list-tile>
                             <v-divider></v-divider>
@@ -211,7 +213,7 @@
             <v-card class="pa-4">
                 <h1>Terms and Condtion</h1>
                 <v-divider></v-divider>
-                <div class="pa-2">
+                <div class="pa-2" style="white-space: pre-wrap;">
                     {{ agreement.termsAndCondition }}
                 </div>
             </v-card>

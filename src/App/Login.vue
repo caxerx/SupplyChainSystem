@@ -82,12 +82,12 @@
                         window.localStorage.setItem("userId", this.$store.state.userId);
                         window.localStorage.setItem("userName", this.$store.state.userName);
                         window.localStorage.setItem("userType", this.$store.state.userType);
-                        if(res.data.responseContent.workplace) {
+                        if (res.data.responseContent.workplace) {
                             this.$store.commit('setWorkingRestaurant', res.data.responseContent.workplace.restaurantId);
                             this.$store.commit('setWorkingRestaurantStock', res.data.responseContent.workplace.stockId);
                             window.localStorage.setItem("workingRestaurant", this.$store.state.workingRestaurant);
                             window.localStorage.setItem("workingRestaurantStock", this.$store.state.workingRestaurantStock);
-                        }else{
+                        } else {
 
                             this.$store.commit('setWorkingRestaurant', '-1');
                             this.$store.commit('setWorkingRestaurantStock', '-1');

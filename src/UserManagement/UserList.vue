@@ -9,6 +9,7 @@
                     prepend-icon="search"
                     label="Search"
                     class="ml-5"
+                    v-model="search"
             ></v-text-field>
             <v-spacer></v-spacer>
 
@@ -24,7 +25,7 @@
         <!-- Table toolbar end -->
 
         <!-- Table start -->
-        <v-data-table :headers="headers" :items="users" class="elevation-1">
+        <v-data-table :headers="headers" :items="users" class="elevation-1" :search="search">
             <template slot="items" slot-scope="props">
                 <td>{{ props.item.userId }}</td>
                 <td>{{ props.item.userName }}</td>
@@ -129,6 +130,7 @@
         },
         data() {
             return {
+                search: '',
                 isLoadingData: false, //Loading state
                 isEditDialogShown: false, //Edit dialog
                 isConfirmDialogShown: false, //Confirm dialog

@@ -92,16 +92,20 @@
         created() {
             this.loadData();
             let component = this;
-            bus.$on('editRequestItem', function (data) {
+            bus.$on('editRequestItem', (data) => {
                 component.editMode = true;
                 component.requestItems = data;
                 component.loadData();
             });
-            bus.$on('resetRequestItem', function () {
+            bus.$on('resetRequestItem', () => {
                 component.loadData();
                 component.editMode = false;
                 component.requestItems = [];
             });
+        },
+        destroyed() {
+            bus.$off('editRequestItem');
+            bus.$off('resetRequestItem');
         },
         data() {
             return {

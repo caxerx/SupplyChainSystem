@@ -43,6 +43,11 @@ import RestaurantList from './RestaurantManagement/RestaurantList'
 import RestaurantTypeList from './RestaurantManagement/RestaurantTypeList'
 import RestaurantManagerList from './RestaurantManagement/RestaurantManagerList'
 
+import RequestMapping from './RequestManagement/RequestMapping'
+import PurchaseOrderManagement from './PurchaseOrderManagement'
+import BlanketPurchaseOrder from './PurchaseOrderManagement/BlanketPurchaseOrder'
+import StandardPurchaseOrder from './PurchaseOrderManagement/StandardPurchaseOrder'
+import ScheduledRelease from './PurchaseOrderManagement/ScheduledRelease'
 
 const routes = [
     {
@@ -90,6 +95,12 @@ const routes = [
         component: PurchaseRequestManagement
     },
     {
+        path: '/requestmapping',
+        name: 'Request Mapping',
+        component: RequestMapping
+    }
+    ,
+    {
         path: '/agreement',
         name: 'Agreement Management',
         component: AgreementManagement
@@ -124,6 +135,28 @@ const routes = [
         path: '/user',
         name: 'User Management',
         component: UserManagement
+    },
+    {
+        path: '/purchaseorder',
+        name: 'Purchase Order Management',
+        component: PurchaseOrderManagement,
+        children: [
+            {
+                path: '/purchaseorder/blanketpurchaseorder',
+                name: 'Blanket Purchase Order',
+                component: BlanketPurchaseOrder
+            },
+            {
+                path: '/purchaseorder/standardpurchaseorder',
+                name: 'Standard Purchase Order',
+                component: StandardPurchaseOrder
+            },
+            {
+                path: '/purchaseorder/scheduledrelease',
+                name: 'Scheduled Release',
+                component: ScheduledRelease
+            }
+        ]
     },
     {
         path: '/setting',
@@ -184,11 +217,11 @@ const store = new Vuex.Store({
             setUserName(state, payload) {
                 state.userName = payload;
             },
-            setWorkingRestaurant(state,payload){
-                state.workingRestaurant=payload;
+            setWorkingRestaurant(state, payload) {
+                state.workingRestaurant = payload;
             },
-            setWorkingRestaurantStock(state,payload){
-                state.workingRestaurantStock=payload;
+            setWorkingRestaurantStock(state, payload) {
+                state.workingRestaurantStock = payload;
             },
             closeErrorDialog(state) {
                 state.isErrorDialogShown = false;
