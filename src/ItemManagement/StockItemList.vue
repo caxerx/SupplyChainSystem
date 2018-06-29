@@ -134,6 +134,9 @@
     export default {
         name: "StockItemList",
         components: {VirtualItemSelect},
+        beforeDestroy(){
+            bus.$off(this.selectChannel)
+        },
         created() {
             this.loadData();
             let component = this;

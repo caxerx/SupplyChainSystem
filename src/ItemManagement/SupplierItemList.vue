@@ -49,6 +49,15 @@
         </v-data-table>
         <!-- Table end -->
 
+
+        <!-- Supplier Select Dialog start -->
+        <v-dialog v-model="isSupplierDialogShown" max-width="900">
+            <v-card>
+                <supplier-select :channel="selectChannel"></supplier-select>
+            </v-card>
+        </v-dialog>
+        <!-- Supplier Select Dialog end -->
+
         <!-- Edit Dialog start -->
         <v-dialog v-model="isEditDialogShown" max-width="500px">
             <v-card>
@@ -82,10 +91,31 @@
                                               @blur="$v.fvItemName.$touch()"></v-text-field>
                             </v-flex>
                         </v-layout>
+
                         <v-layout row>
                             <v-flex xs4>
                                 <v-subheader>Supplier</v-subheader>
                             </v-flex>
+                            <v-flex xs4>
+                                <v-text-field v-model="editedItem.supplierId" label="Supplier Id"
+                                              single-line
+                                              :error-messages="supplierError"
+                                              required
+                                              @change="$v.fvSupplier.$touch()"
+                                              readonly></v-text-field>
+                            </v-flex>
+                            <v-flex xs4 class="pl-3">
+                                <v-btn block @click.native="selectSupplier">Select Supplier</v-btn>
+                            </v-flex>
+                        </v-layout>
+                        <!--
+
+                        <v-layout row>
+
+                            <v-flex xs4>
+                                <v-subheader>Supplier</v-subheader>
+                            </v-flex>
+
                             <v-flex xs8>
                                 <v-select v-model="editedItem.supplierId"
                                           :items="suppliers"
@@ -100,7 +130,9 @@
                                 >
                                 </v-select>
                             </v-flex>
+
                         </v-layout>
+                        -->
                         <v-layout row>
                             <v-flex xs4>
                                 <v-subheader>Description</v-subheader>
@@ -139,11 +171,14 @@
 </template>
 
 <script>
+    import {bus} from "../main";
     import {validationMixin} from 'vuelidate'
     import {required} from 'vuelidate/lib/validators'
+    import SupplierSelect from "./SupplierSelect";
 
     export default {
         name: "ItemList",
+        components: {SupplierSelect},
         validations: {
             fvItemName: {
                 required
@@ -157,14 +192,24 @@
         },
         created() {
             this.loadData();
+            bus.$on(this.selectChannel, (data)=>{
+                console.log('Supplier Item List received msg:', data);
+                this.editedItem.supplierId = data;
+                this.isSupplierDialogShown = false;
+            });
+        },
+        beforeDestroy(){
+            bus.$off(this.selectChannel)
         },
         data() {
             return {
+                selectChannel:"supplierItemListSelect",
                 mixins: [validationMixin],
 
                 search: '',
                 isLoadingData: false, //Loading state
                 isEditDialogShown: false, //Edit dialog
+                isSupplierDialogShown: false,
                 isConfirmDialogShown: false, //Confirm dialog
                 headers: [
                     //Table header data
@@ -197,7 +242,6 @@
                     }
                 ],
                 items: [], //User data, ajax fetch reserve
-                suppliers: [],
                 editedIndex: -1,
                 removedIndex: -1,
                 editedSupplierItemId: '',
@@ -259,25 +303,18 @@
         methods: {
             loadData() {
                 this.isLoadingData = true;
-                this.$http.get('supplier').then(res => {
+                this.$http.get('item').then(res => {
+                    setTimeout(() => {
+                        this.isLoadingData = false;
+                    }, 300);
                     if (res.data.success) {
-                        this.suppliers = res.data.responseContent;
-                        console.log(this.suppliers);
+                        this.items = res.data.responseContent;
+                        console.log(res.data.responseContent);
                     }
-                }).then(() => {
-                    this.$http.get('item').then(res => {
-                        setTimeout(() => {
-                            this.isLoadingData = false;
-                        }, 300);
-                        if (res.data.success) {
-                            this.items = res.data.responseContent;
-                            console.log(res.data.responseContent);
-                            this.items.map(obj =>
-                                obj['supplierName'] = this.suppliers.find(supplier =>
-                                    supplier.supplierId === obj.supplierId).supplierName);
-                        }
-                    });
                 });
+            },
+            selectSupplier() {
+                this.isSupplierDialogShown = true;
             },
             editItem(item) {
                 this.editedSupplierItemId = item.supplierItemId;
