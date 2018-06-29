@@ -143,6 +143,8 @@
                         return "Delivering";
                     case 4:
                         return "Delivered";
+                    case 5:
+                        return "Waiting For Despatch";
                 }
             },
             canEditRequest() {

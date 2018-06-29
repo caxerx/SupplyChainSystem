@@ -1,6 +1,6 @@
 <template>
     <div>
-        <stock-item-list :stock="$store.state.workingRestaurantStock"></stock-item-list>
+        <stock-item-list :stock="myStock"></stock-item-list>
     </div>
 </template>
 
@@ -15,6 +15,7 @@
         },
         data() {
             return {
+                myStock: 0,
                 search: '',
                 isLoadingData: false, //Loading state
                 isEditDialogShown: false, //Edit dialog
@@ -63,15 +64,21 @@
             loadData() {
                 this.isLoadingData = true;
 
-                this.$http.get('stockitem').then(res => {
-                    setTimeout(() => {
-                        this.isLoadingData = false;
-                    }, 300);
-                    if (res.data.success) {
-                        this.stockItems = res.data.responseContent;
-                        console.log(res.data.responseContent);
-                    }
+                this.$http.get('mystock').then(res => {
+                    this.myStock = res.data.responseContent.stock;
+                }).then(() => {
+
+                    this.$http.get('stockitem').then(res => {
+                        setTimeout(() => {
+                            this.isLoadingData = false;
+                        }, 300);
+                        if (res.data.success) {
+                            this.stockItems = res.data.responseContent;
+                            console.log(res.data.responseContent);
+                        }
+                    });
                 });
+
             },
             viewItem(item) {
                 this.selectedStock = item.stockId;

@@ -39,6 +39,7 @@
                       :items="requests"
                       class="elevation-1"
                       :search="search"
+                      :pagination.sync="pagination"
         >
             <template slot="items" slot-scope="props">
                 <td>{{ props.item.requestId }}</td>
@@ -165,6 +166,7 @@
         },
         data() {
             return {
+                pagination: {'sortBy': 'requestId', 'descending': true, 'rowsPerPage': 5},
                 search: '',
                 isLoadingData: false,
                 isEditDialogShown: false,
@@ -232,6 +234,8 @@
                         return "Delivering";
                     case 4:
                         return "Delivered";
+                    case 5:
+                        return "Waiting For Despatch";
                 }
             },
             loadData() {
