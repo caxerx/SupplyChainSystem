@@ -62,13 +62,13 @@
 
         <!-- Table end -->
 
-        <v-dialog v-model="isDetailDialogShown" max-width="1200">
+        <v-dialog v-model="isDetailDialogShown" max-width="1400">
             <v-card>
                 <agreement-detail :agreement="selectedAgreement"></agreement-detail>
             </v-card>
         </v-dialog>
 
-        <v-dialog v-model="isEditDialogShown" max-width="1200">
+        <v-dialog v-model="isEditDialogShown" max-width="1400">
             <v-card>
                 <agreement-item-list></agreement-item-list>
             </v-card>

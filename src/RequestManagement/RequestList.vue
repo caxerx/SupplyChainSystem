@@ -44,7 +44,9 @@
                 <td>{{ props.item.requestId }}</td>
                 <td>{{ props.item.restaurantName }} ({{ props.item.restaurantId }})</td>
                 <td>{{ props.item.name }}</td>
-                <td><span v-if="props.item.requestStatus==-1" class="red--text">{{ props.item.requestStatusName }}</span><template v-else>{{ props.item.requestStatusName }}</template></td>
+                <td><span v-if="props.item.requestStatus===-1||props.item.requestStatus===-2" class="red--text">{{ props.item.requestStatusName }}</span>
+                    <template v-else>{{ props.item.requestStatusName }}</template>
+                </td>
                 <td>{{ moment(props.item.createTime).format("YYYY-MM-DD HH:mm:ss")}}
                 </td>
                 <td class="layout px-0">
@@ -56,11 +58,11 @@
                     </v-tooltip>
                     <v-tooltip top>
                         <v-btn icon class="mx-0" @click.native="editItem(props.item)" slot="activator"
-                               :disabled="props.item.requestCreator!=$store.state.userId">
+                               :disabled="!canEditRequest(props.item)">
                             <v-icon color="teal">edit</v-icon>
                         </v-btn>
-                        <span v-if="props.item.requestCreator==$store.state.userId">Edit</span>
-                        <span v-else>You are not the creator</span>
+                        <span v-if="canEditRequest(props.item)">Edit</span>
+                        <span v-else>You cannot edit this request</span>
                     </v-tooltip>
 
                     <v-tooltip top>
@@ -70,7 +72,7 @@
                         </v-btn>
                         <span v-if="isCancellable(props.item)">Cancel</span>
                         <span v-else-if="props.item.requestCreator != $store.state.userId">You are not the creator</span>
-                        <span v-else>Only can cancel before process</span>
+                        <span v-else>Request already processed</span>
                     </v-tooltip>
 
                 </td>
@@ -189,6 +191,8 @@
         methods: {
             getRequestType(typeId) {
                 switch (typeId) {
+                    case -2:
+                        return "Process Failed";
                     case -1:
                         return "Cancelled";
                     case 0:
@@ -277,6 +281,12 @@
             },
             isCancellable(item) {
                 if (item.requestStatus == 0 && item.requestCreator == this.$store.state.userId) {
+                    return true;
+                }
+                return false;
+            },
+            canEditRequest(item) {
+                if (item.requestCreator == this.$store.state.userId && (item.requestStatus === 0 || item.requestStatus === -2)) {
                     return true;
                 }
                 return false;

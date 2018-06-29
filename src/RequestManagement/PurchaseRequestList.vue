@@ -38,7 +38,7 @@
                 <td>{{ props.item.requestId }}</td>
                 <td>{{ props.item.restaurantName }} ({{ props.item.restaurantId }})</td>
                 <td>{{ props.item.name }}</td>
-                <td><span v-if="props.item.requestStatus==-1" class="red--text">{{ props.item.requestStatusName }}</span><template v-else>{{ props.item.requestStatusName }}</template></td>
+                <td><span v-if="props.item.requestStatus===-1||props.item.requestStatus===-2" class="red--text">{{ props.item.requestStatusName }}</span><template v-else>{{ props.item.requestStatusName }}</template></td>
                 <td>{{ moment(props.item.createTime).format("YYYY-MM-DD HH:mm:ss")}}
                 </td>
                 <td class="layout px-0">
@@ -157,6 +157,8 @@
         methods: {
             getRequestType(typeId) {
                 switch (typeId) {
+                    case -2:
+                        return "Process Failed";
                     case -1:
                         return "Cancelled";
                     case 0:

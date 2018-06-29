@@ -162,8 +162,8 @@
                                         <v-subheader>Time Unit</v-subheader>
                                     </v-flex>
                                     <v-flex xs8>
-                                        <v-text-field label="Time Unit" v-model="details.timeUnit"
-                                        ></v-text-field>
+                                        <v-select v-model="details.timeUnit" :items="timeUnit" item-text="text"
+                                                  item-value="code" label="Time Unit"></v-select>
                                     </v-flex>
                                 </v-layout>
                             </template>
@@ -431,6 +431,12 @@
                     period: '',
                     timeUnit: ''
                 },
+
+
+                timeUnit: [
+                    {code: "day", text: "Day(s)"},
+                    {code: "month", text: "Month(s)"},
+                ],
 
                 startDateMenu: false,
                 expiryDateMenu: false,

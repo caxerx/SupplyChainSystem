@@ -32,7 +32,7 @@
                     <v-toolbar-title class="white--text">Request Item List</v-toolbar-title>
                     <v-spacer></v-spacer>
 
-                    <v-btn icon @click="editItem">
+                    <v-btn icon @click="editItem" v-if="canEditRequest">
                         <v-icon>edit</v-icon>
                     </v-btn>
                 </v-toolbar>
@@ -102,7 +102,7 @@
         methods: {
             loadData() {
                 if (this.request) {
-                    this.$http.get(`restaurantrequest/${this.request}`).then(res => {
+                    this.$http.get(`purchaserequest/${this.request}`).then(res => {
                         if (res.data.success) {
                             this.requestDetail = res.data.responseContent;
                             this.requestItems = res.data.responseContent.requestItem;
@@ -121,6 +121,10 @@
         computed: {
             requestStatusName() {
                 switch (this.requestDetail.requestStatus) {
+                    case -2:
+                        return "Process Failed";
+                    case -1:
+                        return "Cancelled";
                     case 0:
                         return "Waiting For Process";
                     case 1:
@@ -132,6 +136,12 @@
                     case 4:
                         return "Delivered";
                 }
+            },
+            canEditRequest() {
+                if (this.$store.state.userType == 1 && (this.requestDetail.requestStatus != 0 && this.requestDetail.requestStatus != -2)) {
+                    return false;
+                }
+                return true;
             }
         }
 

@@ -62,6 +62,14 @@
                                         {{ agreement.blanketPurchaseAgreementDetails.amountAgreed }}
                                     </v-list-tile-content>
                                 </v-list-tile>
+                                <v-list-tile>
+                                    <v-list-tile-content>
+                                        Amount used:
+                                    </v-list-tile-content>
+                                    <v-list-tile-content class="align-end">
+                                        {{ agreement.blanketPurchaseAgreementDetails.amountUsed }}
+                                    </v-list-tile-content>
+                                </v-list-tile>
                             </template>
                             <!-- Contract Purchase Agreement -->
                             <template v-else-if="agreement.agreementType===1">
@@ -136,8 +144,10 @@
                                 <td>{{ props.item.item.supplierItemId }}</td>
                                 <td>{{ props.item.item.itemName }}</td>
                                 <td>{{ props.item.promisedQuantity }}</td>
+                                <td>{{ props.item.usedQuantity }}</td>
                                 <td>{{ props.item.minimumQuantity }}</td>
                                 <td>{{ props.item.unit }}</td>
+                                <td>{{ props.item.price }}</td>
                             </template>
                             <template slot="no-data">
                                 No Data!
@@ -245,12 +255,20 @@
                         value: 'promisedQuantity'
                     },
                     {
+                        text: 'Used Quantity',
+                        value: 'promisedQuantity'
+                    },
+                    {
                         text: 'Minimum Quantity',
                         value: 'minimumQuantity'
                     },
                     {
                         text: 'Unit',
                         value: 'unit'
+                    },
+                    {
+                        text: 'Price',
+                        value: 'price'
                     }
                 ],
                 cpaHeaders: [

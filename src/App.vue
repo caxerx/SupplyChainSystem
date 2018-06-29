@@ -195,11 +195,23 @@
 
         <!-- Error dialog end -->
 
+        <!--notification snack bar start-->
+        <v-snackbar
+                :timeout="6000"
+                :bottom="true"
+                :right="true"
+                v-model="snackbar"
+        >
+            {{ notificationMessage }}
+            <v-btn flat color="pink" @click.native="snackbar = false">Close</v-btn>
+        </v-snackbar>
+        <!--notification snack bar end-->
 
     </v-app>
 </template>
 
 <script>
+    import {HubConnection, HubConnectionBuilder, LogLevel} from '@aspnet/signalr';
     import Login from "./App/Login";
     import moment from "moment";
 
@@ -210,9 +222,24 @@
             this.$store.state.token = window.localStorage.getItem('token');
             this.checkLoginStatus();
             console.log('Computed nav', this.nav);
+
+            const connection = new HubConnectionBuilder()
+                .withUrl(this.$store.state.serverUrl + "/notification")
+                .configureLogging(LogLevel.Information)
+                .build();
+            connection.start().catch(err => console.error(err.toString()));
+            connection.on("ReceiveMessage", (user, message) => {
+                if (this.$store.state.userType === 4 || this.$store.state.userType === 999) {
+                    this.notificationMessage = message;
+                    this.snackbar = true;
+                }
+            });
+
         },
         data() {
             return {
+                snackbar: false,
+                notificationMessage: '',
                 datetime: '',
                 // Vuetify UI Component settings
                 drawer: true,
@@ -272,7 +299,8 @@
                             },
                             {
                                 to: '/requestmapping',
-                                text: 'Request Mapping'
+                                text: 'Request Mapping',
+                                access: [3]
                             }
                             ,
                             {
@@ -337,7 +365,8 @@
                                 to: '/purchaseorder/scheduledrelease',
                                 text: 'Scheduled Release'
                             }
-                        ]
+                        ],
+                        access: [3]
                     },
                     {
                         to: '/logistic',
@@ -352,7 +381,8 @@
                                 to: '/logistic/deliverynote',
                                 text: 'Delivery Notes'
                             }
-                        ]
+                        ],
+                        access: [3]
                     },
                     {
                         divider: true

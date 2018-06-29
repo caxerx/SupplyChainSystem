@@ -13,7 +13,7 @@
             ></v-text-field>
             <v-spacer></v-spacer>
 
-            <v-btn icon @click="addItem()">
+            <v-btn icon @click="addItem()" v-if="canAddRestaurant">
                 <v-icon>add</v-icon>
             </v-btn>
 
@@ -33,7 +33,7 @@
                 <td>{{ props.item.restaurantTypeName }}</td>
                 <td>{{ props.item.stockId }}</td>
                 <td class="layout px-0">
-                    <v-btn icon class="mx-0" @click="viewItem(props.item)">
+                    <v-btn icon class="mx-0" @click="viewItem(props.item)" v-if="canEditStock">
                         <v-icon color="blue">category</v-icon>
                     </v-btn>
                     <template v-if="[999,0].includes($store.state.userType)">
@@ -210,6 +210,12 @@
         computed: {
             formTitle() {
                 return this.editedIndex === -1 ? "New Item" : "Edit Item";
+            },
+            canAddRestaurant() {
+                return this.$store.state.userType === 0 || this.$store.state.userType === 999
+            },
+            canEditStock() {
+                return this.$store.state.userType !== 0
             }
         },
 

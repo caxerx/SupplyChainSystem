@@ -9,8 +9,10 @@
     "build": "cross-env NODE_ENV=production webpack --progress --hide-modules"
   },
   "dependencies": {
+    "@aspnet/signalr": "^1.0.0",
     "axios": "^0.18.0",
     "moment": "^2.22.2",
+    "tslib": "^1.9.3",
     "vue": "^2.5.3",
     "vue-router": "^3.0.1",
     "vue-simple-spinner": "^1.2.8",
