@@ -1,5 +1,7 @@
 <template>
-    
+    <div>
+
+    </div>
 </template>
 
 <script>
@@ -7,7 +9,3 @@
         name: "DeliveryNoteList"
     }
 </script>
-
-<style scoped>
-
-</style>
