@@ -1,58 +1,66 @@
 <template>
     <div>
-        <v-layout>
-            <v-flex xs3>
-                <v-card-title>
-                    <h4>Request Summary</h4>
-                </v-card-title>
-                <v-divider></v-divider>
-                <v-list dense>
-                    <v-list-tile>
-                        <v-list-tile-content>Request ID:</v-list-tile-content>
-                        <v-list-tile-content class="align-end">{{ requestDetail.requestId }}</v-list-tile-content>
-                    </v-list-tile>
-                    <v-list-tile>
-                        <v-list-tile-content>Created On:</v-list-tile-content>
-                        <v-list-tile-content class="align-end">{{ requestDetail.createTime.replace('T',' ') }}
-                        </v-list-tile-content>
-                    </v-list-tile>
-                    <v-list-tile>
-                        <v-list-tile-content>Created By:</v-list-tile-content>
-                        <v-list-tile-content class="align-end">{{ requestDetail.user.name }}</v-list-tile-content>
-                    </v-list-tile>
-                    <v-list-tile>
-                        <v-list-tile-content>Status:</v-list-tile-content>
-                        <v-list-tile-content class="align-end">{{ requestStatusName }}</v-list-tile-content>
-                    </v-list-tile>
-                </v-list>
-            </v-flex>
-            <v-flex xs9>
-                <!-- Table toolbar start -->
-                <v-toolbar dark color="primary" class="elevation-0" :clipped-left="$vuetify.breakpoint.lgAndUp">
-                    <v-toolbar-title class="white--text">Request Item List</v-toolbar-title>
-                    <v-spacer></v-spacer>
+        <v-card class="pa-3" color="grey lighten-3">
+            <v-layout>
+                <v-flex xs4 class="mr-3">
+                    <v-card>
+                        <v-card-title>
+                            <h4>Request Summary</h4>
+                        </v-card-title>
+                        <v-divider></v-divider>
+                        <v-list dense>
+                            <v-list-tile>
+                                <v-list-tile-content>Request ID:</v-list-tile-content>
+                                <v-list-tile-content class="align-end">{{ requestDetail.requestId }}
+                                </v-list-tile-content>
+                            </v-list-tile>
+                            <v-list-tile>
+                                <v-list-tile-content>Created On:</v-list-tile-content>
+                                <v-list-tile-content class="align-end">{{ requestDetail.createTime.replace('T',' ') }}
+                                </v-list-tile-content>
+                            </v-list-tile>
+                            <v-list-tile>
+                                <v-list-tile-content>Created By:</v-list-tile-content>
+                                <v-list-tile-content class="align-end">{{ requestDetail.user.name }}
+                                </v-list-tile-content>
+                            </v-list-tile>
+                            <v-list-tile>
+                                <v-list-tile-content>Status:</v-list-tile-content>
+                                <v-list-tile-content class="align-end">{{ requestStatusName }}</v-list-tile-content>
+                            </v-list-tile>
+                        </v-list>
+                    </v-card>
 
-                    <v-btn icon @click="editItem" v-if="canEditRequest">
-                        <v-icon>edit</v-icon>
-                    </v-btn>
-                </v-toolbar>
-                <!-- Table toolbar end -->
+                </v-flex>
+                <v-flex xs8>
+                    <!-- Table toolbar start -->
+                    <v-toolbar dark color="primary" class="elevation-0" :clipped-left="$vuetify.breakpoint.lgAndUp">
+                        <v-toolbar-title class="white--text">Request Item List</v-toolbar-title>
+                        <v-spacer></v-spacer>
 
-                <!-- Table start -->
-                <v-data-table :headers="requestHeaders" :items="requestItems" class="elevation-1">
-                    <template slot="items" slot-scope="props">
-                        <td>{{ props.item.virtualItemId }}</td>
-                        <td>{{ props.item.virtualItemName }}</td>
-                        <td>{{ props.item.quantity }}</td>
-                    </template>
+                        <v-btn icon @click="editItem" v-if="canEditRequest">
+                            <v-icon>edit</v-icon>
+                        </v-btn>
+                    </v-toolbar>
+                    <!-- Table toolbar end -->
 
-                    <template slot="no-data">
-                        No Data!
-                    </template>
-                </v-data-table>
-                <!-- Table end -->
-            </v-flex>
-        </v-layout>
+                    <!-- Table start -->
+                    <v-data-table :headers="requestHeaders" :items="requestItems" class="elevation-1">
+                        <template slot="items" slot-scope="props">
+                            <td>{{ props.item.virtualItemId }}</td>
+                            <td>{{ props.item.virtualItemName }}</td>
+                            <td>{{ props.item.quantity }}</td>
+                        </template>
+
+                        <template slot="no-data">
+                            No Data!
+                        </template>
+                    </v-data-table>
+                    <!-- Table end -->
+                </v-flex>
+            </v-layout>
+        </v-card>
+
     </div>
 </template>
 

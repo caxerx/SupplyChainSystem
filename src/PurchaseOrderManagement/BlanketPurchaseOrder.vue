@@ -93,7 +93,7 @@
                     },
                     {
                         text: 'Status',
-                        value: 'status'
+                        value: 'purchaseOrderStatus'
                     },
                     {
                         text: 'Actions',
@@ -110,6 +110,9 @@
                 this.$http.get('blanketpurchaseorder').then(res => {
                     if (res.data.success) {
                         this.purchaseOrders = res.data.responseContent;
+                        this.purchaseOrders.map(i => {
+                            i.purchaseOrderStatus = this.getStatusName(i.purchaseOrderStatus);
+                        });
                     }
                 });
                 setTimeout(() => this.isLoadingData = false, 300);
@@ -117,6 +120,18 @@
             viewDetail(item) {
                 this.selectedPurchaseOrder = item;
                 this.isDetailDialogShown = true;
+            },
+            getStatusName(status) {
+                switch (status) {
+                    case 0:
+                        return "Ordered";
+                    case 1:
+                        return "Received";
+                    case 2:
+                        return "Paid";
+                    default:
+                        return "Unknown";
+                }
             }
         }
     }

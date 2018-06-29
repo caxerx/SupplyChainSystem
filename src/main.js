@@ -303,7 +303,10 @@ axios.interceptors.response.use(response => {
             store.commit('setTokenValidState', false);
         }
         if (error.response.status === 404) {
-            console.log('404');
+            console.log('Not found');
+        }
+        if (error.response.status === 500) {
+            console.log('Server error');
         }
     } else {
         console.log('Network Error');
