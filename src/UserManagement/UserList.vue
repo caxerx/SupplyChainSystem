@@ -163,7 +163,8 @@
                     {code: 0, text: "Administrator"},
                     {code: 1, text: "Restaurant Manager"},
                     {code: 2, text: "Category Manager"},
-                    {code: 3, text: "Purchase Manager"}
+                    {code: 3, text: "Purchase Manager"},
+                    {code: 4, text: "Warehouse Clerk"}
                 ],
                 users: [], // User data from AJAX calls
                 editedIndex: -1, // -1 means it is a new Item
@@ -279,6 +280,8 @@
                         return "Category Manager";
                     case "3":
                         return "Purchase Manager";
+                    case "4":
+                        return "Warehouse Clerk";
                     case "999":
                         return "Debug user";
                     default:

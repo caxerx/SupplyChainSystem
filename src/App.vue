@@ -261,7 +261,7 @@
                         icon: 'category',
                         text: 'Item Management',
                         model: false,
-                        access: [1, 2, 3],
+                        access: [1, 2, 3,4],
                         children:
                             [
                                 {
@@ -282,7 +282,7 @@
                                 {
                                     text: 'Stock',
                                     to: '/item/stock',
-                                    access: [1]
+                                    access: [1,4]
                                 },
                                 {
                                     text: 'Category',
@@ -386,7 +386,7 @@
                                 text: 'Delivery Notes'
                             }
                         ],
-                        access: [3]
+                        access: [3,4]
                     },
                     {
                         divider: true
