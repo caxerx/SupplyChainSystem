@@ -201,6 +201,7 @@
 
 <script>
     import Login from "./App/Login";
+    import moment from "moment";
 
     export default {
         components: {Login},
@@ -339,6 +340,21 @@
                         ]
                     },
                     {
+                        to: '/logistic',
+                        icon: 'local_shipping',
+                        text: 'Logistic Management',
+                        children: [
+                            {
+                                to: '/logistic/despatchinstruction',
+                                text: 'Despatch Instruction'
+                            },
+                            {
+                                to: '/logistic/deliverynote',
+                                text: 'Delivery Notes'
+                            }
+                        ]
+                    },
+                    {
                         divider: true
                     },
                     {
@@ -392,8 +408,7 @@
         },
         methods: {
             updateTime() {
-                let cd = new Date();
-                this.datetime = `${cd.toDateString()} ${cd.toTimeString()}`;
+                this.datetime = moment().format('DD MMM, Y hh:mm:ss');
             },
             checkLoginStatus() {
                 if (this.$store.state.token !== '') {

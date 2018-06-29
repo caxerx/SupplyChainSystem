@@ -24,31 +24,19 @@
         <!-- Table toolbar end -->
 
         <!-- Table start -->
-        <!-- TODO bind values -->
         <v-data-table :headers="headers"
-                      :items="agreements"
+                      :items="purchaseOrders"
                       class="elevation-1"
                       :search="search"
         >
             <template slot="items" slot-scope="props">
+                <td>{{ props.item.orderId }}</td>
+                <td>{{ props.item.requestId }}</td>
                 <td>{{ props.item.agreementId }}</td>
-                <td>{{ props.item.supplierName }}</td>
-                <td>{{ props.item.agreementTypeName }}</td>
-                <td>{{ props.item.startDate }}</td>
-                <td>{{ props.item.expiryDate }}</td>
-                <td>{{ props.item.name }}</td>
-                <td v-if="props.item.status==='Expired'" class="red--text">{{ props.item.status }}</td>
-                <td v-else-if="props.item.status==='Active'" class="green--text">{{ props.item.status }}</td>
-                <td v-else>{{ props.item.status }}</td>
+                <td>{{ props.item.purchaseOrderStatus }}</td>
                 <td class="layout px-0">
                     <v-btn icon class="mx-0" @click.native="viewDetail(props.item)">
                         <v-icon color="blue">info</v-icon>
-                    </v-btn>
-                    <v-btn icon class="mx-0" @click.native="editItem(props.item)">
-                        <v-icon color="teal">edit</v-icon>
-                    </v-btn>
-                    <v-btn icon class="mx-0" @click.native="deleteItem(props.item)">
-                        <v-icon color="pink">delete</v-icon>
                     </v-btn>
                 </td>
             </template>
@@ -61,7 +49,7 @@
 
         <v-dialog v-model="isDetailDialogShown" max-width="1200">
             <v-card>
-
+                <purchase-order-detail :purchase-order="selectedPurchaseOrder"></purchase-order-detail>
             </v-card>
         </v-dialog>
 
@@ -69,8 +57,11 @@
 </template>
 
 <script>
+    import PurchaseOrderDetail from "./PurchaseOrderDetail";
+
     export default {
         name: "BlanketPurchaseOrder",
+        components: {PurchaseOrderDetail},
         created() {
             this.loadData();
         },
@@ -79,33 +70,19 @@
                 search: '',
                 isLoadingData: false,
                 isDetailDialogShown: false,
-                isEditDialogShown: false,
-                isConfirmDialogShown: false,
-                selectedAgreement: {},
+                selectedPurchaseOrder: {},
                 headers: [
                     {
                         text: 'Id',
+                        value: 'orderId'
+                    },
+                    {
+                        text: 'Request Id',
+                        value: 'requestId'
+                    },
+                    {
+                        text: 'Agreement Id',
                         value: 'agreementId'
-                    },
-                    {
-                        text: 'Supplier',
-                        value: 'supplierName'
-                    },
-                    {
-                        text: 'Type',
-                        value: 'agreementTypeName'
-                    },
-                    {
-                        text: 'Start Date',
-                        value: 'startDate'
-                    },
-                    {
-                        text: 'Expiry Date',
-                        value: 'expiryDate'
-                    },
-                    {
-                        text: 'Creator',
-                        value: 'name'
                     },
                     {
                         text: 'Status',
@@ -116,65 +93,24 @@
                         value: 'action'
                     }
                 ],
-                agreements: [],
-                users: [],
-                suppliers: [],
+                purchaseOrders: [],
                 removedIndex: -1
-            }
-        },
-        watch: {
-            isEditDialogShown(val) {
-                val || this.close();
             }
         },
 
         methods: {
             loadData() {
                 this.isLoadingData = true;
+                this.$http.get('blanketpurchaseorder').then(res => {
+                    if (res.data.success) {
+                        this.purchaseOrders = res.data.responseContent;
+                    }
+                });
                 setTimeout(() => this.isLoadingData = false, 300);
             },
-            getStatus(item) {
-                let startDate = new Date(item.startDate);
-                let expiryDate = new Date(item.expiryDate);
-                let sysDate = new Date();
-                if (expiryDate.getTime() < sysDate.getTime()) {
-                    return 'Expired';
-                } else if (startDate.getTime() > sysDate.getTime()) {
-                    return 'Not Started';
-                } else {
-                    return 'Active';
-                }
-            },
             viewDetail(item) {
-                this.selectedAgreement = item;
+                this.selectedPurchaseOrder = item;
                 this.isDetailDialogShown = true;
-            },
-            addItem() {
-                this.isEditDialogShown = true;
-            },
-            editItem(item) {
-                this.isEditDialogShown = true;
-                bus.$emit('editAgreementStepperData', item)
-            },
-            confirm() {
-                this.$http.delete('agreement', this.agreements[this.removedIndex].agreementId, {}).then(res => {
-                    if (res.data.success) {
-                        console.log(`Agreement with id ${this.agreements[this.removedIndex].agreementId} deleted`);
-                    }
-                    this.loadData();
-                    this.cancel();
-                });
-            },
-            cancel() {
-                this.isConfirmDialogShown = false;
-                this.removedIndex = -1;
-            },
-            deleteItem(item) {
-                this.removedIndex = this.agreements.indexOf(item);
-                this.isConfirmDialogShown = true;
-            },
-            close() {
-                this.isEditDialogShown = false;
             }
         }
     }

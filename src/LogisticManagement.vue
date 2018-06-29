@@ -1,7 +1,7 @@
 <template>
     <v-container>
         <!-- Page title start -->
-        <h1 class="display-1 primary--text mb-3">Purchase Order Management</h1>
+        <h1 class="display-1 primary--text mb-3">Logistic Management</h1>
         <!-- Page title end -->
         <router-view></router-view>
     </v-container>
@@ -9,7 +9,7 @@
 
 <script>
     export default {
-        name: "PurchaseOrderManagement"
+        name: "LogisticManagement"
     }
 </script>
 

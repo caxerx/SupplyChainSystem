@@ -27,6 +27,8 @@ import PurchaseRequestManagement from './PurchaseRequestManagement.vue'
 import AgreementManagement from './AgreementManagement.vue'
 import RestaurantManagement from './RestaurantManagement'
 import SupplierManagement from './SupplierManagement'
+import PurchaseOrderManagement from './PurchaseOrderManagement'
+import LogisticManagement from './LogisticManagement'
 import UserManagement from './UserManagement.vue'
 import Settings from './Settings.vue'
 import About from './About.vue'
@@ -43,11 +45,17 @@ import RestaurantList from './RestaurantManagement/RestaurantList'
 import RestaurantTypeList from './RestaurantManagement/RestaurantTypeList'
 import RestaurantManagerList from './RestaurantManagement/RestaurantManagerList'
 
+// Request Mapping
 import RequestMapping from './RequestManagement/RequestMapping'
-import PurchaseOrderManagement from './PurchaseOrderManagement'
+
+// Purchase Order Management
 import BlanketPurchaseOrder from './PurchaseOrderManagement/BlanketPurchaseOrder'
 import StandardPurchaseOrder from './PurchaseOrderManagement/StandardPurchaseOrder'
 import ScheduledRelease from './PurchaseOrderManagement/ScheduledRelease'
+
+// Logistic Management
+import DespatchInstructionList from './LogisticManagement/DespatchInstructionList'
+import DeliveryNoteList from './LogisticManagement/DeliveryNoteList'
 
 const routes = [
     {
@@ -142,19 +150,36 @@ const routes = [
         component: PurchaseOrderManagement,
         children: [
             {
-                path: '/purchaseorder/blanketpurchaseorder',
+                path: 'blanketpurchaseorder',
                 name: 'Blanket Purchase Order',
                 component: BlanketPurchaseOrder
             },
             {
-                path: '/purchaseorder/standardpurchaseorder',
+                path: 'standardpurchaseorder',
                 name: 'Standard Purchase Order',
                 component: StandardPurchaseOrder
             },
             {
-                path: '/purchaseorder/scheduledrelease',
+                path: 'scheduledrelease',
                 name: 'Scheduled Release',
                 component: ScheduledRelease
+            }
+        ]
+    },
+    {
+        path: '/logistic',
+        name: 'Logistic Management',
+        component: LogisticManagement,
+        children: [
+            {
+                path: 'despatchinstruction',
+                name: 'Despatch Instruction',
+                component: DespatchInstructionList
+            },
+            {
+                path: 'deliverynote',
+                name: 'Delivery Note',
+                component: DeliveryNoteList
             }
         ]
     },
