@@ -75,6 +75,15 @@
                         <span v-else>Request already processed</span>
                     </v-tooltip>
 
+                    <v-tooltip top>
+                        <v-btn icon class="mx-0" @click.native="receiveConfirm(props.item)" slot="activator"
+                               :disabled="!canConfirmRequest(props.item)">
+                            <v-icon color="green">check</v-icon>
+                        </v-btn>
+                        <span v-if="canConfirmRequest(props.item)">Received Confirm</span>
+                        <span v-else>Request already not processed or finished</span>
+                    </v-tooltip>
+
                 </td>
             </template>
             <template slot="no-data">
@@ -111,6 +120,23 @@
             </v-card>
         </v-dialog>
         <!-- Cancel Confirm Dialog end -->
+
+        <!-- Delivered Confirm Dialog start -->
+        <v-dialog v-model="isDeliveredDialogShown" max-width="420">
+            <v-card>
+                <v-card-title class="headline">Cancel Request</v-card-title>
+                <v-card-text>Are you sure the delivered goods and quantity is correct?<br/> Order will sent to
+                    Accounting
+                    Department after confirm.
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="green darken-1" flat @click.native="cancelDelivery">Cancel</v-btn>
+                    <v-btn color="green darken-1" flat @click.native="confirmDelivery">Confirm</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+        <!-- Delivered Confirm Dialog end -->
     </div>
 </template>
 
@@ -144,6 +170,7 @@
                 isEditDialogShown: false,
                 isDetailDialogShown: false,
                 isCancelDialogShown: false,
+                isDeliveredDialogShown: false,
 
                 selectedRequest: '',
                 // Table Data
@@ -263,6 +290,11 @@
                 this.selectedRequest = item.requestId;
                 this.isCancelDialogShown = true;
             },
+
+            receiveConfirm(item) {
+                this.selectedRequest = item.requestId;
+                this.isDeliveredDialogShown = true;
+            },
             confirm() {
                 this.$http.post(`requeststatus/${this.selectedRequest}`, {status: -1}).then(res => {
                     if (res.data.success) {
@@ -274,19 +306,36 @@
             cancel() {
                 this.isCancelDialogShown = false;
             },
+            confirmDelivery() {
+                this.$http.post(`requeststatus/${this.selectedRequest}`, {status: 4}).then(res => {
+                    if (res.data.success) {
+                        this.loadData();
+                    }
+                });
+                this.isDeliveredDialogShown = false;
+            },
+            cancelDelivery() {
+                this.isDeliveredDialogShown = false;
+            },
             viewItem(item) {
                 this.selectedRequest = item.requestId;
                 this.isDetailDialogShown = true;
                 bus.$emit('refreshRequestDetail')
             },
             isCancellable(item) {
-                if (item.requestStatus == 0 && item.requestCreator == this.$store.state.userId) {
+                if (item.requestCreator == this.$store.state.userId && (item.requestStatus === 0 || item.requestStatus === -2)) {
                     return true;
                 }
                 return false;
             },
             canEditRequest(item) {
                 if (item.requestCreator == this.$store.state.userId && (item.requestStatus === 0 || item.requestStatus === -2)) {
+                    return true;
+                }
+                return false;
+            },
+            canConfirmRequest(item) {
+                if (item.requestStatus === 2 || item.requestStatus === 3) {
                     return true;
                 }
                 return false;
