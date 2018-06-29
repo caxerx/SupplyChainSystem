@@ -520,6 +520,7 @@
             close() {
                 this.editMode = false;
                 bus.$emit('closeAgreementStepper');
+                this.$v.$reset();
             },
             nextStep() {
                 this.$v.$touch();
