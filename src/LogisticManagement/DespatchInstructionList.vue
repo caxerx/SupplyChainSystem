@@ -25,12 +25,16 @@
                       :pagination.sync="pagination">
             <template slot="items" slot-scope="props">
                 <td>{{ props.item.despatchInstructionId }}</td>
-                <td>{{ props.item.requestId }}</td>
-                <td>{{ props.item.createTime.replace('T',' ') }}</td>
-                <td>{{ props.item.despatchInstructionStatus }}</td>
+                <td>{{ props.item.request.restaurant.restaurantName }}</td>
+                <td>{{ props.item.createTime }}</td>
+                <td>{{ props.item.despatchInstructionStatusName }}</td>
                 <td class="layout px-0">
                     <v-btn icon class="mx-0" @click="viewItem(props.item)">
                         <v-icon color="blue">info</v-icon>
+                    </v-btn>
+
+                    <v-btn icon class="mx-0" @click="createDeliveryNote(props.item)">
+                        <v-icon color="green">check</v-icon>
                     </v-btn>
                 </td>
             </template>
@@ -74,8 +78,8 @@
                         value: "despatchInstructionId"
                     },
                     {
-                        text: "Request Id",
-                        value: "requestId"
+                        text: "Restaurant",
+                        value: "request.restaurant.restaurantName"
                     },
                     {
                         text: "Create Time",
@@ -83,7 +87,7 @@
                     },
                     {
                         text: "Status",
-                        value: "despatchInstructionStatus"
+                        value: "despatchInstructionStatusName"
                     },
                     {
                         text: "Actions",
@@ -103,12 +107,31 @@
                     if (res.data.success) {
                         setTimeout(() => this.isLoadingData = false, 300);
                         this.despatchInstrutions = res.data.responseContent;
+                        for (let i = 0; i < this.despatchInstrutions.length; i++) {
+                            this.despatchInstrutions[i].createTime = this.despatchInstrutions[i].createTime.replace('T', ' ');
+                            this.despatchInstrutions[i].despatchInstructionStatusName = this.getStatusName(this.despatchInstrutions[i].despatchInstructionStatus)
+                        }
                     }
                 });
             },
             viewItem(item) {
                 this.selectedDespatchInstruction = item;
                 this.isDetailDialogShown = true;
+            },
+            createDeliveryNote(item) {
+                this.$http.put('despatchinstruction', item.despatchInstructionId).then(res => {
+                    this.loadData();
+                });
+            },
+            getStatusName(status) {
+                switch (status) {
+                    case 0:
+                        return 'Waiting';
+                    case 1:
+                        return 'Finished';
+                    default:
+                        return 'Unknown';
+                }
             }
         }
     }
