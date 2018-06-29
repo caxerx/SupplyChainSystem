@@ -44,38 +44,13 @@
         <!-- Table end -->
 
         <!-- Edit Dialog start -->
-        <v-dialog v-model="isEditDialogShown" max-width="500px">
+        <v-dialog v-model="isEditDialogShown" max-width="1000">
             <v-card>
-                <v-card-title>
-                    <span class="headline">{{ formTitle }}</span>
-                </v-card-title>
-                <v-card-text>
-                    <v-container fluid>
-                        <v-layout row>
-                            <v-flex xs4>
-                                <v-subheader>Virtual Item ID</v-subheader>
-                            </v-flex>
-                            <v-flex xs8>
-                                <v-select v-model="editedItem.virtualItemId"
-                                          :items="virtualItems"
-                                          item-text="virtualItemName"
-                                          item-value="virtualItemId"
-                                          label="Select a Virtual Item"
-                                          single-line
-                                >
-                                </v-select>
-                            </v-flex>
-                        </v-layout>
-                    </v-container>
-                </v-card-text>
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn color="blue darken-1" flat @click.native="close">Cancel</v-btn>
-                    <v-btn color="blue darken-1" flat @click.native="save">Save</v-btn>
-                </v-card-actions>
+                <virtual-item-select :channel="itemSelect"></virtual-item-select>
             </v-card>
         </v-dialog>
         <!-- Edit Dialog end -->
+
 
         <!-- Delete Confirm Dialog start -->
         <v-dialog v-model="isConfirmDialogShown" max-width="290">
@@ -96,13 +71,28 @@
 </template>
 
 <script>
+    import {bus} from "../main";
+    import VirtualItemSelect from "./VirtualItemSelect";
+
     export default {
         name: "CategoryItemList",
+        components: {VirtualItemSelect},
         created() {
             this.loadData();
+
+            bus.$on(this.itemSelect, (data) => {
+                console.log('Stock Item List received msg:', data);
+                this.selectedVirtualItemId = data;
+                this.save();
+            });
+        },
+        beforeDestroy() {
+            bus.$off(this.itemSelect);
         },
         data() {
             return {
+                itemSelect: 'categoryitemselect',
+                selectedVirtualItemId: -1,
                 search: '',
                 isLoadingData: false, //Loading state
                 isEditDialogShown: false, //Edit dialog
@@ -192,12 +182,6 @@
                 });
             }
             ,
-            editItem(item) {
-                this.editedIndex = this.categoryItems.indexOf(item);
-                this.editedItem = Object.assign({}, item);
-                this.isEditDialogShown = true;
-            }
-            ,
 
             deleteItem(item) {
                 this.isConfirmDialogShown = true;
@@ -235,7 +219,7 @@
             ,
 
             save() {
-                this.$http.post(`categoryitem/${this.category}`, {id: this.editedItem.virtualItemId}).then(res => {
+                this.$http.post(`categoryitem/${this.category}`, {id: this.selectedVirtualItemId}).then(res => {
                     if (res.data.success) {
                         this.loadData();
                     }
