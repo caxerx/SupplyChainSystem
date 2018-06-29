@@ -25,7 +25,10 @@
                         <v-list-tile-content class="align-end">{{ requestStatusName }}</v-list-tile-content>
                     </v-list-tile>
                 </v-list>
+
             </v-flex>
+
+
             <v-flex xs9>
                 <!-- Table toolbar start -->
                 <v-toolbar dark color="primary" class="elevation-0" :clipped-left="$vuetify.breakpoint.lgAndUp">
@@ -135,6 +138,8 @@
                         return "Delivering";
                     case 4:
                         return "Delivered";
+                    case 5:
+                        return "Waiting For Despatch";
                 }
             },
             canEditRequest() {
