@@ -13,10 +13,6 @@
             ></v-text-field>
             <v-spacer></v-spacer>
 
-            <v-btn icon @click="addItem()">
-                <v-icon>add</v-icon>
-            </v-btn>
-
             <v-btn icon @click="loadData()">
                 <v-icon v-if="!isLoadingData">refresh</v-icon>
                 <v-progress-circular v-else size="25" indeterminate color="blue"></v-progress-circular>
@@ -26,7 +22,7 @@
 
         <!-- Table start -->
         <v-data-table :headers="headers" :items="despatchInstrutions" class="elevation-1" :search="search"
-                      :pagination="pagination">
+                      :pagination.sync="pagination">
             <template slot="items" slot-scope="props">
                 <td>{{ props.item.despatchInstructionId }}</td>
                 <td>{{ props.item.requestId }}</td>
@@ -44,12 +40,24 @@
             </template>
         </v-data-table>
         <!-- Table end -->
+
+        <!-- Detail Dialog -->
+        <v-dialog v-model="isDetailDialogShown" max-width="1000">
+            <v-card>
+                <despatch-instruction-item-list
+                        :despatchInstruction="selectedDespatchInstruction"></despatch-instruction-item-list>
+            </v-card>
+        </v-dialog>
+
     </div>
 </template>
 
 <script>
+    import DespatchInstructionItemList from "./DespatchInstructionDetail";
+
     export default {
         name: "DespatchInstructionList",
+        components: {DespatchInstructionItemList},
         created() {
             this.loadData();
         },
@@ -57,7 +65,8 @@
             return {
                 search: '',
                 isLoadingData: false, //Loading state
-                pagination: {'sortBy': 'despatchInstructionId', 'descending': true, 'rowsPerPage': -1},
+                isDetailDialogShown: false,
+                pagination: {'sortBy': 'despatchInstructionId', 'descending': true, 'rowsPerPage': 5},
                 headers: [
                     //Table header data
                     {
@@ -99,6 +108,7 @@
             },
             viewItem(item) {
                 this.selectedDespatchInstruction = item;
+                this.isDetailDialogShown = true;
             }
         }
     }

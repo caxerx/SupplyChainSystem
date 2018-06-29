@@ -28,6 +28,7 @@
                       :items="purchaseOrders"
                       class="elevation-1"
                       :search="search"
+                      :pagination.sync="pagination"
         >
             <template slot="items" slot-scope="props">
                 <td>{{ props.item.orderId }}</td>
@@ -72,6 +73,7 @@
                 isLoadingData: false,
                 isDetailDialogShown: false,
                 selectedPurchaseOrder: {},
+                pagination: {'sortBy': 'orderId', 'descending': true, 'rowsPerPage': 5},
                 headers: [
                     {
                         text: 'Id',
