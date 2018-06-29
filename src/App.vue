@@ -1,5 +1,8 @@
 <template>
     <v-app>
+        <!--
+        <div v-if="!isReady"></div>
+        -->
         <!-- IF THE USER IS LOGGED IN -->
         <template v-if="this.$store.state.isLoggedIn">
             <!-- Navigation drawer start -->
@@ -211,7 +214,7 @@
 </template>
 
 <script>
-    import {HubConnection, HubConnectionBuilder, LogLevel} from '@aspnet/signalr';
+    import {HubConnectionBuilder, LogLevel} from '@aspnet/signalr';
     import Login from "./App/Login";
     import moment from "moment";
 
@@ -238,6 +241,7 @@
         },
         data() {
             return {
+                isReady: false,
                 snackbar: false,
                 notificationMessage: '',
                 datetime: '',
@@ -444,12 +448,6 @@
                 if (this.$store.state.token !== '') {
                     this.$http.get('token').then(res => {
                         console.log('Auto Login:', res);
-                        /*
-                        this.$store.commit('setLoginState', !!res.data.success);
-                        this.$store.commit('setTokenValidState', true);
-                        this.$store.commit('setUserType', window.localStorage.getItem("userType"));
-                        this.$store.commit('setUserName', window.localStorage.getItem("userName"));
-                        */
                         this.$store.commit('setToken', res.data.responseContent.token);
                         window.localStorage.setItem("token", this.$store.state.token);
                         this.$store.commit('setLoginState', true);
@@ -472,10 +470,12 @@
                             window.localStorage.setItem("workingRestaurant", '-1');
                             window.localStorage.setItem("workingRestaurantStock", '-1');
                         }
+                        this.isReady = true;
                         // console.log('Login data:', res.data.responseContent);
                     }).catch(err => {
                         // Error Handling
                         console.log(err.message);
+                        this.isReady = true;
                         this.$store.commit('setLoginState', false);
                     })
                 }

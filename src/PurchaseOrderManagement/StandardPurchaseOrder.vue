@@ -32,8 +32,9 @@
         >
             <template slot="items" slot-scope="props">
                 <td>{{ props.item.orderId }}</td>
-                <td>{{ props.item.requestId }}</td>
                 <td>{{ props.item.agreementId }}</td>
+                <td>{{ props.item.request.restaurant.restaurantName }}</td>
+                <td>{{ props.item.createTime }}</td>
                 <td>{{ props.item.purchaseOrderStatus }}</td>
                 <td class="layout px-0">
                     <v-btn icon class="mx-0" @click.native="viewDetail(props.item)">
@@ -79,12 +80,16 @@
                         value: 'orderId'
                     },
                     {
-                        text: 'Request Id',
-                        value: 'requestId'
-                    },
-                    {
                         text: 'Agreement Id',
                         value: 'agreementId'
+                    },
+                    {
+                        text: 'Restaurant',
+                        value: 'request.restaurant.restaurantName'
+                    },
+                    {
+                        text: 'Create Time',
+                        value: 'createTime'
                     },
                     {
                         text: 'Status',

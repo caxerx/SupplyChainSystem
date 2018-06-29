@@ -25,6 +25,14 @@
                                     {{ purchaseOrder.request.createTime.replace('T',' ') }}
                                 </v-list-tile-content>
                             </v-list-tile>
+                            <v-list-tile v-if="purchaseOrder.request && purchaseOrder.request.restaurant">
+                                <v-list-tile-content>
+                                    Restaurant:
+                                </v-list-tile-content>
+                                <v-list-tile-content class="align-end">
+                                    {{ purchaseOrder.request.restaurant.restaurantName }}
+                                </v-list-tile-content>
+                            </v-list-tile>
                             <v-list-tile>
                                 <v-list-tile-content>
                                     Supplier:

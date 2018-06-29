@@ -48,8 +48,8 @@
         <!-- Detail Dialog -->
         <v-dialog v-model="isDetailDialogShown" max-width="1000">
             <v-card>
-                <despatch-instruction-item-list
-                        :despatchInstruction="selectedDespatchInstruction"></despatch-instruction-item-list>
+                <despatch-instruction-detail
+                        :despatchInstruction="selectedDespatchInstruction"></despatch-instruction-detail>
             </v-card>
         </v-dialog>
 
@@ -57,11 +57,11 @@
 </template>
 
 <script>
-    import DespatchInstructionItemList from "./DespatchInstructionDetail";
+    import DespatchInstructionDetail from "./DespatchInstructionDetail";
 
     export default {
         name: "DespatchInstructionList",
-        components: {DespatchInstructionItemList},
+        components: {DespatchInstructionDetail},
         created() {
             this.loadData();
         },
