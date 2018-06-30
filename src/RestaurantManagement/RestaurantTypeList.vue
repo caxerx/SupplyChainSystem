@@ -58,7 +58,7 @@
                                 <v-subheader>Restaurant Type Name</v-subheader>
                             </v-flex>
                             <v-flex xs8>
-                                <v-text-field v-model="editedItem.name"
+                                <v-text-field v-model="editedItem.restaurantTypeName"
                                               label="Restaurant Type Name"></v-text-field>
                             </v-flex>
                         </v-layout>
