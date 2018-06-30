@@ -2,7 +2,7 @@
     <div>
         <!-- Table toolbar start -->
         <v-toolbar dark color="primary" class="elevation-0" :clipped-left="$vuetify.breakpoint.lgAndUp">
-            <v-toolbar-title class="white--text">Supplier Item List</v-toolbar-title>
+            <v-toolbar-title class="white--text">Supplier List</v-toolbar-title>
             <v-text-field
                     flat
                     solo-inverted

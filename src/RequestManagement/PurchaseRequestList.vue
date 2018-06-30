@@ -223,7 +223,7 @@
                         req.map(x => {
                             x.virtualItemId = x.requestVirtualItemId;
                         });
-                        bus.$emit('editRequestItem', req);
+                        bus.$emit('requestListEditRequest', req);
                         this.isEditDialogShown = true;
                     }
                 });

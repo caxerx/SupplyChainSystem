@@ -11,8 +11,22 @@
             <v-subheader>Last success mapping time:</v-subheader>
             <div>{{ lastSuccess }}</div>
             <v-spacer/>
-            <v-btn color="primary" @click.native="execute">Execute Request Mapping</v-btn>
+            <v-btn color="primary" @click.native="showExec()">Execute Request Mapping</v-btn>
         </v-layout>
+
+
+        <v-alert
+                :value="true"
+                color="black"
+                icon="info"
+                outline
+                v-if="requestMapEmpty"
+        >
+            No Data
+        </v-alert>
+
+
+
         <v-expansion-panel v-for="(requestMap,i) in filteredRequestMaps" :key="i" class="mb-3">
             <v-expansion-panel-content>
                 <v-divider/>
@@ -121,6 +135,24 @@
             {{ message }}
             <v-btn flat color="pink" @click.native="snackbar = false">Close</v-btn>
         </v-snackbar>
+
+
+        <!-- Map Confirm Dialog start -->
+        <v-dialog v-model="isConfirmDialogShown" max-width="290">
+            <v-card>
+                <v-card-title class="headline">Map Request</v-card-title>
+                <v-card-text>Execute a Request Mapping will clear the record of previous map, are you sure to do this?
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="green darken-1" flat @click.native="no">Cancel</v-btn>
+                    <v-btn color="green darken-1" flat @click.native="execute">Confirm</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+        <!-- Delete Confirm Dialog end -->
+
+
     </v-container>
 
 </template>
@@ -142,6 +174,7 @@
                 createContracts: [],
                 createRequestId: 0,
                 isCreateDialogShown: false,
+                isConfirmDialogShown: false,
                 headers:
                     [
                         {
@@ -225,6 +258,9 @@
                     return result;
                 }
                 return this.requestMaps;
+            },
+            requestMapEmpty() {
+                return this.filteredRequestMaps.length == 0
             }
         },
         methods: {
@@ -256,6 +292,7 @@
                 this.isCreateDialogShown = false;
             },
             execute() {
+                this.no();
                 this.$http.post('maprequest').then(res => {
                     if (res.data.success) {
                         this.loadData();
@@ -263,6 +300,11 @@
                         this.snackbar = true;
                     }
                 })
+            },
+            showExec() {
+                this.isConfirmDialogShown = true
+            }, no() {
+                this.isConfirmDialogShown = false
             }
         }
     }
