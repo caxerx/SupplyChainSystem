@@ -110,6 +110,8 @@
                         return "Category Manager";
                     case "3":
                         return "Purchase Manager";
+                    case "3":
+                        return "Warehouse Clerk";
                     case "999":
                         return "Debug user";
                     default:

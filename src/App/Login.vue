@@ -96,6 +96,7 @@
                         }
 
                         console.log('Login data:', res.data.responseContent);
+                        window.location.reload();
                     } else {
                         this.isLoginFailed = true;
                         this.loginFailMessage = "Incorrect username or password";
