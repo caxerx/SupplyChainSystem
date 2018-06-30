@@ -32,10 +32,6 @@
                     <v-btn icon class="mx-0" @click="viewItem(props.item)">
                         <v-icon color="blue">info</v-icon>
                     </v-btn>
-
-                    <v-btn icon class="mx-0" @click="createDeliveryNote(props.item)">
-                        <v-icon color="green">check</v-icon>
-                    </v-btn>
                 </td>
             </template>
 
@@ -114,11 +110,6 @@
             viewItem(item) {
                 this.selectedDeliveryNote = item;
                 this.isDetailDialogShown = true;
-            },
-            createDeliveryNote(item) {
-                this.$http.put('despatchinstruction', item.despatchInstructionId).then(res => {
-                    this.loadData();
-                });
             },
             getStatusName(status) {
                 switch (status) {
