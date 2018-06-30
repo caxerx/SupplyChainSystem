@@ -315,7 +315,7 @@
                                 access: [3]
                             }
                         ],
-                        access: [1]
+                        access: [1,3]
                     },
                     {
                         to: '/agreement',
