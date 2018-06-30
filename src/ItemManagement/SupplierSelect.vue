@@ -25,9 +25,6 @@
             <template slot="items" slot-scope="props">
                 <td>{{ props.item.supplierId }}</td>
                 <td>{{ props.item.supplierName }}</td>
-                <td>{{ props.item.supplierEmail }}</td>
-                <td>{{ props.item.supplierPhoneNumber }}</td>
-                <td>{{ props.item.supplierAddress }}</td>
                 <td>{{ props.item.supplierContactPerson }}</td>
                 <td class="layout px-0">
                     <v-btn icon class="mx-0" @click="selectItem(props.item)">
@@ -66,18 +63,6 @@
                     {
                         text: "Supplier Name",
                         value: "supplierName"
-                    },
-                    {
-                        text: "E-Mail",
-                        value: "supplierEmail"
-                    },
-                    {
-                        text: "Phone Number",
-                        value: "supplierPhoneNumber"
-                    },
-                    {
-                        text: "Address",
-                        value: "supplierAddress"
                     },
                     {
                         text: "Contact Person",
