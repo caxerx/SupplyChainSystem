@@ -197,14 +197,14 @@
             },
             save() {
                 if (this.editMode) {
-                    this.$http.put(`purchaserequest`, this.request, this.requestItems).then(res => {
+                    this.$http.put(`restaurantrequest`, this.request, this.requestItems).then(res => {
                         if (res.data.success) {
                             console.log('Request Item edited');
                             bus.$emit('saveRequestItem');
                         }
                     });
                 } else {
-                    this.$http.post('purchaserequest', this.requestItems).then(res => {
+                    this.$http.post('restaurantrequest', this.requestItems).then(res => {
                         if (res.data.success) {
                             console.log('Request sent');
                         }

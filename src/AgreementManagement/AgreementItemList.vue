@@ -51,7 +51,7 @@
                                                       readonly></v-text-field>
                                     </v-flex>
 
-                                    <v-flex class="px-3">
+                                    <v-flex class="px-3" xs6>
                                         <v-btn block @click.native="selectSupplier">Select Supplier</v-btn>
                                     </v-flex>
                                 </v-layout>

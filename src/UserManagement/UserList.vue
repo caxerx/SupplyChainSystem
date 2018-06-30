@@ -174,12 +174,12 @@
                     userName: "",
                     name: "",
                     password: "",
-                    userType: ""
+                    userType: -1
                 },
                 defaultItem: {
                     userName: "",
                     password: "",
-                    userType: ""
+                    userType: -1
                 },
                 drawer: true
             };
@@ -189,16 +189,14 @@
             formTitle() {
                 return this.editedIndex === -1 ? "New Item" : "Edit Item";
             },
-
-            watch() {
-                return {
-                    isEditDialogShown(val) {
-                        val || this.close();
-                    }
+        },
+        watch() {
+            return {
+                isEditDialogShown(val) {
+                    val || this.close();
                 }
             }
         },
-
         methods: {
             loadData() {
                 this.isLoadingData = true;
