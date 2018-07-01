@@ -303,7 +303,8 @@
                 this.isDetailDialogShown = false;
                 this.isConfirmDialogShown = false;
                 this.isEditDialogShown = false;
-                this.editedItem = {}
+                this.editedItem = {};
+                this.selected = [];
             },
             showDetails(item) {
                 this.detailItem = item;
