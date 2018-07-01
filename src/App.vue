@@ -429,9 +429,10 @@
                         divider: true
                     },
                     {
-                        to: '/setting',
-                        icon: 'settings',
-                        text: 'Settings'
+                        to: '/announcement',
+                        icon: 'notification_important',
+                        text: 'Announcement',
+                        access: [0]
                     },
                     {
                         to: '/about',

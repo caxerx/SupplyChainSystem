@@ -30,7 +30,7 @@ import SupplierManagement from './SupplierManagement'
 import PurchaseOrderManagement from './PurchaseOrderManagement'
 import LogisticManagement from './LogisticManagement'
 import UserManagement from './UserManagement.vue'
-import Settings from './Settings.vue'
+import Announcement from './Announcement.vue'
 import About from './About.vue'
 
 // Sub routes
@@ -184,9 +184,9 @@ const routes = [
         ]
     },
     {
-        path: '/setting',
-        name: 'Settings',
-        component: Settings
+        path: '/announcement',
+        name: 'Announcement',
+        component: Announcement
     },
     {
         path: '/about',
@@ -211,7 +211,7 @@ const store = new Vuex.Store({
             // User data end
             token: '', // Token of api auth
             // Server settings
-            serverUrl: 'https://sapi.caxerx.com/api',
+            serverUrl: 'http://127.0.0.1:55564/api',
             rowPerPage: [15, 30, 60, {text: 'All', value: -1}],
             // Error Dialog
             isErrorDialogShown: false,

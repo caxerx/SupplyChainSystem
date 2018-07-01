@@ -22,7 +22,7 @@
                                     Status:
                                 </v-list-tile-content>
                                 <v-list-tile-content class="align-end">
-                                    {{ status }}
+                                    {{ this.deliveryNote.deliveryStatus }}
                                 </v-list-tile-content>
                             </v-list-tile>
                             <v-list-tile>
@@ -106,18 +106,6 @@
                         value: 'quantity'
                     }
                 ]
-            }
-        },
-        computed: {
-            status() {
-                switch (this.deliveryNote.deliveryStatus) {
-                    case 0:
-                        return 'Delivering';
-                    case 1:
-                        return 'Received';
-                    default:
-                        return 'Unknown';
-                }
             }
         },
         props: ['deliveryNote']

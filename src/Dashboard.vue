@@ -13,33 +13,35 @@
                     </v-card-title>
                 </v-card>
 
-                <v-card class="my-2">
-                    <v-card-title primary-title>
-                        <div>
-                            <div class="headline">Title</div>
-                            <span class="grey--text">1234-48-48 23:33</span>
-                        </div>
-                    </v-card-title>
+                <div v-for="announcement in announcements">
+                    <v-card class="my-2">
 
-                    <v-card-text>
-                        Plz
+                        <v-card-title primary-title>
+                            <div>
+                                <div class="headline">{{announcement.data.title}}</div>
+                                <span class="grey--text">{{announcement.createTime.replace('T',' ')}}</span>
+                            </div>
+                        </v-card-title>
+
+                        <v-divider/>
+
+                        <v-card-text style="white-space: pre-wrap;">{{announcement.data.message}}</v-card-text>
+
+                        <v-divider/>
+                        <v-card-text>
+                            <span class="grey--text">Post Until: {{announcement.data.removalTime.replace('T',' ')}}</span>
+                        </v-card-text>
+                    </v-card>
+                </div>
 
 
-                        <br/>
-                        <br/>
-                        <span class="grey--text">Post Until: 1234-48-48 23:33</span>
-                    </v-card-text>
-
-                </v-card>
-
-
-                <v-alert
-                        :value="true"
-                        color="black"
-                        icon="info"
-                        outline
+                <v-alert v-if="announcements.length==0"
+                         :value="true"
+                         color="black"
+                         icon="info"
+                         outline
                 >
-                    No Data
+                    No Announcement
                 </v-alert>
             </v-flex>
         </v-layout>
@@ -48,7 +50,29 @@
 
 <script>
     export default {
-        name: "Dashboard"
+        name: "Dashboard",
+        created() {
+            this.$http.get('announcement').then(res => {
+                setTimeout(() => {
+                    this.isLoadingData = false;
+                }, 300);
+                if (res.data.success) {
+                    this.announcements = res.data.responseContent;
+                    this.announcements = this.announcements.filter(p => this.myUserType == 999 || p.data.target.includes(this.myUserType));
+                    console.log(res.data.responseContent);
+                }
+            });
+        },
+        data() {
+            return {
+                announcements: []
+            }
+        },
+        computed: {
+            myUserType() {
+                return this.$store.state.userType;
+            }
+        }
     }
 </script>
 
