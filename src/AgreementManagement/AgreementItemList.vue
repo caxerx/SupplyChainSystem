@@ -27,9 +27,15 @@
                             </v-flex>
                             <v-flex xs4 class="px-3">
                                 <h3>Currency and Supplier</h3>
-                                <v-text-field label="Currency" required
+                                <v-text-field label="Currency"
                                               prepend-icon="attach_money"
-                                              v-model="currency"></v-text-field>
+                                              v-model="currency"
+                                              :error-messages="currencyError"
+                                              required
+                                              @input="$v.currency.$touch()"
+                                              @blur="$v.currency.$touch()"
+                                              @chage="$v.currency.$touch()"
+                                ></v-text-field>
 
 
                                 <!--
@@ -48,7 +54,13 @@
                                         <v-text-field prepend-icon="shopping_basket" label="Supplier Id"
                                                       required
                                                       v-model="supplierId"
-                                                      readonly></v-text-field>
+                                                      readonly
+                                                      :error-messages="supplierIdError"
+                                                      required
+                                                      @input="$v.supplierId.$touch()"
+                                                      @blur="$v.supplierId.$touch()"
+                                                      @chage="$v.supplierId.$touch()"
+                                        ></v-text-field>
                                     </v-flex>
 
                                     <v-flex class="px-3" xs6>
@@ -78,6 +90,12 @@
                                             label="Start Date"
                                             prepend-icon="event"
                                             readonly
+
+                                            :error-messages="startDateError"
+                                            required
+                                            @input="$v.startDate.$touch()"
+                                            @blur="$v.startDate.$touch()"
+                                            @chage="$v.startDate.$touch()"
                                     ></v-text-field>
                                     <v-date-picker v-model="startDate"
                                                    @input="$refs.startDateMenu.save(date)"></v-date-picker>
@@ -101,6 +119,12 @@
                                             label="Expiry Date"
                                             prepend-icon="event"
                                             readonly
+
+                                            :error-messages="expiryDateError"
+                                            required
+                                            @input="$v.expiryDate.$touch()"
+                                            @blur="$v.expiryDate.$touch()"
+                                            @chage="$v.expiryDate.$touch()"
                                     ></v-text-field>
                                     <v-date-picker v-model="expiryDate"
                                                    @input="$refs.expiryDateMenu.save(date)"></v-date-picker>
@@ -140,7 +164,8 @@
                                         </v-flex>
                                         <v-flex xs8>
                                             <v-text-field label="Amount" v-model="details.amountAgreed"
-                                                          type="number"></v-text-field>
+                                                          type="number" min="1"
+                                            ></v-text-field>
                                         </v-flex>
                                     </v-layout>
                                 </template>
@@ -178,7 +203,8 @@
                                         </v-flex>
                                         <v-flex xs8>
                                             <v-text-field label="Period" v-model="details.period"
-                                                          type="number"></v-text-field>
+                                                          type="number"
+                                            ></v-text-field>
                                         </v-flex>
                                     </v-layout>
                                     <v-layout row>
@@ -187,7 +213,8 @@
                                         </v-flex>
                                         <v-flex xs8>
                                             <v-select v-model="details.timeUnit" :items="timeUnit" item-text="text"
-                                                      item-value="code" label="Time Unit"></v-select>
+                                                      item-value="code" label="Time Unit"
+                                            ></v-select>
                                         </v-flex>
                                     </v-layout>
                                 </template>
@@ -318,7 +345,7 @@
     import moment from "moment"
 
     import {validationMixin} from 'vuelidate'
-    import {required, minLength} from 'vuelidate/lib/validators'
+    import {required, minValue} from 'vuelidate/lib/validators'
 
     export default {
         name: "AgreementItemList",
@@ -341,6 +368,9 @@
                 component.step = 1;
                 component.agreementId = '';
                 component.agreementItems = [];
+                component.editMode = false;
+                console.log("stepper data cleared.");
+                this.$v.$reset();
             });
 
             bus.$on('editAgreementStepperData', (data) => {
@@ -393,6 +423,7 @@
                         component.agreementItems = data.plannedPurchaseAgreementLines;
                 }
                 component.step = 1;
+                this.$v.$reset();
             });
 
             bus.$on(this.selectChannel, (data) => {
@@ -410,6 +441,18 @@
         validations: {
             agreementType: {
                 required
+            },
+            currency: {
+                required
+            },
+            supplierId: {
+                required
+            },
+            startDate: {
+                required
+            },
+            expiryDate: {
+                required
             }
         },
         data() {
@@ -424,7 +467,7 @@
 
                 search: '',
                 date: '',
-                step: 0,
+                step: 1,
                 isLoadingData: false,
                 supplierItemHeaders: [
                     {
@@ -493,18 +536,49 @@
             }
         },
         computed: {
-            filteredSupplierItems() {
-                return this.supplierItems.filter(supp => supp.supplierId === this.supplierId);
+            step1Invalid() {
+                this.$v.agreementType.$touch();
+                this.$v.currency.$touch();
+                this.$v.supplierId.$touch();
+                this.$v.startDate.$touch();
+                this.$v.expiryDate.$touch();
+                return this.$v.currency.$invalid || this.$v.supplierId.$invalid || this.$v.startDate.$invalid || this.$v.expiryDate.$invalid || this.$v.agreementType.$invalid;
             },
             agreementTypeError() {
                 const errors = [];
                 if (!this.$v.agreementType.$dirty) return errors;
                 !this.$v.agreementType.required && errors.push('Agreement Type is required');
                 return errors
+            },
+            currencyError() {
+                const errors = [];
+                if (!this.$v.currency.$dirty) return errors;
+                !this.$v.currency.required && errors.push('Currency is required');
+                return errors
+            },
+            supplierIdError() {
+                const errors = [];
+                if (!this.$v.supplierId.$dirty) return errors;
+                !this.$v.supplierId.required && errors.push('Supplier Id is required');
+                return errors
+            },
+            startDateError() {
+                const errors = [];
+                if (!this.$v.startDate.$dirty) return errors;
+                !this.$v.startDate.required && errors.push('Start Date is required');
+                return errors
+            },
+            expiryDateError() {
+                const errors = [];
+                if (!this.$v.expiryDate.$dirty) return errors;
+                !this.$v.expiryDate.required && errors.push('Expiry Date is required');
+                return errors
+            },
+            filteredSupplierItems() {
+                return this.supplierItems.filter(supp => supp.supplierId === this.supplierId);
             }
         },
         methods: {
-
             selectSupplier() {
                 this.isSupplierDialogShown = true;
             },
@@ -572,8 +646,9 @@
                 this.$v.$reset();
             },
             nextStep() {
-                this.$v.$touch();
-                if (this.$v.$invalid) return;
+                if (this.step === 1 && this.step1Invalid) {
+                    return;
+                }
                 this.step++;
             }
         }

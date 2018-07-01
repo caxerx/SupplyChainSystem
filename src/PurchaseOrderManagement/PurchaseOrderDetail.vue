@@ -46,7 +46,7 @@
                                     Status:
                                 </v-list-tile-content>
                                 <v-list-tile-content class="align-end">
-                                    {{ purchaseOrderStatusName }}
+                                    {{ purchaseOrder.purchaseOrderStatus }}
                                 </v-list-tile-content>
                             </v-list-tile>
                         </v-list>
@@ -169,20 +169,6 @@
                         value: 'quantity'
                     }
                 ],
-            }
-        },
-        computed: {
-            purchaseOrderStatusName() {
-                switch (this.purchaseOrder.purchaseOrderStatus) {
-                    case 0:
-                        return "Ordered";
-                    case 1:
-                        return "Received";
-                    case 2:
-                        return "Paid";
-                    default:
-                        return "Unknown";
-                }
             }
         },
         watch: {

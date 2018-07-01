@@ -105,6 +105,10 @@
                 component.isDetailDialogShown = false;
             });
         },
+        beforeDestroy() {
+            bus.$off('saveRequestItem');
+            bus.$off('requestListEditRequest');
+        },
         data() {
             return {
                 pagination: {'sortBy': 'requestId', 'descending': true, 'rowsPerPage': 5},
@@ -223,7 +227,7 @@
                         req.map(x => {
                             x.virtualItemId = x.requestVirtualItemId;
                         });
-                        bus.$emit('requestListEditRequest', req);
+                        //bus.$emit('requestListEditRequest', req);
                         this.isEditDialogShown = true;
                     }
                 });

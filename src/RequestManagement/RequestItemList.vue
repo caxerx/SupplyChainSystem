@@ -103,7 +103,7 @@
                 component.requestItems = [];
             });
         },
-        destroyed() {
+        beforeDestroy() {
             bus.$off('editRequestItem');
             bus.$off('resetRequestItem');
         },

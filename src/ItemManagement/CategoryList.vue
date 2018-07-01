@@ -61,7 +61,13 @@
                                 <v-subheader>Category Name</v-subheader>
                             </v-flex>
                             <v-flex xs8>
-                                <v-text-field v-model="editedItem.categoryName" label="Category Name"></v-text-field>
+                                <v-text-field v-model="editedItem.categoryName" label="Category Name"
+                                              :error-messages="categoryNameError"
+                                              required
+                                              @input="$v.fvCategoryName.$touch()"
+                                              @blur="$v.fvCategoryName.$touch()"
+                                              @change="$v.fvCategoryName.$touch()"
+                                ></v-text-field>
                             </v-flex>
                         </v-layout>
                     </v-container>
@@ -100,6 +106,8 @@
 
 <script>
     import CategoryItemList from "./CategoryItemList";
+    import {validationMixin} from 'vuelidate'
+    import {required, minValue} from 'vuelidate/lib/validators'
 
     export default {
         name: "CategoryList",
@@ -107,8 +115,15 @@
         created() {
             this.loadData();
         },
+        validations: {
+            fvCategoryName: {
+                required
+            }
+        },
         data() {
             return {
+                mixins: [validationMixin],
+
                 search: '',
                 isLoadingData: false, //Loading state
                 isEditDialogShown: false, //Edit dialog
@@ -159,7 +174,16 @@
             },
             isRequired() {
                 return this.editedItem === -1;
-            }
+            },
+            fvCategoryName() {
+                return this.editedItem.categoryName;
+            },
+            categoryNameError() {
+                const errors = [];
+                if (!this.$v.fvCategoryName.$dirty) return errors;
+                !this.$v.fvCategoryName.required && errors.push('Virtual Item Id is required');
+                return errors
+            },
         },
 
         methods: {
@@ -206,6 +230,8 @@
             },
 
             close() {
+                this.$v.$reset();
+
                 this.isEditDialogShown = false;
                 setTimeout(() => {
                     this.editedItem = Object.assign({}, this.defaultItem);
@@ -214,6 +240,8 @@
             },
 
             save() {
+                this.$v.$touch();
+                if (this.$v.$invalid) return;
                 if (this.editedIndex > -1) {
                     this.$http.put('category', this.editedItem.categoryId, this.editedItem).then(res => {
                         console.log(res);

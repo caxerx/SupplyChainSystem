@@ -211,7 +211,7 @@ const store = new Vuex.Store({
             // User data end
             token: '', // Token of api auth
             // Server settings
-            serverUrl: 'https://sapi.caxerx.com/api',
+            serverUrl: 'http://127.0.0.1:55564/api',
             rowPerPage: [15, 30, 60, {text: 'All', value: -1}],
             // Error Dialog
             isErrorDialogShown: false,

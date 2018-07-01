@@ -125,10 +125,9 @@
         <!-- Delivered Confirm Dialog start -->
         <v-dialog v-model="isDeliveredDialogShown" max-width="420">
             <v-card>
-                <v-card-title class="headline">Cancel Request</v-card-title>
+                <v-card-title class="headline">Confirm Request</v-card-title>
                 <v-card-text>Are you sure the delivered goods and quantity is correct?<br/> Order will sent to
-                    Accounting
-                    Department after confirm.
+                    Accounting Department after confirm.
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
@@ -163,6 +162,10 @@
                 component.editItem(component.requests.find(i => i.requestId === component.selectedRequest));
                 component.isDetailDialogShown = false;
             });
+        },
+        beforeDestroy() {
+            bus.$off('saveRequestItem');
+            bus.$off('requestListEditRequest');
         },
         data() {
             return {

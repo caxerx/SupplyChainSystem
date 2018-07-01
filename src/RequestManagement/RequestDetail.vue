@@ -31,6 +31,103 @@
                         </v-list>
                     </v-card>
 
+                    <v-card class="mt-2" v-if="requestDetail.requestMap">
+                        <v-card-title>
+                            <h4>Delivery Summary</h4>
+                        </v-card-title>
+                        <v-divider></v-divider>
+                        <v-list dense>
+                            <v-list-tile>
+                                <v-list-tile-content>Delivery Type:</v-list-tile-content>
+                                <v-list-tile-content class="align-end">{{ mapType }}
+                                </v-list-tile-content>
+                            </v-list-tile>
+
+                            <div v-if="requestDetail.requestMap.mapType==0">
+                                <v-list-tile>
+                                    <v-list-tile-content>Order On:</v-list-tile-content>
+                                    <v-list-tile-content class="align-end">{{
+                                        requestDetail.blanketRelease.createTime.replace('T',' ') }}
+                                    </v-list-tile-content>
+                                </v-list-tile>
+                                <v-list-tile>
+                                    <v-list-tile-content>Supplier:</v-list-tile-content>
+                                    <v-list-tile-content class="align-end">{{
+                                        requestDetail.requestMap.agreement.supplier.supplierName }}
+                                    </v-list-tile-content>
+                                </v-list-tile>
+                                <v-list-tile>
+                                    <v-list-tile-content>Order Id:</v-list-tile-content>
+                                    <v-list-tile-content class="align-end">{{
+                                        requestDetail.blanketRelease.orderId }}
+                                    </v-list-tile-content>
+                                </v-list-tile>
+                            </div>
+
+
+                            <div v-if="requestDetail.requestMap.mapType==1">
+                                <v-list-tile>
+                                    <v-list-tile-content>Order On:</v-list-tile-content>
+                                    <v-list-tile-content class="align-end">{{
+                                        requestDetail.standardPurchaseOrder.createTime.replace('T',' ') }}
+                                    </v-list-tile-content>
+                                </v-list-tile>
+
+                                <v-list-tile>
+                                    <v-list-tile-content>Supplier:</v-list-tile-content>
+                                    <v-list-tile-content class="align-end">{{
+                                        requestDetail.requestMap.agreement.supplier.supplierName }}
+                                    </v-list-tile-content>
+                                </v-list-tile>
+                                <v-list-tile>
+                                    <v-list-tile-content>Order Id:</v-list-tile-content>
+                                    <v-list-tile-content class="align-end">{{
+                                        requestDetail.standardPurchaseOrder.orderId }}
+                                    </v-list-tile-content>
+                                </v-list-tile>
+                            </div>
+
+
+                            <div v-if="requestDetail.requestMap.mapType==2">
+                                <v-list-tile v-if="requestDetail.despatchInstruction.despatchInstructionStatus==1">
+                                    <v-list-tile-content>Delivery Note Id:</v-list-tile-content>
+                                    <v-list-tile-content class="align-end">{{ requestDetail.deliveryNote.deliveryNoteId
+                                        }}
+                                    </v-list-tile-content>
+                                </v-list-tile>
+
+                                <v-list-tile v-if="requestDetail.despatchInstruction.despatchInstructionStatus==0">
+                                    <v-list-tile-content>Update On:</v-list-tile-content>
+                                    <v-list-tile-content class="align-end">{{
+                                        requestDetail.despatchInstruction.createTime.replace('T',' ') }}
+                                    </v-list-tile-content>
+                                </v-list-tile>
+
+                                <div v-if="requestDetail.despatchInstruction.despatchInstructionStatus==1">
+
+
+                                    <v-list-tile>
+                                        <v-list-tile-content>Update On:</v-list-tile-content>
+                                        <v-list-tile-content class="align-end">{{
+                                            requestDetail.deliveryNote.createTime.replace('T',' ') }}
+                                        </v-list-tile-content>
+                                    </v-list-tile>
+
+                                    <v-list-tile>
+                                        <v-list-tile-content>Delivery On:</v-list-tile-content>
+                                        <v-list-tile-content class="align-end">{{
+                                            requestDetail.deliveryNote.createTime.replace('T',' ') }}
+                                        </v-list-tile-content>
+                                    </v-list-tile>
+
+                                </div>
+                            </div>
+
+
+                        </v-list>
+                    </v-card>
+
+
                 </v-flex>
                 <v-flex xs8>
                     <!-- Table toolbar start -->
@@ -74,6 +171,9 @@
             bus.$on('refreshRequestDetail', () => {
                 component.loadData();
             });
+        },
+        beforeDestroy() {
+            bus.$off('refreshRequestDetail');
         },
         props: ['request'],
         data() {
@@ -127,6 +227,16 @@
             }
         },
         computed: {
+            mapType() {
+                switch (this.requestDetail.requestMap.mapType) {
+                    case 0:
+                        return "Blanket Release";
+                    case 1:
+                        return "Standard Purchase Order";
+                    case 2:
+                        return "Warehouse";
+                }
+            },
             requestStatusName() {
                 switch (this.requestDetail.requestStatus) {
                     case -2:

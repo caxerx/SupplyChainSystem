@@ -164,7 +164,8 @@
                     {code: 1, text: "Restaurant Manager"},
                     {code: 2, text: "Category Manager"},
                     {code: 3, text: "Purchase Manager"},
-                    {code: 4, text: "Warehouse Clerk"}
+                    {code: 4, text: "Warehouse Clerk"},
+                    {code: 5, text: "Accounting Manager"}
                 ],
                 users: [], // User data from AJAX calls
                 editedIndex: -1, // -1 means it is a new Item
@@ -190,11 +191,9 @@
                 return this.editedIndex === -1 ? "New Item" : "Edit Item";
             },
         },
-        watch() {
-            return {
-                isEditDialogShown(val) {
-                    val || this.close();
-                }
+        watch: {
+            isEditDialogShown(val) {
+                val || this.close();
             }
         },
         methods: {
@@ -280,6 +279,8 @@
                         return "Purchase Manager";
                     case "4":
                         return "Warehouse Clerk";
+                    case "5":
+                        return "Accounting Manager";
                     case "999":
                         return "Debug user";
                     default:

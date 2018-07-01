@@ -71,18 +71,42 @@
                 </v-toolbar-title>
                 <v-spacer></v-spacer>
 
-                <v-badge color="red" overlap v-model="$store.state.devMode">
-                    <span slot="badge">1</span>
-                    <v-tooltip bottom>
-                        <v-btn icon slot="activator">
-                            <v-icon>notifications</v-icon>
-                        </v-btn>
-                        <span>Notifications</span>
-                    </v-tooltip>
 
+                <template>
+                    <div class="text-xs-center">
 
+                        <v-menu offset-y max-height="400px">
+                            <v-btn icon slot="activator">
+                                <v-badge color="red" overlap>
+                                    <span slot="badge" v-if="notifications.length>0">{{notifications.length}}</span>
+                                    <v-icon>notifications</v-icon>
+                                </v-badge>
+                            </v-btn>
 
-                </v-badge>
+                            <v-list two-line subheader v-if="notifications.length>0">
+                                <v-subheader>Notifications
+                                    <v-spacer/>
+
+                                    <v-chip @click.native="clearNotification">
+                                        Clear
+                                    </v-chip>
+
+                                </v-subheader>
+                                <v-list-tile
+                                        v-for="noti in notifications"
+                                        @click=""
+                                >
+                                    <v-list-tile-content>
+                                        <v-list-tile-title>{{ noti.title }}</v-list-tile-title>
+                                        <v-list-tile-sub-title>{{ noti.time }}</v-list-tile-sub-title>
+                                    </v-list-tile-content>
+
+                                </v-list-tile>
+                            </v-list>
+                        </v-menu>
+                    </div>
+                </template>
+
 
                 <!-- Avatar icon menu start -->
                 <v-menu offset-y>
@@ -234,15 +258,23 @@
                 .build();
             connection.start().catch(err => console.error(err.toString()));
             connection.on("ReceiveMessage", (user, message) => {
-                if (this.$store.state.userType === 4 || this.$store.state.userType === 999) {
-                    this.notificationMessage = message;
-                    this.snackbar = true;
+                if (user == "Warehouse" && (this.$store.state.userType === 4 || this.$store.state.userType === 999)) {
+                    this.notifyMessage(message);
+                }
+
+                if (user == "Purchase" && (this.$store.state.userType === 3 || this.$store.state.userType === 999)) {
+                    this.notifyMessage(message);
+                }
+
+                if (user == "All") {
+                    this.notifyMessage(message);
                 }
             });
-
         },
         data() {
             return {
+                notificationClosed: "test",
+                notifications: [],
                 isReady: false,
                 snackbar: false,
                 notificationMessage: '',
@@ -263,7 +295,7 @@
                         icon: 'category',
                         text: 'Item Management',
                         model: false,
-                        access: [1, 2, 3,4],
+                        access: [1, 2, 3, 4],
                         children:
                             [
                                 {
@@ -284,7 +316,7 @@
                                 {
                                     text: 'Stock',
                                     to: '/item/stock',
-                                    access: [1,4]
+                                    access: [1, 4]
                                 },
                                 {
                                     text: 'Category',
@@ -315,7 +347,7 @@
                                 access: [3]
                             }
                         ],
-                        access: [1,3]
+                        access: [1, 3]
                     },
                     {
                         to: '/agreement',
@@ -361,18 +393,21 @@
                         children: [
                             {
                                 to: '/purchaseorder/blanketpurchaseorder',
-                                text: 'Blanket Purchase Order'
+                                text: 'Blanket Purchase Order',
+                                access: [3, 5]
                             },
                             {
                                 to: '/purchaseorder/standardpurchaseorder',
-                                text: 'Standard Purchase Order'
+                                text: 'Standard Purchase Order',
+                                access: [3]
                             },
                             {
                                 to: '/purchaseorder/scheduledrelease',
-                                text: 'Scheduled Release'
+                                text: 'Scheduled Release',
+                                access: [3]
                             }
                         ],
-                        access: [3]
+                        access: [3, 5]
                     },
                     {
                         to: '/logistic',
@@ -388,7 +423,7 @@
                                 text: 'Delivery Notes'
                             }
                         ],
-                        access: [3,4]
+                        access: [3, 4]
                     },
                     {
                         divider: true
@@ -443,6 +478,14 @@
             }
         },
         methods: {
+            clearNotification() {
+                this.notifications = [];
+            },
+            notifyMessage(message) {
+                this.notificationMessage = message;
+                this.notifications.push({time: moment().format('hh:mm'), title: message});
+                this.snackbar = true;
+            },
             updateTime() {
                 this.datetime = moment().format('DD MMM, Y hh:mm:ss');
             },
@@ -497,6 +540,11 @@
             },
             isAccessible(access) {
                 return access.includes(Number.parseInt(this.$store.state.userType)) || access.includes(-1);
+            }
+        },
+        watch: {
+            returnValue() {
+                console.log("show")
             }
         }
     }

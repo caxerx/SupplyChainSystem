@@ -63,7 +63,11 @@
                                 </v-flex>
                                 <v-flex xs8>
                                     <v-text-field v-model="editedItem.quantity" type="number"
-                                                  label="Quantity" min="1"></v-text-field>
+                                                  label="Quantity" min="1"
+                                                  :error-messages="itemQuantityError"
+                                                  required
+                                                  @change="$v.fvQuantity.$touch()"
+                                                  @blur="$v.fvQuantity.$touch()"></v-text-field>
                                 </v-flex>
                             </v-layout>
                         </template>
@@ -75,6 +79,11 @@
                                 </v-flex>
                                 <v-flex xs4>
                                     <v-text-field v-model="editedItem.virtualItemId" label="Virtual Item Id"
+                                                  :error-messages="itemIdError"
+                                                  required
+                                                  @input="$v.fvItemId.$touch()"
+                                                  @blur="$v.fvItemId.$touch()"
+                                                  @change="$v.fvItemId.$touch()"
                                                   readonly></v-text-field>
                                 </v-flex>
                                 <v-flex xs4 class="pl-3">
@@ -87,7 +96,12 @@
                                 </v-flex>
                                 <v-flex xs8>
                                     <v-text-field v-model="editedItem.quantity" type="number" min="1"
-                                                  label="Quantity"></v-text-field>
+                                                  label="Quantity"
+                                                  :error-messages="itemQuantityError"
+                                                  required
+                                                  @change="$v.fvQuantity.$touch()"
+                                                  @blur="$v.fvQuantity.$touch()"
+                                    ></v-text-field>
                                 </v-flex>
                             </v-layout>
                         </template>
@@ -130,11 +144,13 @@
 <script>
     import {bus} from "../main";
     import VirtualItemSelect from "./VirtualItemSelect";
+    import {validationMixin} from 'vuelidate'
+    import {required, minValue} from 'vuelidate/lib/validators'
 
     export default {
         name: "StockItemList",
         components: {VirtualItemSelect},
-        beforeDestroy(){
+        beforeDestroy() {
             bus.$off(this.selectChannel)
         },
         created() {
@@ -146,8 +162,19 @@
                 component.isItemDialogShown = false;
             });
         },
+        validations: {
+            fvItemId: {
+                required
+            },
+            fvQuantity: {
+                required,
+                minValue: minValue(1)
+            }
+        },
         data() {
             return {
+
+                mixins: [validationMixin],
                 selectChannel: 'stockItemSelect',
                 search: '',
                 isLoadingData: false, //Loading state
@@ -199,6 +226,25 @@
             },
             isRequired() {
                 return this.editedItem === -1;
+            },
+            fvItemId() {
+                return this.editedItem.virtualItemId;
+            },
+            fvQuantity() {
+                return this.editedItem.quantity;
+            },
+            itemIdError() {
+                const errors = [];
+                if (!this.$v.fvItemId.$dirty) return errors;
+                !this.$v.fvItemId.required && errors.push('Virtual Item Id is required');
+                return errors
+            },
+            itemQuantityError() {
+                const errors = [];
+                if (!this.$v.fvQuantity.$dirty) return errors;
+                !this.$v.fvQuantity.required && errors.push('Quantity is required');
+                !this.$v.fvQuantity.minValue && errors.push('Quantity must equal or greater than 1');
+                return errors
             }
         },
         props: ['stock'],
@@ -270,6 +316,8 @@
             },
 
             close() {
+                this.$v.$reset();
+
                 this.isEditDialogShown = false;
                 setTimeout(() => {
                     this.editedItem = Object.assign({}, this.defaultItem);
@@ -278,6 +326,8 @@
             },
 
             save() {
+                this.$v.$touch();
+                if (this.$v.$invalid) return;
                 if (this.editedIndex > -1) {
                     this.$http.put('stockitem', this.stock, this.editedItem).then(res => {
                         console.log(res);

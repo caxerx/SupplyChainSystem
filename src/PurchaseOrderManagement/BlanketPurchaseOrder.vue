@@ -40,6 +40,12 @@
                     <v-btn icon class="mx-0" @click.native="viewDetail(props.item)">
                         <v-icon color="blue">info</v-icon>
                     </v-btn>
+
+                    <v-btn icon class="mx-0" @click="pay(props.item)" v-if="userCanPay"
+                           :disabled="!orderCanPay(props.item)">
+                        <v-icon color="green">check</v-icon>
+                    </v-btn>
+
                 </td>
             </template>
             <template slot="no-data">
@@ -52,6 +58,20 @@
         <v-dialog v-model="isDetailDialogShown" max-width="1200">
             <v-card>
                 <purchase-order-detail :purchase-order="selectedPurchaseOrder"></purchase-order-detail>
+            </v-card>
+        </v-dialog>
+
+
+        <v-dialog v-model="isPayDialogShown" max-width="420">
+            <v-card>
+                <v-card-title class="headline">Pay Order</v-card-title>
+                <v-card-text>Are you sure to paid the Purchase Order? Amount of the order will pay to supplier.<br/>
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="green darken-1" flat @click.native="cancel">Cancel</v-btn>
+                    <v-btn color="green darken-1" flat @click.native="confirmPay">Confirm</v-btn>
+                </v-card-actions>
             </v-card>
         </v-dialog>
 
@@ -69,11 +89,13 @@
         },
         data() {
             return {
+                isPayDialogShown: false,
                 search: '',
                 isLoadingData: false,
                 isDetailDialogShown: false,
                 pagination: {'sortBy': 'orderId', 'descending': true, 'rowsPerPage': 5},
                 selectedPurchaseOrder: {},
+                selectedPurchaseOrderId: 0,
                 headers: [
                     {
                         text: 'Id',
@@ -103,7 +125,11 @@
                 purchaseOrders: []
             }
         },
-
+        computed: {
+            userCanPay() {
+                return this.$store.state.userType == 5 || this.$store.state.userType == 999
+            }
+        },
         methods: {
             loadData() {
                 this.isLoadingData = true;
@@ -120,6 +146,24 @@
             viewDetail(item) {
                 this.selectedPurchaseOrder = item;
                 this.isDetailDialogShown = true;
+            },
+            orderCanPay(item) {
+                return item.purchaseOrderStatus == "Received";
+            },
+            pay(item) {
+                this.selectedPurchaseOrderId = item.orderId;
+                this.isPayDialogShown = true;
+            },
+            confirmPay() {
+                this.$http.put("blanketpurchaseorder", this.selectedPurchaseOrderId, {purchaseOrderStatus: 2}).then(res => {
+                    if (res.data.success) {
+                        this.loadData();
+                    }
+                });
+                this.isPayDialogShown = false;
+            },
+            cancel() {
+                this.isPayDialogShown = false;
             },
             getStatusName(status) {
                 switch (status) {
