@@ -257,6 +257,13 @@
                 .configureLogging(LogLevel.Information)
                 .build();
             connection.start().catch(err => console.error(err.toString()));
+
+            //ReceiveAnnouncement
+            connection.on("ReceiveAnnouncement", (user, message) => {
+                if (this.$store.state.userType === 999 || user.includes(this.$store.state.userType)) {
+                    this.notifyMessage(message);
+                }
+            });
             connection.on("ReceiveMessage", (user, message) => {
                 if (user == "Warehouse" && (this.$store.state.userType === 4 || this.$store.state.userType === 999)) {
                     this.notifyMessage(message);
