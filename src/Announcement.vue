@@ -199,6 +199,9 @@
         watch: {
             isEditDialogShown(val) {
                 val || this.close();
+            },
+            selected() {
+                this.lvSelect();
             }
         },
         data() {
@@ -289,7 +292,7 @@
                 this.isEditDialogShown = true;
             },
             save() {
-                this.editedItem.target = this.lvSelect;
+                this.editedItem.target = this.lvSelect();
                 console.log(this.editedItem);
                 this.$http.post('announcement', this.editedItem).then(res => {
                     console.log(res);
@@ -311,16 +314,16 @@
                 this.isDetailDialogShown = true;
             },
             userType(item) {
-                return this.userTypes.find(p => p.code == item).text;
-            }
-        }, computed: {
+                return this.userTypes.find(p => p.code === item).text;
+            },
             lvSelect() {
                 let filtered = [];
                 for (let i of this.selected) {
-                    if (i.code) {
+                    if (i.code != undefined && i.code != null) {
                         filtered.push(i.code)
                     }
                 }
+
                 return filtered;
             }
         }
