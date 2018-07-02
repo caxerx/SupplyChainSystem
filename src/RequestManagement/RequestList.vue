@@ -82,8 +82,8 @@
                                :disabled="!canConfirmRequest(props.item)">
                             <v-icon color="green">check</v-icon>
                         </v-btn>
-                        <span v-if="canConfirmRequest(props.item)">Received Confirm</span>
-                        <span v-else>Request already not processed or finished</span>
+                        <span v-if="canConfirmRequest(props.item)">Confirm Delivery</span>
+                        <span v-else>Request canceled or finished already</span>
                     </v-tooltip>
 
                 </td>

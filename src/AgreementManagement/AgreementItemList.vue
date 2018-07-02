@@ -237,6 +237,7 @@
                                         <v-toolbar dark color="primary" class="elevation-0">
                                             <v-toolbar-title class="white--text">Items</v-toolbar-title>
                                             <v-text-field
+                                                    hide-details
                                                     flat
                                                     solo-inverted
                                                     prepend-icon="search"
@@ -271,6 +272,7 @@
                                         <v-toolbar dark color="primary" class="elevation-0">
                                             <v-toolbar-title class="white--text">Agreement Item List</v-toolbar-title>
                                             <v-text-field
+                                                    hide-details
                                                     flat
                                                     solo-inverted
                                                     prepend-icon="search"
@@ -598,7 +600,7 @@
                 this.agreementItems.push(item);
             },
             deleteItem(item) {
-                this.agreementItems.splice(this.agreementItems[this.agreementItems.indexOf(item), 1]);
+                this.agreementItems.splice(this.agreementItems[this.agreementItems.indexOf(item)], 1);
             },
             submit() {
                 if (this.editMode) {
