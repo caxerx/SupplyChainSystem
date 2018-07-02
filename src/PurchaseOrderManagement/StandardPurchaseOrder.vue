@@ -4,6 +4,7 @@
         <v-toolbar dark color="primary" class="elevation-0">
             <v-toolbar-title class="white--text">Standard Purchase Order List</v-toolbar-title>
             <v-text-field
+                    hide-details
                     flat
                     solo-inverted
                     prepend-icon="search"

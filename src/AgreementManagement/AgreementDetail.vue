@@ -126,6 +126,7 @@
                         <v-toolbar dark color="primary" class="elevation-0">
                             <v-toolbar-title class="white--text">BPA Lines</v-toolbar-title>
                             <v-text-field
+                                    hide-details
                                     flat
                                     solo-inverted
                                     prepend-icon="search"
@@ -159,6 +160,7 @@
                         <v-toolbar dark color="primary" class="elevation-0">
                             <v-toolbar-title class="white--text">CPA Lines</v-toolbar-title>
                             <v-text-field
+                                    hide-details
                                     flat
                                     solo-inverted
                                     prepend-icon="search"
@@ -188,6 +190,7 @@
                         <v-toolbar dark color="primary" class="elevation-0">
                             <v-toolbar-title class="white--text">PPA Lines</v-toolbar-title>
                             <v-text-field
+                                    hide-details
                                     flat
                                     solo-inverted
                                     prepend-icon="search"
