@@ -260,20 +260,25 @@
 
             //ReceiveAnnouncement
             connection.on("ReceiveAnnouncement", (user, message) => {
+                console.log(`ReceiveAnnouncement: ${user} ${message}`);
                 if (this.$store.state.userType === 999 || user.includes(this.$store.state.userType)) {
                     this.notifyMessage(message);
                 }
             });
             connection.on("ReceiveMessage", (user, message) => {
-                if (user == "Warehouse" && (this.$store.state.userType === 4 || this.$store.state.userType === 999)) {
+                console.log(`${user} -> ReceiveMessage: ${message}`);
+                if (user == "Warehouse" && (this.$store.state.userType == 4 || this.$store.state.userType == 999)) {
+                    console.log("notify sent");
                     this.notifyMessage(message);
                 }
 
-                if (user == "Purchase" && (this.$store.state.userType === 3 || this.$store.state.userType === 999)) {
+                if (user == "Purchase" && (this.$store.state.userType == 3 || this.$store.state.userType == 999)) {
+                    console.log("notify sent");
                     this.notifyMessage(message);
                 }
 
                 if (user == "All") {
+                    console.log("notify sent");
                     this.notifyMessage(message);
                 }
             });
