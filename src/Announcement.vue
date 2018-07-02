@@ -4,11 +4,12 @@
         <h1 class="display-1 primary--text mb-3">Announcement</h1>
         <!-- Page title end -->
 
-        <v-container>
+        <div>
             <!-- Table toolbar start -->
             <v-toolbar dark color="primary" class="elevation-0" :clipped-left="$vuetify.breakpoint.lgAndUp">
                 <v-toolbar-title class="white--text">Announcement List</v-toolbar-title>
                 <v-text-field
+                        hide-details
                         flat
                         solo-inverted
                         prepend-icon="search"
@@ -49,144 +50,141 @@
                 </template>
             </v-data-table>
             <!-- Table end -->
-        </v-container>
+        </div>
 
-        <v-container>
-
-            <!-- Edit Dialog start -->
-            <v-dialog v-model="isEditDialogShown" max-width="1000px">
-                <v-card>
-                    <v-card-title>
-                        <span class="headline">Create Announcement</span>
-                    </v-card-title>
-                    <v-card-text>
-                        <v-container fluid>
-                            <v-layout row>
-                                <v-flex xs2>
-                                    <v-subheader>Title</v-subheader>
-                                </v-flex>
-                                <v-flex xs10>
-                                    <v-text-field v-model="editedItem.title" label="Title"></v-text-field>
-                                </v-flex>
-                            </v-layout>
+        <!-- Edit Dialog start -->
+        <v-dialog v-model="isEditDialogShown" max-width="1000px">
+            <v-card>
+                <v-card-title>
+                    <span class="headline">Create Announcement</span>
+                </v-card-title>
+                <v-card-text>
+                    <v-container fluid>
+                        <v-layout row>
+                            <v-flex xs2>
+                                <v-subheader>Title</v-subheader>
+                            </v-flex>
+                            <v-flex xs10>
+                                <v-text-field v-model="editedItem.title" label="Title"></v-text-field>
+                            </v-flex>
+                        </v-layout>
 
 
-                            <v-layout row>
+                        <v-layout row>
 
-                                <v-flex xs2>
-                                    <v-subheader>Removal Date</v-subheader>
-                                </v-flex>
-                                <v-flex xs10>
-                                    <v-menu
-                                            ref="removalDateMenu"
-                                            :close-on-content-click="false"
-                                            v-model="removalDateMenu"
-                                            :nudge-right="40"
-                                            :return-value.sync="date"
-                                            lazy
-                                            transition="scale-transition"
-                                            offset-y
-                                            full-width
-                                            min-width="290px"
-                                    >
-                                        <v-text-field
-                                                slot="activator"
-                                                v-model="editedItem.removalTime"
-                                                label="Removal Date"
-                                                readonly
-                                        ></v-text-field>
+                            <v-flex xs2>
+                                <v-subheader>Removal Date</v-subheader>
+                            </v-flex>
+                            <v-flex xs10>
+                                <v-menu
+                                        ref="removalDateMenu"
+                                        :close-on-content-click="false"
+                                        v-model="removalDateMenu"
+                                        :nudge-right="40"
+                                        :return-value.sync="date"
+                                        lazy
+                                        transition="scale-transition"
+                                        offset-y
+                                        full-width
+                                        min-width="290px"
+                                >
+                                    <v-text-field
+                                            slot="activator"
+                                            v-model="editedItem.removalTime"
+                                            label="Removal Date"
+                                            readonly
+                                    ></v-text-field>
 
-                                        <v-date-picker v-model="editedItem.removalTime"></v-date-picker>
+                                    <v-date-picker v-model="editedItem.removalTime"></v-date-picker>
 
-                                    </v-menu>
-                                </v-flex>
+                                </v-menu>
+                            </v-flex>
 
-                            </v-layout>
+                        </v-layout>
 
-                            <v-layout row>
-                                <v-flex xs2>
-                                    <v-subheader>Message</v-subheader>
-                                </v-flex>
+                        <v-layout row>
+                            <v-flex xs2>
+                                <v-subheader>Message</v-subheader>
+                            </v-flex>
 
-                                <v-flex xs10>
-                                    <v-textarea v-model="editedItem.message" label="Message" rows="12"></v-textarea>
-                                </v-flex>
-                            </v-layout>
+                            <v-flex xs10>
+                                <v-textarea v-model="editedItem.message" label="Message" rows="12"></v-textarea>
+                            </v-flex>
+                        </v-layout>
 
 
-                            <v-layout row>
-                                <v-flex xs2>
-                                    <v-subheader>Target</v-subheader>
-                                </v-flex>
-                                <v-flex xs10>
-                                    <v-combobox
-                                            clearable
-                                            v-model="selected"
-                                            :items="userTypes"
-                                            label="User Type"
-                                            multiple
-                                            chips
-                                    ></v-combobox>
-                                    <!--
-                                    {{lvSelect}}
-                                    <v-text-field v-model="editedItem.userType"
-                                                  label="User Type"></v-text-field>
-                                                  -->
-                                </v-flex>
-                            </v-layout>
-                        </v-container>
-                    </v-card-text>
-                    <v-card-actions>
-                        <v-spacer></v-spacer>
-                        <v-btn color="blue darken-1" flat @click.native="close">Cancel</v-btn>
-                        <v-btn color="blue darken-1" flat @click.native="save">Save</v-btn>
-                    </v-card-actions>
-                </v-card>
-            </v-dialog>
-            <!-- Edit Dialog end -->
+                        <v-layout row>
+                            <v-flex xs2>
+                                <v-subheader>Target</v-subheader>
+                            </v-flex>
+                            <v-flex xs10>
+                                <v-combobox
+                                        clearable
+                                        v-model="selected"
+                                        :items="userTypes"
+                                        label="User Type"
+                                        multiple
+                                        chips
+                                ></v-combobox>
+                                <!--
+                                {{lvSelect}}
+                                <v-text-field v-model="editedItem.userType"
+                                              label="User Type"></v-text-field>
+                                              -->
+                            </v-flex>
+                        </v-layout>
+                    </v-container>
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="blue darken-1" flat @click.native="close">Cancel</v-btn>
+                    <v-btn color="blue darken-1" flat @click.native="save">Save</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+        <!-- Edit Dialog end -->
 
-            <!-- Delete Confirm Dialog start -->
-            <v-dialog v-model="isConfirmDialogShown" max-width="290">
-                <v-card>
-                    <v-card-title class="headline">Delete Item</v-card-title>
-                    <v-card-text>Are you sure to delete this item? This action is irreversible.
-                    </v-card-text>
-                    <v-card-actions>
-                        <v-spacer></v-spacer>
-                        <v-btn color="green darken-1" flat @click.native="close">Cancel</v-btn>
-                        <v-btn color="green darken-1" flat @click.native="delAnnounce">Confirm</v-btn>
-                    </v-card-actions>
-                </v-card>
-            </v-dialog>
-            <!-- Delete Confirm Dialog start -->
+        <!-- Delete Confirm Dialog start -->
+        <v-dialog v-model="isConfirmDialogShown" max-width="290">
+            <v-card>
+                <v-card-title class="headline">Delete Item</v-card-title>
+                <v-card-text>Are you sure to delete this item? This action is irreversible.
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="green darken-1" flat @click.native="close">Cancel</v-btn>
+                    <v-btn color="green darken-1" flat @click.native="delAnnounce">Confirm</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+        <!-- Delete Confirm Dialog start -->
 
-            <v-dialog v-model="isDetailDialogShown" max-width="800">
-                <v-card>
-                    <v-card-title>
+        <v-dialog v-model="isDetailDialogShown" max-width="800">
+            <v-card>
+                <v-card-title>
 
+                    <div>
+                        <div class="headline">{{detailItem.data.title}}</div>
+                        <span class="grey--text">Post on: {{detailItem.createTime.replace('T',' ')}}</span>
+                        <br/>
+                        <span class="grey--text">Remove on: {{detailItem.data.removalTime.replace('T',' ')}}</span>
                         <div>
-                            <div class="headline">{{detailItem.data.title}}</div>
-                            <span class="grey--text">Post on: {{detailItem.createTime.replace('T',' ')}}</span>
-                            <br/>
-                            <span class="grey--text">Remove on: {{detailItem.data.removalTime.replace('T',' ')}}</span>
-                            <div>
                                 <span class="text-xs-center" v-for="item in detailItem.data.target">
                                     <v-chip>{{userType(item)}}</v-chip>
                                 </span>
-                            </div>
                         </div>
-                    </v-card-title>
-                    <v-divider/>
-                    <v-card-text style="white-space: pre-wrap;">{{detailItem.data.message}}</v-card-text>
-                    <v-divider/>
-                    <v-card-actions>
-                        <v-spacer></v-spacer>
-                        <v-btn color="green darken-1" flat @click.native="close">Close</v-btn>
-                    </v-card-actions>
-                </v-card>
-            </v-dialog>
+                    </div>
+                </v-card-title>
+                <v-divider/>
+                <v-card-text style="white-space: pre-wrap;">{{detailItem.data.message}}</v-card-text>
+                <v-divider/>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="green darken-1" flat @click.native="close">Close</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
 
-        </v-container>
     </v-container>
 </template>
 

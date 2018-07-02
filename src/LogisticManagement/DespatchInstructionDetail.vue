@@ -19,6 +19,14 @@
                             </v-list-tile>
                             <v-list-tile>
                                 <v-list-tile-content>
+                                    Status:
+                                </v-list-tile-content>
+                                <v-list-tile-content class="align-end">
+                                    {{ status }}
+                                </v-list-tile-content>
+                            </v-list-tile>
+                            <v-list-tile>
+                                <v-list-tile-content>
                                     Restaurant Name:
                                 </v-list-tile-content>
                                 <v-list-tile-content class="align-end">
@@ -33,14 +41,6 @@
                                     {{ despatchInstruction.request.restaurant.restaurantLocation }}
                                 </v-list-tile-content>
                             </v-list-tile>
-                            <v-list-tile>
-                                <v-list-tile-content>
-                                    Status:
-                                </v-list-tile-content>
-                                <v-list-tile-content class="align-end">
-                                    {{ status }}
-                                </v-list-tile-content>
-                            </v-list-tile>
                         </v-list>
                     </v-card>
                 </v-flex>
@@ -51,6 +51,7 @@
                     <v-toolbar dark color="primary" class="elevation-0">
                         <v-toolbar-title class="white--text">Request Item List</v-toolbar-title>
                         <v-text-field
+                                hide-details
                                 flat
                                 solo-inverted
                                 prepend-icon="search"
