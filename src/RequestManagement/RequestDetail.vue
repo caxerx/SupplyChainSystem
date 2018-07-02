@@ -258,10 +258,11 @@
                 }
             },
             canEditRequest() {
-                if (this.$store.state.userType == 1 && (this.requestDetail.requestStatus != 0 && this.requestDetail.requestStatus != -2)) {
+                if (this.$store.state.userType == 1 && ((this.requestDetail.requestStatus != 0 && this.requestDetail.requestStatus != -2) || this.$store.state.userId != this.requestDetail.requestCreator)) {
                     return false;
                 }
                 return true;
+
             }
         }
 
