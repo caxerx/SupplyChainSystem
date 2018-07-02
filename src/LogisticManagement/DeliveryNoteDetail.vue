@@ -37,10 +37,10 @@
                                 <v-list-tile-content>
                                     Restaurant Location:
                                 </v-list-tile-content>
-                                <v-list-tile-content class="align-end loc">
-                                    {{ deliveryNote.request.restaurant.restaurantLocation }}
-                                </v-list-tile-content>
                             </v-list-tile>
+                            <div class="align-end loc">
+                                {{ deliveryNote.request.restaurant.restaurantLocation }}
+                            </div>
                         </v-list>
                     </v-card>
                 </v-flex>
@@ -115,8 +115,9 @@
 
 <style scoped>
     .loc {
-        text-align: end;
-        height: 100px;
+        margin-top: -30px;
+        padding: 10px 15px;
         white-space: pre-line;
+        text-align: end;
     }
 </style>

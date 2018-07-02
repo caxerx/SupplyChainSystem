@@ -34,13 +34,21 @@
                 <td>{{ props.item.restaurantTypeName }}</td>
                 <td>{{ props.item.stockId }}</td>
                 <td class="layout px-0">
-                    <v-btn icon class="mx-0" @click="viewItem(props.item)" v-if="canEditStock">
-                        <v-icon color="blue">category</v-icon>
-                    </v-btn>
-                    <template v-if="[999,0].includes($store.state.userType)">
-                        <v-btn icon class="mx-0" @click="viewManager(props.item)">
-                            <v-icon color="orange">account_circle</v-icon>
+                    <v-tooltip top>
+                        <v-btn slot="activator" icon class="mx-0" @click="viewItem(props.item)" v-if="canEditStock">
+                            <v-icon color="blue">category</v-icon>
                         </v-btn>
+                        <span>Stock</span>
+                    </v-tooltip>
+
+                    <template v-if="[999,0].includes($store.state.userType)">
+                        <v-tooltip top>
+                            <v-btn slot="activator" icon class="mx-0" @click="viewManager(props.item)">
+                                <v-icon color="orange">account_circle</v-icon>
+                            </v-btn>
+                            <span>Manager</span>
+                        </v-tooltip>
+
                         <v-btn icon class="mx-0" @click="editItem(props.item)">
                             <v-icon color="teal">edit</v-icon>
                         </v-btn>
